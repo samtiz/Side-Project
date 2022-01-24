@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BasicActivity() {
     private lateinit var mFirebaseAuth: FirebaseAuth            // Firebase certification
     private lateinit var mDatabaseReference: DatabaseReference  // Firebase real time database
     private lateinit var mEtEmail: EditText                     // email text
