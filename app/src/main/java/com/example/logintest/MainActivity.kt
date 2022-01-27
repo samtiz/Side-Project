@@ -33,6 +33,7 @@ class MainActivity : BasicActivity() {
         val btnAdd: FloatingActionButton = findViewById(R.id.btn_add)
         btnAdd.setOnClickListener {
             val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
+            intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
             startActivity(intent2)
         }
     }

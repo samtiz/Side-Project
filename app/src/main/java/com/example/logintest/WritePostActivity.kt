@@ -8,12 +8,12 @@ import android.text.SpannableStringBuilder
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.RangeSlider
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,11 +31,21 @@ class WritePostActivity: BasicActivity() {
     private lateinit var mTxtTimeWarning: TextView
     private lateinit var mEtMainText: EditText
     private lateinit var mBtnPost: Button
+    private lateinit var mDatabaseReference: DatabaseReference  // Firebase real time database
+
+    private var uid: String? = null
+    private var minCost: Int? = null
+    private var maxCost: Int? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_write_post)
-        
+
+        if (intent.hasExtra("uid")) {
+            uid = intent.getStringExtra("uid")
+        }
+
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
         
         mEtFoodCategory = findViewById(R.id.edit_category)
         mBtnFoodCategory = findViewById(R.id.btn_category)
@@ -74,15 +84,31 @@ class WritePostActivity: BasicActivity() {
         mCostSlider.addOnSliderTouchListener(rangeSliderTouchListener)
 
         mBtnPost.setOnClickListener {
-            val intent = Intent(this@WritePostActivity, MainActivity::class.java)
-            startActivity(intent)
-            finish()
+            if (mEtFoodCategory.text.isBlank() || mEtRestaurantName.text.isBlank() || mEtTime.text.isBlank()) {
+                Toast.makeText(this@WritePostActivity, "음식 카테고리, 음식점, 만료시간을 모두 설정해주세요", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                val post = Post()
+                post.foodCategory = mEtFoodCategory.text.toString()
+                post.restaurantName = mEtRestaurantName.text.toString()
+                post.minDeliveryFee = minCost
+                post.maxDeliveryFee = maxCost
+                post.mainText = mEtMainText.text.toString()
+                post.timeLimit = mEtTime.text.toString()
+
+                uid?.let { it1 -> mDatabaseReference.child("Post").child(it1).setValue(post) }
+
+                val intent = Intent(this@WritePostActivity, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+
         }
 
         mBtnTime.setOnClickListener {
             val cal = Calendar.getInstance()
             val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hour, minute ->
-                val timeString = "${hour}시 ${minute}분"
+                val timeString = "${hour}:${minute}"
                 mEtTime.setText(timeString)
             }
             TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),true).show()
@@ -91,13 +117,10 @@ class WritePostActivity: BasicActivity() {
     }
 
     private val rangeSliderTouchListener: RangeSlider.OnSliderTouchListener = object : RangeSlider.OnSliderTouchListener {
-        override fun onStartTrackingTouch(slider: RangeSlider) {
-
-        }
-
+        override fun onStartTrackingTouch(slider: RangeSlider) {}
         override fun onStopTrackingTouch(slider: RangeSlider) {
-            val minCost = mCostSlider.values[0].toInt()
-            val maxCost = mCostSlider.values[1].toInt()
+            minCost = mCostSlider.values[0].toInt()
+            maxCost = mCostSlider.values[1].toInt()
             mTxtSelectedFee.text = "$minCost 원 ~ $maxCost 원"
         }
     }

@@ -15,6 +15,7 @@
         android:ems="10"
         android:gravity="start|top"
         android:hint="내용 (추가적인 사항을 적어주세요)"
+        android:textSize="17dp"
         android:inputType="textMultiLine"
         android:textColor="@color/black"
         android:lines="5"
