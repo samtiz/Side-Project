@@ -17,7 +17,7 @@ class ManageAccountActivity : BasicActivity() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_manageaccount)
+            setContentView(R.layout.activity_manage_account)
 
             mFirebaseAuth = FirebaseAuth.getInstance()
             mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")

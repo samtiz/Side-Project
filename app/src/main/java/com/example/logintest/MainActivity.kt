@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -29,5 +30,12 @@ class MainActivity : BasicActivity() {
             startActivity(intent)
         }
 
+        val btnAdd: FloatingActionButton = findViewById(R.id.btn_add)
+        btnAdd.setOnClickListener {
+            val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
+            startActivity(intent2)
+        }
     }
+
+
 }

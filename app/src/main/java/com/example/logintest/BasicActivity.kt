@@ -11,4 +11,3 @@ open class BasicActivity : AppCompatActivity() {
     }
 }
 
-
