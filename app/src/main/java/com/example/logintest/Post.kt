@@ -10,4 +10,5 @@ class Post {
     var mainText: String? = null
     var uid: String? = null
 
+    class User (val name : String? = null, val profileImageUrl : String? = null, val pid : String? = null)
 }
