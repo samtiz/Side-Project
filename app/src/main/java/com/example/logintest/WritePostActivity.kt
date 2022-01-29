@@ -38,6 +38,9 @@ class WritePostActivity: BasicActivity() {
     private var dorm: String? = null
     private var minCost: Int? = 1000
     private var maxCost: Int? = 4000
+
+    private val selectedItems = ArrayList<Int>()
+    val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발/보쌈", "찜/탕", "구이", "피자", "중식", "일식", "회/해물", "양식", "커피/차", "디저트", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽")
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +100,14 @@ class WritePostActivity: BasicActivity() {
             }
             else {
                 val post = Post()
-                post.foodCategory = mEtFoodCategory.text.toString()
+                val categoryList = ArrayList<String>()
+                for (i in selectedItems) {
+                    categoryList.add(foods[i])
+                }
+                while (categoryList.size < 4) {
+                    categoryList.add("")
+                }
+                post.foodCategories = categoryList
                 post.restaurantName = mEtRestaurantName.text.toString()
                 post.minDeliveryFee = minCost
                 post.maxDeliveryFee = maxCost
@@ -142,9 +152,8 @@ class WritePostActivity: BasicActivity() {
         }
     }
 
-    private val selectedItems = ArrayList<Int>()
+
     fun showFoodCategoryDialog(view: View) {
-        val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발/보쌈", "찜/탕", "구이", "피자", "중식", "일식", "회/해물", "양식", "커피/차", "디저트", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽")
         MaterialAlertDialogBuilder(this).setTitle("배달 카테고리 모두 선택").setMultiChoiceItems(foods, null,  DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
             if (isChecked) {
                 // If the user checked the item, add it to the selected items
@@ -158,7 +167,7 @@ class WritePostActivity: BasicActivity() {
                         selectedFoodCategory += foods[i]
                         selectedFoodCategory += " "
                     }
-                    mEtFoodCategory.setText(selectedFoodCategory)
+                    mEtFoodCategory.setText(selectedFoodCategory.trim())
                 }.setNeutralButton("취소") { _, _ ->  }.show()
 
     }

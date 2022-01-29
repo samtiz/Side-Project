@@ -1,15 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/txt_restaurantName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
         android:text="TextView"
-        tools:layout_editor_absoluteX="40dp"
-        tools:layout_editor_absoluteY="38dp" />
+        android:textSize="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txt_restaurantCategory1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="@+id/txt_restaurantName"
+        app:layout_constraintTop_toBottomOf="@+id/txt_restaurantName" />
+
+    <TextView
+        android:id="@+id/txt_restaurantCategory2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/txt_restaurantCategory1"
+        app:layout_constraintTop_toTopOf="@+id/txt_restaurantCategory1" />
+
+    <TextView
+        android:id="@+id/txt_restaurantCategory3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/txt_restaurantCategory2"
+        app:layout_constraintTop_toTopOf="@+id/txt_restaurantCategory2" />
+
+    <TextView
+        android:id="@+id/txt_restaurantCategory4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/txt_restaurantCategory3"
+        app:layout_constraintTop_toTopOf="@+id/txt_restaurantCategory3" />
+
+    <TextView
+        android:id="@+id/txt_mainText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/txt_restaurantName"
+        app:layout_constraintTop_toBottomOf="@+id/txt_restaurantCategory1" />
+
+    <TextView
+        android:id="@+id/txt_dorm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_restaurantName"
+        app:layout_constraintStart_toEndOf="@+id/txt_restaurantName" />
+
+    <TextView
+        android:id="@+id/txt_timeLimit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_dorm"
+        app:layout_constraintStart_toEndOf="@+id/txt_dorm" />
+
+    <TextView
+        android:id="@+id/txt_deliveryFee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_timeLimit"
+        app:layout_constraintStart_toEndOf="@+id/txt_timeLimit" />
 </androidx.constraintlayout.widget.ConstraintLayout>
