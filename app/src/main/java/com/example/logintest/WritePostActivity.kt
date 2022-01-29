@@ -2,6 +2,7 @@ package com.example.logintest
 
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -12,10 +13,10 @@ import android.widget.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.RangeSlider
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class WritePostActivity: BasicActivity() {
 
@@ -34,8 +35,9 @@ class WritePostActivity: BasicActivity() {
     private lateinit var mDatabaseReference: DatabaseReference  // Firebase real time database
 
     private var uid: String? = null
-    private var minCost: Int? = null
-    private var maxCost: Int? = null
+    private var dorm: String? = null
+    private var minCost: Int? = 1000
+    private var maxCost: Int? = 4000
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +48,6 @@ class WritePostActivity: BasicActivity() {
         }
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
-        
         mEtFoodCategory = findViewById(R.id.edit_category)
         mBtnFoodCategory = findViewById(R.id.btn_category)
         mEtRestaurantName = findViewById(R.id.edit_restaurant_name)
@@ -83,9 +84,16 @@ class WritePostActivity: BasicActivity() {
 
         mCostSlider.addOnSliderTouchListener(rangeSliderTouchListener)
 
+        mDatabaseReference.child("UserAccount").child(uid!!).child("dorm").get().addOnSuccessListener {
+            dorm = it.value.toString()
+        }.addOnFailureListener {
+            Toast.makeText(this@WritePostActivity, "get() dorm failed", Toast.LENGTH_SHORT).show()
+        }
+
+
         mBtnPost.setOnClickListener {
             if (mEtFoodCategory.text.isBlank() || mEtRestaurantName.text.isBlank() || mEtTime.text.isBlank()) {
-                Toast.makeText(this@WritePostActivity, "음식 카테고리, 음식점, 만료시간을 모두 설정해주세요", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@WritePostActivity, "음식 카테고리, 음식점, 모집만료시간을 모두 설정해주세요", Toast.LENGTH_SHORT).show()
             }
             else {
                 val post = Post()
@@ -95,8 +103,17 @@ class WritePostActivity: BasicActivity() {
                 post.maxDeliveryFee = maxCost
                 post.mainText = mEtMainText.text.toString()
                 post.timeLimit = mEtTime.text.toString()
+                post.uid = uid
+                post.dorm = dorm
 
-                uid?.let { it1 -> mDatabaseReference.child("Post").child(it1).setValue(post) }
+                val key = mDatabaseReference.child("Post").push().key
+                if (key == null) {
+                    Toast.makeText(this@WritePostActivity, "게시를 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    Toast.makeText(this@WritePostActivity, "게시물을 올렸습니다.", Toast.LENGTH_SHORT).show()
+                    mDatabaseReference.child("Post").child(key).setValue(post)
+                }
 
                 val intent = Intent(this@WritePostActivity, MainActivity::class.java)
                 startActivity(intent)
@@ -125,16 +142,24 @@ class WritePostActivity: BasicActivity() {
         }
     }
 
-    var selectedItemIndex = 0
+    private val selectedItems = ArrayList<Int>()
     fun showFoodCategoryDialog(view: View) {
-        val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발/보쌈", "찜/탕", "구이", "피자", "중식", "일식", "회/해물", "양식", "커피/차", "디저트", "간식", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽", "프렌차이즈")
-        var selectedFoodCategory = foods[selectedItemIndex]
-        MaterialAlertDialogBuilder(this).setTitle("배달 카테고리 선택").setSingleChoiceItems(foods, selectedItemIndex) { _, which ->
-            selectedItemIndex = which
-            selectedFoodCategory = foods[which]
-        }.setPositiveButton("확인") { _, _ ->
-            mEtFoodCategory.setText(selectedFoodCategory)
-        }.setNeutralButton("취소") { _, _ ->  }.show()
+        val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발/보쌈", "찜/탕", "구이", "피자", "중식", "일식", "회/해물", "양식", "커피/차", "디저트", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽")
+        MaterialAlertDialogBuilder(this).setTitle("배달 카테고리 모두 선택").setMultiChoiceItems(foods, null,  DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
+            if (isChecked) {
+                // If the user checked the item, add it to the selected items
+                selectedItems.add(which)
+            } else if (selectedItems.contains(which)) {
+                // Else, if the item is already in the array, remove it
+                selectedItems.remove(which)
+            }}).setPositiveButton("확인") { _, _ ->
+                    var selectedFoodCategory: String = ""
+                    for (i in selectedItems) {
+                        selectedFoodCategory += foods[i]
+                        selectedFoodCategory += " "
+                    }
+                    mEtFoodCategory.setText(selectedFoodCategory)
+                }.setNeutralButton("취소") { _, _ ->  }.show()
 
     }
 

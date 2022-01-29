@@ -32,6 +32,9 @@ class MainActivity : BasicActivity() {
 
         val btnAdd: FloatingActionButton = findViewById(R.id.btn_add)
         btnAdd.setOnClickListener {
+            // 자신이 쓴 게시글 있는지 확인하는 코드 추가해야함
+            //mDatabaseReference.child("Post")
+
             val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
             intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
             startActivity(intent2)
