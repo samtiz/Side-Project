@@ -40,7 +40,7 @@ class WritePostActivity: BasicActivity() {
     private var maxCost: Int? = 4000
 
     private val selectedItems = ArrayList<Int>()
-    val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발/보쌈", "찜/탕", "구이", "피자", "중식", "일식", "회/해물", "양식", "커피/차", "디저트", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽")
+    private val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발·보쌈", "찜·탕", "구이", "피자", "중식", "일식", "회·해물", "양식", "커피·차", "디저트", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽")
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,6 +98,9 @@ class WritePostActivity: BasicActivity() {
             if (mEtFoodCategory.text.isBlank() || mEtRestaurantName.text.isBlank() || mEtTime.text.isBlank()) {
                 Toast.makeText(this@WritePostActivity, "음식 카테고리, 음식점, 모집만료시간을 모두 설정해주세요", Toast.LENGTH_SHORT).show()
             }
+            else if (mEtFoodCategory.text.split(' ').size > 4) {
+                Toast.makeText(this@WritePostActivity, "음식 카테고리는 최대 4개까지만 설정 가능합니다.", Toast.LENGTH_SHORT).show()
+            }
             else {
                 val post = Post()
                 val categoryList = ArrayList<String>()
@@ -121,8 +124,14 @@ class WritePostActivity: BasicActivity() {
                     Toast.makeText(this@WritePostActivity, "게시를 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                 }
                 else {
-                    Toast.makeText(this@WritePostActivity, "게시물을 올렸습니다.", Toast.LENGTH_SHORT).show()
+//                    카테고리마다 차일드 만드는 주석
+//                    for (category in categoryList) {
+//                        if (category != "") {
+//                            mDatabaseReference.child("${category}").child(key).setValue(post)
+//                        }
+//                    }
                     mDatabaseReference.child("Post").child(key).setValue(post)
+                    Toast.makeText(this@WritePostActivity, "게시물을 올렸습니다.", Toast.LENGTH_SHORT).show()
                 }
 
                 val intent = Intent(this@WritePostActivity, MainActivity::class.java)
@@ -154,6 +163,7 @@ class WritePostActivity: BasicActivity() {
 
 
     fun showFoodCategoryDialog(view: View) {
+        selectedItems.clear()
         MaterialAlertDialogBuilder(this).setTitle("배달 카테고리 모두 선택").setMultiChoiceItems(foods, null,  DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
             if (isChecked) {
                 // If the user checked the item, add it to the selected items

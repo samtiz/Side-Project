@@ -214,12 +214,21 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
+                android:id="@+id/btn_mealBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="도시락"
+                app:layout_constraintStart_toEndOf="@+id/btn_mexican"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
                 android:id="@+id/btn_jook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="죽"
-                app:layout_constraintStart_toEndOf="@+id/btn_mexican"
+                app:layout_constraintStart_toEndOf="@+id/btn_mealBox"
                 app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -292,7 +301,7 @@
         app:srcCompat="?android:attr/actionModeWebSearchDrawable" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/txt_subject"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="전체"

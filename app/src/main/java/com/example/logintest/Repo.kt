@@ -9,7 +9,7 @@ import com.google.firebase.database.ValueEventListener
 
 
 class Repo {
-    fun getData(): LiveData<MutableList<Post>> {
+    fun getData(category:String): LiveData<MutableList<Post>> {
         val mutableData = MutableLiveData<MutableList<Post>>()
         val myRef = FirebaseDatabase.getInstance().getReference("logintest/Post")
         myRef.addValueEventListener(object : ValueEventListener {
@@ -18,7 +18,10 @@ class Repo {
                 if (snapshot.exists()){
                     for (PostSnapshot in snapshot.children){
                         val getData = PostSnapshot.getValue(Post::class.java)
-                        listData.add(getData!!)
+                        if (category == "전체" || getData?.foodCategories?.contains(category)!!) {
+                            listData.add(getData!!)
+                        }
+
 
                         mutableData.value = listData
                     }

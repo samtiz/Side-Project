@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 
 class ListViewModel : ViewModel() {
     private val repo = Repo()
-    fun fetchData(): LiveData<MutableList<Post>> {
+    fun fetchData(category:String): LiveData<MutableList<Post>> {
         val mutableData = MutableLiveData<MutableList<Post>>()
-        repo.getData().observeForever{
+        repo.getData(category).observeForever{
             mutableData.value = it
         }
         return mutableData
     }
+
 }
