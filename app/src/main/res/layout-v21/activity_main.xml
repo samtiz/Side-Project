@@ -39,6 +39,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="전체"
+                android:tag="전체"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,6 +50,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="한식"
+                android:tag="한식"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_allCategory"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,6 +61,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="치킨"
+                android:tag = "치킨"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_korean"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -66,6 +72,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="분식"
+                android:tag ="분식"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_chicken"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -75,6 +83,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="돈까스"
+                android:tag="돈까스"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_boonsik"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -83,7 +93,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="족발/보쌈"
+                android:text="족발·보쌈"
+                android:tag="족발·보쌈"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_donkkas"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -92,7 +104,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="찜/탕"
+                android:text="찜·탕"
+                android:tag="찜·탕"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_jokbal"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -102,6 +116,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="구이"
+                android:tag ="구이"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_zzim"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -111,6 +127,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="피자"
+                android:tag="피자"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_roast"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -120,6 +138,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="중식"
+                android:tag="중식"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_pizza"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -129,6 +149,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="일식"
+                android:tag="일식"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_chinese"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -137,7 +159,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="회/해물"
+                android:text="회·해물"
+                android:tag="회·해물"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_japanese"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -147,6 +171,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="양식"
+                android:tag="양식"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_rawFish"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -155,7 +181,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="커피/차"
+                android:text="커피·차"
+                android:tag="커피·차"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_western"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -165,6 +193,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="디저트"
+                android:tag="디저트"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_coffee"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -174,6 +204,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="아시안"
+                android:tag="아시안"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_dessert"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -183,6 +215,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="샌드위치"
+                android:tag="샌드위치"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_asian"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -192,6 +226,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="샐러드"
+                android:tag="샐러드"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_sandwich"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -201,6 +237,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="버거"
+                android:tag="버거"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_salad"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -210,6 +248,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="멕시칸"
+                android:tag="멕시칸"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_burger"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -219,6 +259,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="도시락"
+                android:tag="도시락"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_mexican"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -228,6 +270,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="죽"
+                android:tag="죽"
+                android:onClick="changeListwithFoodCategory"
                 app:layout_constraintStart_toEndOf="@+id/btn_mealBox"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -254,10 +298,12 @@
                 android:layout_height="40dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginLeft="10dp"
-                android:text="가까운 건물만"
-                android:drawableRight="@android:drawable/ic_menu_more"
-                android:paddingRight="5dp"
+                android:layout_marginStart="10dp"
+                android:text="지역: 전체"
+                android:drawableEnd="@android:drawable/ic_menu_more"
+                android:paddingEnd="5dp"
+                android:paddingStart="15dp"
+                android:onClick="selectArea"
                 />
 
 
