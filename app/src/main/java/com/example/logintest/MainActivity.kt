@@ -11,11 +11,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
+import com.google.firebase.database.ktx.getValue
 import org.w3c.dom.Text
 
 class MainActivity : BasicActivity() {
@@ -47,18 +48,32 @@ class MainActivity : BasicActivity() {
             // 이걸로 받아오고싶은데 이러면 'Query'이고 내가 원하는건 Post 객체들 중 uid가 유저의 uid랑 같은 Post list인데 이걸 어케 하는지 모르겠음
             // val a = mDatabaseReference.child("Post").orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid)
 
+            //근데 데이터 구조 보다가 본건데 회원 정보는 realtime database가 아니라 storage에 넣어주는게 좋지 않을까
+            val sameUserPosts = ArrayList<Post>()
+            mDatabaseReference.child("Post").orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid).addListenerForSingleValueEvent(object :
+                    ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
+                }
 
-            // 그래서 그 리스트가 비었는지 확인하는 것으로 자신이 쓴 게시물이 있나 없나 확인하려하는 거임
-            //if (a != null) {
-            //    Toast.makeText(this@MainActivity, "${a.toString()}", Toast.LENGTH_SHORT).show()
-            //}
-            //else {
-            val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
-            intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
-            startActivity(intent2)
-           // }
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    //sameUserPosts.clear()
+                    for (data in snapshot.children){
+                        sameUserPosts.add(data.getValue<Post>()!!)
+                    }
+                    if (sameUserPosts.isEmpty()) {
+                        println(sameUserPosts.size)
+                        val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
+                        intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+                        startActivity(intent2)
+                    }else {
+                        //Toast.makeText(this@MainActivity, "${sameUserPosts.toString()}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
 
         }
+
 
         adapter = ListAdapter(this)
 
@@ -181,6 +196,19 @@ class MainActivity : BasicActivity() {
         }
 
 
+        val btnArea: Button = findViewById(R.id.btn_area)
+        btnArea.setOnClickListener {
+            var selectedItemIndex: Int = 0
+            val dormCategory = arrayOf("같은 건물만", "북측기숙사", "서측기숙사", "동측기숙사", "문지관", "화암관" )
+            var selectedDormCategory = dormCategory[selectedItemIndex]
+            MaterialAlertDialogBuilder(this).setTitle("기숙사 선택").setSingleChoiceItems(dormCategory, selectedItemIndex) { _, which ->
+                selectedItemIndex = which
+                selectedDormCategory = dormCategory[which]
+            }.setPositiveButton("확인") { _, _ ->
+                btnArea.setText(selectedDormCategory)
+            }.setNeutralButton("취소") { _, _ ->  }.show()
+        }
+
     }
 
     fun observerData(category:String){
@@ -189,6 +217,23 @@ class MainActivity : BasicActivity() {
             adapter.setListData(it)
             adapter.notifyDataSetChanged()
         })
+    }
+
+
+    fun isNorth(dorm: String): Boolean {
+        return dorm == "사랑관" || dorm == "소망관" || dorm == "성실관" || dorm == "진리관" || dorm == "아름관" || dorm == "신뢰관" || dorm == "지혜관"
+    }
+    fun isWest(dorm: String): Boolean {
+        return dorm == "갈릴레이관" || dorm == "여울/나들관" || dorm == "다솜/희망관" || dorm == "원내아파트" || dorm == "나래/미르관" || dorm == "나눔관"
+    }
+    fun isEast(dorm: String): Boolean {
+        return dorm == "세종관"
+    }
+    fun isMunji(dorm: String): Boolean {
+        return dorm == "문지관"
+    }
+    fun isHwaam(dorm: String): Boolean {
+        return dorm == "화암관"
     }
 
 
