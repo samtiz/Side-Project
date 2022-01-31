@@ -70,7 +70,7 @@ class MainActivity : BasicActivity() {
                 }
 
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    //sameUserPosts.clear()
+                    sameUserPosts.clear()
                     for (data in snapshot.children){
                         sameUserPosts.add(data.getValue<Post>()!!)
                     }

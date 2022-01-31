@@ -62,12 +62,15 @@
 
     <TextView
         android:id="@+id/txt_mainText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txt_restaurantCategory4"
         app:layout_constraintStart_toStartOf="@+id/txt_restaurantName"
         app:layout_constraintTop_toBottomOf="@+id/txt_dorm" />
 
