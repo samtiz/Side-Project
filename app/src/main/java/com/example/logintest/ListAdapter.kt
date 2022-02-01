@@ -1,11 +1,16 @@
 package com.example.logintest
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapter.ViewHolder>() {
     private var postList = mutableListOf<Post>()
@@ -30,6 +35,15 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         holder.dorm.text = post.dorm
         holder.timeLimit.text = post.timeLimit + "까지"
         holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
+
+        // 현태가 수정한 부분 ///
+        // 게시물을 클릭하면 채팅 activity로 넘어가게 함
+        holder.itemView.setOnClickListener{
+            val intent = Intent(context, MessageActivity::class.java)
+            intent.putExtra("postId", post.postId)
+            context?.startActivity(intent)
+        }
+        ////////////////////
     }
 
     override fun getItemCount(): Int {

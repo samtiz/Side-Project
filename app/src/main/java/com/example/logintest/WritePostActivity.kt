@@ -1,5 +1,6 @@
 package com.example.logintest
 
+import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -35,13 +36,18 @@ class WritePostActivity: BasicActivity() {
     private lateinit var mDatabaseReference: DatabaseReference  // Firebase real time database
 
     private var uid: String? = null
+
+    // 현태 수정 ///////
+    private var userName: String? = null
+    /////////////////
+
     private var dorm: String? = null
     private var minCost: Int? = 1000
     private var maxCost: Int? = 4000
 
     private val selectedItems = ArrayList<Int>()
     private val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발·보쌈", "찜·탕", "구이", "피자", "중식", "일식", "회·해물", "양식", "커피·차", "디저트", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽")
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_write_post)
@@ -87,6 +93,15 @@ class WritePostActivity: BasicActivity() {
 
         mCostSlider.addOnSliderTouchListener(rangeSliderTouchListener)
 
+        /// 현태 수정 ////////
+        // 현재 사용자 닉네임 받아오기
+        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
+            userName = it.value.toString()
+        }.addOnFailureListener {
+            Toast.makeText(this@WritePostActivity, "get() username failed", Toast.LENGTH_SHORT).show()
+        }
+        /////////////////////
+
         mDatabaseReference.child("UserAccount").child(uid!!).child("dorm").get().addOnSuccessListener {
             dorm = it.value.toString()
         }.addOnFailureListener {
@@ -120,6 +135,22 @@ class WritePostActivity: BasicActivity() {
                 post.dorm = dorm
 
                 val key = mDatabaseReference.child("Post").push().key
+
+                // 현태가 수정한 부분 //////
+                // post Id에 자동으로 부여된 게시물 id 넣기
+                post.postId = key
+                // post에 참여한 user hashmap에 현재 사용자 넣기
+                post.users.put(uid!!, userName!!)
+                //val userIdList = ArrayList<String>()
+                //userIdList.add(uid!!)
+                //post.usersId = userIdList
+
+                //val userNameSet = MutableSet<String>()
+                //userNameSet.add(userName!!)
+                //post.userName = userNameSet
+                ///////////////////////
+
+
                 if (key == null) {
                     Toast.makeText(this@WritePostActivity, "게시를 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                 }
@@ -152,6 +183,7 @@ class WritePostActivity: BasicActivity() {
 
     }
 
+    @SuppressLint("RestrictedApi")
     private val rangeSliderTouchListener: RangeSlider.OnSliderTouchListener = object : RangeSlider.OnSliderTouchListener {
         override fun onStartTrackingTouch(slider: RangeSlider) {}
         override fun onStopTrackingTouch(slider: RangeSlider) {

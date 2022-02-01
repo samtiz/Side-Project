@@ -95,7 +95,6 @@ class MainActivity : BasicActivity() {
 
         }
 
-
         adapter = ListAdapter(this)
 
         val recyclerView : RecyclerView = findViewById(R.id.recyclerView)
