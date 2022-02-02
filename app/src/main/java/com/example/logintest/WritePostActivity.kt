@@ -140,7 +140,7 @@ class WritePostActivity: BasicActivity() {
                 // post Id에 자동으로 부여된 게시물 id 넣기
                 post.postId = key
                 // post에 참여한 user hashmap에 현재 사용자 넣기
-                post.users.put(uid!!, userName!!)
+                post.users[uid!!] = userName!!
                 //val userIdList = ArrayList<String>()
                 //userIdList.add(uid!!)
                 //post.usersId = userIdList

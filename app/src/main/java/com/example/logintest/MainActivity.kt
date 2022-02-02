@@ -3,11 +3,10 @@ package com.example.logintest
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
 import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BasicActivity() {
 
@@ -30,6 +30,7 @@ class MainActivity : BasicActivity() {
     private var selectedFoodCategory: String? = null
     private var userLocation: String? = null
     private lateinit var btnArea: Button
+    private var searchText: String? = null
 
 
 
@@ -42,6 +43,10 @@ class MainActivity : BasicActivity() {
 
         selectedDormCategory = "전체"
         selectedFoodCategory = "전체"
+
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("dorm").get().addOnSuccessListener {
             userLocation = it.value.toString()
@@ -105,6 +110,7 @@ class MainActivity : BasicActivity() {
         txtSubject= findViewById(R.id.txt_subject)
         btnArea = findViewById(R.id.btn_area)
 
+
     }
 
     fun changeListwithFoodCategory(v: View) {
@@ -114,24 +120,48 @@ class MainActivity : BasicActivity() {
         txtSubject.text = foodCategory
     }
 
+
     fun observerData(){
         viewModel.fetchData(selectedFoodCategory, selectedDormCategory, userLocation).observe(this, Observer {
-            //Toast.makeText(this@MainActivity, "${it.size}개의 포스트 감지", Toast.LENGTH_SHORT).show()
             adapter.setListData(it)
+            adapter.filter.filter(searchText)
             adapter.notifyDataSetChanged()
         })
     }
 
     fun selectArea(view: View) {
         val dormCategory = arrayOf("전체", "같은 건물만", "북측기숙사", "서측기숙사", "동측기숙사", "문지캠", "화암캠" )
-        MaterialAlertDialogBuilder(this).setTitle("지역 선택").setItems(dormCategory, DialogInterface.OnClickListener { dialog, which ->
+        MaterialAlertDialogBuilder(this@MainActivity).setTitle("지역 선택").setItems(dormCategory) { dialog, which ->
             // The 'which' argument contains the index position
             // of the selected item
             selectedDormCategory = dormCategory[which]
             val obj: String = "지역: $selectedDormCategory"
             btnArea.text = obj
             observerData()
-        }).show()
+        }.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        val menuItem = menu?.findItem(R.id.action_search)
+        val searchView: SearchView = menuItem?.actionView as SearchView
+        searchView.onActionViewExpanded()
+        searchView.queryHint = "검색어를 입력하세요"
+
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter.filter(newText)
+                searchText = newText
+                return false
+            }
+        })
+        return super.onCreateOptionsMenu(menu)
+
     }
 
 }
