@@ -9,6 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Logintest">
+        <activity
+            android:name=".MessageActivity"
+            android:exported="false" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,14 +20,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".ManageAccountActivity"/>
-        <activity android:name=".BasicActivity"/>
-        <activity android:name=".WritePostActivity"/>
-
-
-
-
+        <activity android:name=".MainActivity" />
+        <activity android:name=".ManageAccountActivity" />
+        <activity android:name=".BasicActivity" />
+        <activity android:name=".WritePostActivity" />
     </application>
 
 </manifest>
