@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapter.ViewHolder>(), Filterable {
     private var postList = mutableListOf<Post>()
@@ -70,16 +72,21 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val charString = constraint?.toString() ?: ""
-                if (charString.isEmpty()) postListFiltered = postList else {
+                if (charString.isEmpty()) {
+                    postListFiltered = postList
+                }
+                else {
                     val filteredList = ArrayList<Post>()
-                    postList
+                    val temp = ArrayList<Post>()
+                    temp.addAll(postList)
+                    temp
                             .filter {
-                                (it.dorm?.contains(constraint!!))!! or
+//                                        (it.dorm?.contains(constraint!!, ignoreCase = true))!! or
 //                                        (it.foodCategories?.get(0)?.contains(constraint!!))!! or
 //                                        (it.foodCategories?.get(1)?.contains(constraint!!))!! or
 //                                        (it.foodCategories?.get(2)?.contains(constraint!!))!! or
 //                                        (it.foodCategories?.get(3)?.contains(constraint!!))!! or
-                                        (it.restaurantName?.contains(constraint!!))!!
+                                          (it.restaurantName?.contains(constraint!!, ignoreCase = true))!!
 
                             }
                             .forEach { filteredList.add(it) }

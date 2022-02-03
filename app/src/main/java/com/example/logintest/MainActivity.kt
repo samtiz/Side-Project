@@ -1,12 +1,22 @@
 package com.example.logintest
 
+import android.app.SearchManager
 import android.content.DialogInterface
 import android.content.Intent
+import android.database.Cursor
+import android.database.MatrixCursor
 import android.os.Bundle
+import android.provider.BaseColumns
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.MenuItemCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +41,8 @@ class MainActivity : BasicActivity() {
     private var userLocation: String? = null
     private lateinit var btnArea: Button
     private var searchText: String? = null
+    private var restaurantNameList: ArrayList<String?> = ArrayList() // 추천검색어용
+    private lateinit var suggestions: List<String?>
 
 
 
@@ -48,6 +60,8 @@ class MainActivity : BasicActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+
+        // userLocation 받아오기. 기본은 자기기숙사
         mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("dorm").get().addOnSuccessListener {
             userLocation = it.value.toString()
         }.addOnFailureListener {
@@ -103,9 +117,43 @@ class MainActivity : BasicActivity() {
         adapter = ListAdapter(this)
 
         val recyclerView : RecyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = WrapContentLinearLayoutManager(this@MainActivity) // recyclerView의 안정성을 위함
         recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
         recyclerView.adapter = adapter
-        observerData()
+        observerData() // 초기 데이터 가져오기
+        mDatabaseReference.child("Post").addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val temp = snapshot.getValue(Post::class.java)
+                if (temp != null) {
+                    restaurantNameList.add(temp.restaurantName)
+                }
+                suggestions = restaurantNameList.distinct()
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                // 빡치지만 이전 데이터를 가져올 수 없음. 수정 기능을 만들 때 데이터를 지우고 새 데이터를 추가할 것.
+                // 혹은 valueEventListener로 매번 restaurantNameList를 지우고 새로만들고 해도 되긴 한데... 별로지 않나..
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                val temp = snapshot.getValue(Post::class.java)
+                if (temp != null) {
+                    restaurantNameList.remove(temp.restaurantName)
+                }
+                suggestions = restaurantNameList.distinct()
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@MainActivity, "value listener of post dir failed", Toast.LENGTH_SHORT).show()
+            }
+
+        })
+
+
 
         txtSubject= findViewById(R.id.txt_subject)
         btnArea = findViewById(R.id.btn_area)
@@ -145,23 +193,90 @@ class MainActivity : BasicActivity() {
         menuInflater.inflate(R.menu.menu, menu)
         val menuItem = menu?.findItem(R.id.action_search)
         val searchView: SearchView = menuItem?.actionView as SearchView
-        searchView.onActionViewExpanded()
-        searchView.queryHint = "검색어를 입력하세요"
+
+        searchView.onActionViewExpanded()  // 두번째 검색버튼 눌린걸 디폴트로
+        searchView.maxWidth = Integer.MAX_VALUE
+        searchView.queryHint = "어느 음식점을 찾으시나요?"
+
+        // 검색어 추천
+
+        // Tlqkf 이거 왜않되 도대체 안해 Tlqkf
+//        searchView.findViewById<AutoCompleteTextView>(R.id.search_src_text).threshold = 1
+
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
+        val to = intArrayOf(R.id.item_label)
+        val cursorAdapter = SimpleCursorAdapter(this@MainActivity, R.layout.item_suggestion, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
+        searchView.suggestionsAdapter = cursorAdapter
 
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
+                val temp = selectedFoodCategory
+                selectedFoodCategory = "전체"
+                observerData()
+                selectedFoodCategory = temp
+                Fragment().hideKeyboard()
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                adapter.filter.filter(newText)
                 searchText = newText
-                return false
+                val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+                newText?.let {
+                    suggestions.forEachIndexed { index, suggestion ->
+                        if (suggestion != null) {
+                            if (suggestion.contains(newText, true))
+                                cursor.addRow(arrayOf(index, suggestion))
+                        }
+                    }
+                }
+                cursorAdapter.changeCursor(cursor)
+                return true
+
             }
         })
-        return super.onCreateOptionsMenu(menu)
 
+        searchView.setOnSuggestionListener(object: SearchView.OnSuggestionListener {
+            override fun onSuggestionSelect(position: Int): Boolean {
+                return false
+            }
+
+            override fun onSuggestionClick(position: Int): Boolean {
+                Fragment().hideKeyboard()
+                val cursor = searchView.suggestionsAdapter.getItem(position) as Cursor
+                val selection = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
+
+                searchView.setQuery(selection, true)
+                // Do something with selection
+                return true
+            }
+
+        })
+
+
+        menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                searchView.isIconified = false
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                searchText = ""
+                searchView.setQuery("", false)
+                Fragment().hideKeyboard()
+                searchView.clearFocus()
+                observerData()
+                return true
+            }
+        })
+
+
+        return super.onCreateOptionsMenu(menu)
     }
 
+
+
+
 }
+
+
