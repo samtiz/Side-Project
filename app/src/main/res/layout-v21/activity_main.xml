@@ -38,9 +38,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="전체"
-                android:tag="전체"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="전체"
+                android:text="전체"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,9 +49,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="한식"
-                android:tag="한식"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="한식"
+                android:text="한식"
                 app:layout_constraintStart_toEndOf="@+id/btn_allCategory"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,9 +60,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="치킨"
-                android:tag = "치킨"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="치킨"
+                android:text="치킨"
                 app:layout_constraintStart_toEndOf="@+id/btn_korean"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,9 +71,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="분식"
-                android:tag ="분식"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="분식"
+                android:text="분식"
                 app:layout_constraintStart_toEndOf="@+id/btn_chicken"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -82,9 +82,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="돈까스"
-                android:tag="돈까스"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="돈까스"
+                android:text="돈까스"
                 app:layout_constraintStart_toEndOf="@+id/btn_boonsik"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -93,9 +93,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="족발·보쌈"
-                android:tag="족발·보쌈"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="족발·보쌈"
+                android:text="족발·보쌈"
                 app:layout_constraintStart_toEndOf="@+id/btn_donkkas"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -104,9 +104,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="찜·탕"
-                android:tag="찜·탕"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="찜·탕"
+                android:text="찜·탕"
                 app:layout_constraintStart_toEndOf="@+id/btn_jokbal"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -115,9 +115,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="구이"
-                android:tag ="구이"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="구이"
+                android:text="구이"
                 app:layout_constraintStart_toEndOf="@+id/btn_zzim"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -126,9 +126,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="피자"
-                android:tag="피자"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="피자"
+                android:text="피자"
                 app:layout_constraintStart_toEndOf="@+id/btn_roast"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -137,9 +137,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="중식"
-                android:tag="중식"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="중식"
+                android:text="중식"
                 app:layout_constraintStart_toEndOf="@+id/btn_pizza"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -148,9 +148,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="일식"
-                android:tag="일식"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="일식"
+                android:text="일식"
                 app:layout_constraintStart_toEndOf="@+id/btn_chinese"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -159,9 +159,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="회·해물"
-                android:tag="회·해물"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="회·해물"
+                android:text="회·해물"
                 app:layout_constraintStart_toEndOf="@+id/btn_japanese"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -170,9 +170,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="양식"
-                android:tag="양식"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="양식"
+                android:text="양식"
                 app:layout_constraintStart_toEndOf="@+id/btn_rawFish"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -181,9 +181,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="커피·차"
-                android:tag="커피·차"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="커피·차"
+                android:text="커피·차"
                 app:layout_constraintStart_toEndOf="@+id/btn_western"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -192,9 +192,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="디저트"
-                android:tag="디저트"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="디저트"
+                android:text="디저트"
                 app:layout_constraintStart_toEndOf="@+id/btn_coffee"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -203,9 +203,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="아시안"
-                android:tag="아시안"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="아시안"
+                android:text="아시안"
                 app:layout_constraintStart_toEndOf="@+id/btn_dessert"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -214,9 +214,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="샌드위치"
-                android:tag="샌드위치"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="샌드위치"
+                android:text="샌드위치"
                 app:layout_constraintStart_toEndOf="@+id/btn_asian"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -225,9 +225,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="샐러드"
-                android:tag="샐러드"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="샐러드"
+                android:text="샐러드"
                 app:layout_constraintStart_toEndOf="@+id/btn_sandwich"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -236,9 +236,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="버거"
-                android:tag="버거"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="버거"
+                android:text="버거"
                 app:layout_constraintStart_toEndOf="@+id/btn_salad"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -247,9 +247,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="멕시칸"
-                android:tag="멕시칸"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="멕시칸"
+                android:text="멕시칸"
                 app:layout_constraintStart_toEndOf="@+id/btn_burger"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -258,9 +258,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="도시락"
-                android:tag="도시락"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="도시락"
+                android:text="도시락"
                 app:layout_constraintStart_toEndOf="@+id/btn_mexican"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -269,9 +269,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="죽"
-                android:tag="죽"
                 android:onClick="changeListwithFoodCategory"
+                android:tag="죽"
+                android:text="죽"
                 app:layout_constraintStart_toEndOf="@+id/btn_mealBox"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -296,15 +296,14 @@
                 android:id="@+id/btn_area"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginStart="10dp"
-                android:text="지역: 전체"
                 android:drawableEnd="@android:drawable/ic_menu_more"
-                android:paddingEnd="5dp"
+                android:onClick="selectArea"
                 android:paddingStart="15dp"
-                android:onClick="selectArea"/>
-
+                android:paddingEnd="5dp"
+                android:text="지역: 전체"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -316,8 +315,7 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settingScrollView" />
-    
-    
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_add"
@@ -326,26 +324,26 @@
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginBottom="15dp"
-        android:contentDescription="write a post"
         android:clickable="true"
+        android:contentDescription="write a post"
         android:elevation="6dp"
         app:backgroundTint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_edit" />
 
-<!--    <ImageButton-->
-<!--        android:id="@+id/btn_search"-->
-<!--        android:layout_width="50dp"-->
-<!--        android:layout_height="50dp"-->
-<!--        android:layout_marginTop="5dp"-->
-<!--        android:layout_marginEnd="5dp"-->
-<!--        android:layout_marginRight="5dp"-->
-<!--        android:background="#00ffffff"-->
-<!--        android:scaleType="fitCenter"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:srcCompat="?android:attr/actionModeWebSearchDrawable" />-->
+    <!--    <ImageButton-->
+    <!--        android:id="@+id/btn_search"-->
+    <!--        android:layout_width="50dp"-->
+    <!--        android:layout_height="50dp"-->
+    <!--        android:layout_marginTop="5dp"-->
+    <!--        android:layout_marginEnd="5dp"-->
+    <!--        android:layout_marginRight="5dp"-->
+    <!--        android:background="#00ffffff"-->
+    <!--        android:scaleType="fitCenter"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:srcCompat="?android:attr/actionModeWebSearchDrawable" />-->
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -354,6 +352,10 @@
         android:background="#FFFFFF"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
+        app:contentInsetEnd="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetRight="0dp"
+        app:contentInsetStart="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -362,11 +364,29 @@
             android:id="@+id/txt_subject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="전체"
             android:textColor="@color/black"
-            android:layout_gravity="center"
-            android:textSize="20sp" />
+            android:textSize="18dp"
+            android:textStyle="bold" />
 
+        <ImageView
+            android:id="@+id/img_location"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_action_location_on_small" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/loc_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:paddingStart="0dp"
+            android:background="@null"
+            android:dropDownHeight="50dp" />
 
 
     </androidx.appcompat.widget.Toolbar>

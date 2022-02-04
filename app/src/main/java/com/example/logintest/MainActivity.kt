@@ -7,15 +7,13 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.InputMethodManager
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.MenuItemCompat
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,22 +25,24 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.reflect.Field
+
 
 class MainActivity : BasicActivity() {
 
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mDatabaseReference: DatabaseReference
-
+    private var userLocation: String? = null
     private lateinit var adapter:ListAdapter
     private lateinit var txtSubject: TextView
     private val viewModel by lazy { ViewModelProvider(this).get(ListViewModel::class.java) }
     private var selectedDormCategory: String? = null
     private var selectedFoodCategory: String? = null
-    private var userLocation: String? = null
     private lateinit var btnArea: Button
     private var searchText: String? = null
     private var restaurantNameList: ArrayList<String?> = ArrayList() // 추천검색어용
     private lateinit var suggestions: List<String?>
+    private lateinit var spinnerItem: Spinner
 
 
 
@@ -56,17 +56,12 @@ class MainActivity : BasicActivity() {
         selectedDormCategory = "전체"
         selectedFoodCategory = "전체"
 
+        spinnerItem = findViewById<Spinner>(R.id.loc_spinner)
+
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_action_location_on_small)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
-
-        // userLocation 받아오기. 기본은 자기기숙사
-        mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("dorm").get().addOnSuccessListener {
-            userLocation = it.value.toString()
-        }.addOnFailureListener {
-            Toast.makeText(this@MainActivity, "get() dorm failed", Toast.LENGTH_SHORT).show()
-        }
 
         val btnManageAccount: ImageButton = findViewById(R.id.btn_manageAccount)
         btnManageAccount.setOnClickListener {
@@ -76,10 +71,6 @@ class MainActivity : BasicActivity() {
 
         val btnAdd: FloatingActionButton = findViewById(R.id.btn_add)
         btnAdd.setOnClickListener {
-            // 자신이 쓴 게시글 있는지 확인하는 코드 추가해야함
-
-            // 이걸로 받아오고싶은데 이러면 'Query'이고 내가 원하는건 Post 객체들 중 uid가 유저의 uid랑 같은 Post list인데 이걸 어케 하는지 모르겠음
-            // val a = mDatabaseReference.child("Post").orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid)
 
             //근데 데이터 구조 보다가 본건데 회원 정보는 realtime database가 아니라 storage에 넣어주는게 좋지 않을까
             val sameUserPosts = ArrayList<Post>()
@@ -90,7 +81,7 @@ class MainActivity : BasicActivity() {
 
                 override fun onDataChange(snapshot: DataSnapshot) {
                     sameUserPosts.clear()
-                    for (data in snapshot.children){
+                    for (data in snapshot.children) {
                         sameUserPosts.add(data.getValue<Post>()!!)
                     }
                     if (sameUserPosts.isEmpty()) {
@@ -98,14 +89,14 @@ class MainActivity : BasicActivity() {
                         val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
                         intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
                         startActivity(intent2)
-                    }else {
+                    } else {
                         MaterialAlertDialogBuilder(this@MainActivity).setMessage("이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?")
                                 .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
                                     val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
                                     intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
                                     startActivity(intent2)
                                 })
-                                .setNegativeButton("취소"){ _, _ ->  }.show()
+                                .setNegativeButton("취소") { _, _ -> }.show()
 
                         //Toast.makeText(this@MainActivity, "이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?", Toast.LENGTH_SHORT).show()
                     }
@@ -115,6 +106,7 @@ class MainActivity : BasicActivity() {
         }
 
         adapter = ListAdapter(this)
+
 
         val recyclerView : RecyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = WrapContentLinearLayoutManager(this@MainActivity) // recyclerView의 안정성을 위함
@@ -178,7 +170,7 @@ class MainActivity : BasicActivity() {
     }
 
     fun selectArea(view: View) {
-        val dormCategory = arrayOf("전체", "같은 건물만", "북측기숙사", "서측기숙사", "동측기숙사", "문지캠", "화암캠" )
+        val dormCategory = arrayOf("전체", "같은 건물만", "북측기숙사", "서측기숙사", "동측기숙사", "문지캠", "화암캠")
         MaterialAlertDialogBuilder(this@MainActivity).setTitle("지역 선택").setItems(dormCategory) { dialog, which ->
             // The 'which' argument contains the index position
             // of the selected item
@@ -192,7 +184,42 @@ class MainActivity : BasicActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         val menuItem = menu?.findItem(R.id.action_search)
+
         val searchView: SearchView = menuItem?.actionView as SearchView
+
+        val spinnerArray: Array<String> = arrayOf("세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
+                "여울/나들관", "다솜/희망관", "원내아파트", "나래/미르관", "나눔관", "문지관", "화암관")
+
+        val loc_spinnerAdapter: ArrayAdapter<String> = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, spinnerArray)
+        spinnerItem.adapter = loc_spinnerAdapter
+
+        mFirebaseAuth = FirebaseAuth.getInstance()
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
+
+        // userLocation 받아오기. 기본은 자기기숙사
+        if (userLocation == null) {
+            mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("dorm").get().addOnSuccessListener {
+                userLocation = it.value.toString()
+                spinnerItem.setSelection(spinnerArray.indexOf(userLocation))
+            }.addOnFailureListener {
+                Toast.makeText(this@MainActivity, "get() dorm failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+        else {
+            spinnerItem.setSelection(spinnerArray.indexOf(userLocation))
+        }
+
+
+        spinnerItem.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                userLocation = spinnerArray[position]
+                observerData()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+
 
         searchView.onActionViewExpanded()  // 두번째 검색버튼 눌린걸 디폴트로
         searchView.maxWidth = Integer.MAX_VALUE
@@ -236,7 +263,7 @@ class MainActivity : BasicActivity() {
             }
         })
 
-        searchView.setOnSuggestionListener(object: SearchView.OnSuggestionListener {
+        searchView.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
             override fun onSuggestionSelect(position: Int): Boolean {
                 return false
             }
@@ -257,6 +284,7 @@ class MainActivity : BasicActivity() {
         menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
                 searchView.isIconified = false
+                spinnerItem.visibility = GONE
                 return true
             }
 
@@ -264,6 +292,7 @@ class MainActivity : BasicActivity() {
                 searchText = ""
                 searchView.setQuery("", false)
                 Fragment().hideKeyboard()
+                spinnerItem.visibility = VISIBLE
                 searchView.clearFocus()
                 observerData()
                 return true
