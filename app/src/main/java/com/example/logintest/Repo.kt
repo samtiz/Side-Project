@@ -2,6 +2,7 @@ package com.example.logintest
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -60,6 +61,28 @@ class Repo {
             }
             private fun isHwaam(dorm: String?): Boolean {
                 return dorm == "화암관"
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+        return mutableData
+    }
+
+    fun getMyPost(): LiveData<MutableList<Post>> {
+        val mutableData = MutableLiveData<MutableList<Post>>()
+        val mFirebaseAuth = FirebaseAuth.getInstance()
+        val myRef = FirebaseDatabase.getInstance().getReference("logintest/Post")
+        myRef.orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid).addValueEventListener(object : ValueEventListener {
+            val listData: MutableList<Post> = mutableListOf<Post>()
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (PostSnapshot in snapshot.children) {
+                        val getData = PostSnapshot.getValue(Post::class.java)
+                        listData.add(getData!!)
+                        mutableData.value = listData
+                    }
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {

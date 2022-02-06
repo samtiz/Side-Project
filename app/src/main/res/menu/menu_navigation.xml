@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:title="홈"
+        android:icon="@drawable/selector_bottom_navi_home_icon_unselected"/>
+
+    <item
+        android:id="@+id/navigation_chat"
+        android:title="채팅"
+        android:icon="@drawable/selector_bottom_navi_chat_icon_unselected"/>
+
+    <item
+        android:id="@+id/navigation_add"
+        android:title="모집하기"
+        android:icon="@drawable/selector_bottom_navi_post_add_icon"/>
+
+    <item
+        android:id="@+id/navigation_myPost"
+        android:title="내 게시물"
+        android:icon="@drawable/selector_bottom_navi_mypost_icon_unselected"/>
+
+    <item
+        android:id="@+id/navigation_myAccount"
+        android:title="내 계정"
+        android:icon="@drawable/selector_bottom_navi_account_icon_unselected"/>
+
+</menu>

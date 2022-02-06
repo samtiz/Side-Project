@@ -13,5 +13,12 @@ class ListViewModel : ViewModel() {
         }
         return mutableData
     }
+    fun fetchMyPost(): LiveData<MutableList<Post>> {
+        val mutableData = MutableLiveData<MutableList<Post>>()
+        repo.getMyPost().observeForever{
+            mutableData.value = it
+        }
+        return mutableData
+    }
 
 }

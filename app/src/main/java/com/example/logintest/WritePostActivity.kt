@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -15,6 +16,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.RangeSlider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_write_post.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -55,6 +58,10 @@ class WritePostActivity: BasicActivity() {
         if (intent.hasExtra("uid")) {
             uid = intent.getStringExtra("uid")
         }
+
+        setSupportActionBar(toolbar_write_post)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
         mEtFoodCategory = findViewById(R.id.edit_category)
@@ -212,6 +219,17 @@ class WritePostActivity: BasicActivity() {
                     mEtFoodCategory.setText(selectedFoodCategory.trim())
                 }.setNeutralButton("취소") { _, _ ->  }.show()
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                overridePendingTransition(R.anim.none, R.anim.horizon_exit)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 

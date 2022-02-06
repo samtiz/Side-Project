@@ -7,6 +7,35 @@
     android:layout_height="match_parent"
     tools:context=".WritePostActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_write_post"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:contentInsetEnd="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetRight="0dp"
+        app:contentInsetStart="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/txt_subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="배달 모집"
+            android:textColor="@color/black"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+
     <EditText
         android:id="@+id/edit_mainText"
         android:layout_width="0dp"
@@ -15,10 +44,10 @@
         android:ems="10"
         android:gravity="start|top"
         android:hint="내용 (추가적인 사항을 적어주세요)"
-        android:textSize="17dp"
+        android:textSize="14dp"
         android:inputType="textMultiLine"
         android:textColor="@color/black"
-        android:lines="5"
+        android:lines="7"
         app:layout_constraintEnd_toEndOf="@+id/sw_decided"
         app:layout_constraintStart_toStartOf="@+id/edit_restaurant_name"
         app:layout_constraintTop_toBottomOf="@+id/edit_time" />
@@ -37,14 +66,15 @@
         android:id="@+id/edit_category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="25dp"
         android:ems="10"
         android:enabled="false"
         android:hint="음식점 카테고리"
+        android:textSize="14dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/btn_category"
         app:layout_constraintStart_toStartOf="@+id/edit_restaurant_name"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_write_post" />
 
     <Button
         android:id="@+id/btn_category"
@@ -67,6 +97,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:hint="음식점 이름"
+        android:textSize="14dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/sw_decided"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,6 +109,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="70dp"
         android:layout_marginRight="70dp"
+        android:theme="@style/Theme.MaterialComponents"
         android:stepSize="500.0"
         android:valueFrom="0.0"
         android:valueTo="10000.0"
@@ -86,13 +118,14 @@
         app:layout_constraintTop_toBottomOf="@+id/txt_deliveryFee"
         app:values="@array/initial_slider_values" />
 
+
     <TextView
         android:id="@+id/txt_deliveryFee"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="배달비"
-        android:textSize="16dp"
+        android:textSize="14dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -114,6 +147,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1000원 ~ 4000원"
+        android:textSize="12dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -136,6 +170,7 @@
         android:ems="10"
         android:enabled="false"
         android:hint="모집 만료 시간"
+        android:textSize="14dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/btn_time"
         app:layout_constraintStart_toStartOf="@+id/edit_restaurant_name"
@@ -147,11 +182,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="* 설정된 시간 이후 게시글이 자동 삭제됩니다."
+        android:textSize="12dp"
         android:textColor="#88ff0000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_time" />
-
 
 
 

@@ -84,6 +84,12 @@ class RegisterActivity : BasicActivity() {
 
                         mFirebaseUser?.uid?.let { it1 -> mDatabaseReference.child("UserAccount").child(it1).setValue(account) }
 
+//                        UserStatus add
+
+//                        val status = UserStatus()
+//                        status.post_num = 0
+//                        mFirebaseUser?.uid?.let { it1 -> mDatabaseReference.child("UserStatus").child(it1).setValue(status) }
+
                         Toast.makeText(this@RegisterActivity, "회원가입에 성공하셨습니다", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                         startActivity(intent)

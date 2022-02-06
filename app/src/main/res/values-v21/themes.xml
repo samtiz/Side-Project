@@ -15,5 +15,7 @@
         <!-- Customize your theme here. -->
         <item name="android:timePickerStyle">@style/SpinnerTimePicker</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorSurface">@color/white</item>
+
     </style>
 </resources>

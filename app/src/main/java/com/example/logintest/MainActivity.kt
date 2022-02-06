@@ -1,5 +1,6 @@
 package com.example.logintest
 
+import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.DialogInterface
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,8 +21,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
@@ -43,6 +50,8 @@ class MainActivity : BasicActivity() {
     private var restaurantNameList: ArrayList<String?> = ArrayList() // 추천검색어용
     private lateinit var suggestions: List<String?>
     private lateinit var spinnerItem: Spinner
+//    private var fragPager: ViewPager? = null
+//    private var navigationBar: TabLayout? = null
 
 
 
@@ -58,61 +67,60 @@ class MainActivity : BasicActivity() {
 
         spinnerItem = findViewById<Spinner>(R.id.loc_spinner)
 
-        setSupportActionBar(toolbar)
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_action_location_on_small)
+        setSupportActionBar(toolbar_main)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
-        val btnManageAccount: ImageButton = findViewById(R.id.btn_manageAccount)
-        btnManageAccount.setOnClickListener {
-            val intent = Intent(this@MainActivity, ManageAccountActivity::class.java)
-            startActivity(intent)
-        }
 
         val btnAdd: FloatingActionButton = findViewById(R.id.btn_add)
         btnAdd.setOnClickListener {
 
             //근데 데이터 구조 보다가 본건데 회원 정보는 realtime database가 아니라 storage에 넣어주는게 좋지 않을까
-            val sameUserPosts = ArrayList<Post>()
-            mDatabaseReference.child("Post").orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid).addListenerForSingleValueEvent(object :
-                    ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {
-                }
+//
+//            val sameUserPosts = ArrayList<Post>()
+//            mDatabaseReference.child("Post").orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid).addListenerForSingleValueEvent(object :
+//                ValueEventListener {
+//                override fun onCancelled(error: DatabaseError) {
+//                }
+//
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    sameUserPosts.clear()
+//                    for (data in snapshot.children) {
+//                        sameUserPosts.add(data.getValue<Post>()!!)
+//                    }
+//                    if (sameUserPosts.isEmpty()) {
+//                        println(sameUserPosts.size)
+//                        val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
+//                        intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+//                        startActivity(intent2)
+//                        overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+//                    } else {
+//                        MaterialAlertDialogBuilder(this@MainActivity).setMessage("이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?")
+//                            .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
+//                                val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
+//                                intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+//                                startActivity(intent2)
+//                                overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+//                            })
+//                            .setNegativeButton("취소") { _, _ -> }.show()
+//                    }
+//                }
+//            })
+            val intent = Intent(applicationContext, WritePostActivity::class.java)
+            intent.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+            startActivity(intent)
+            overridePendingTransition(R.anim.horizon_enter, R.anim.none)
 
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    sameUserPosts.clear()
-                    for (data in snapshot.children) {
-                        sameUserPosts.add(data.getValue<Post>()!!)
-                    }
-                    if (sameUserPosts.isEmpty()) {
-                        println(sameUserPosts.size)
-                        val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
-                        intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
-                        startActivity(intent2)
-                    } else {
-                        MaterialAlertDialogBuilder(this@MainActivity).setMessage("이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?")
-                                .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
-                                    val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
-                                    intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
-                                    startActivity(intent2)
-                                })
-                                .setNegativeButton("취소") { _, _ -> }.show()
-
-                        //Toast.makeText(this@MainActivity, "이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
 
         }
 
         adapter = ListAdapter(this)
 
 
-        val recyclerView : RecyclerView = findViewById(R.id.recyclerView)
+        val recyclerView : RecyclerView = findViewById(R.id.recyclerView_main)
         recyclerView.layoutManager = WrapContentLinearLayoutManager(this@MainActivity) // recyclerView의 안정성을 위함
-        recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+//        recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
         recyclerView.adapter = adapter
         observerData() // 초기 데이터 가져오기
+
         mDatabaseReference.child("Post").addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val temp = snapshot.getValue(Post::class.java)
@@ -136,11 +144,11 @@ class MainActivity : BasicActivity() {
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                Toast.makeText(this@MainActivity, "do not reach here: onChildMoved", Toast.LENGTH_SHORT).show()
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@MainActivity, "value listener of post dir failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "child event listener of post dir failed", Toast.LENGTH_SHORT).show()
             }
 
         })
@@ -149,9 +157,78 @@ class MainActivity : BasicActivity() {
 
         txtSubject= findViewById(R.id.txt_subject)
         btnArea = findViewById(R.id.btn_area)
-
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigationView.selectedItemId = R.id.navigation_home
+        bottomNavigationView.setOnNavigationItemSelectedListener {item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    true
+                }
+                R.id.navigation_chat -> {
+                    true
+                }
+                R.id.navigation_add -> {
+//                    val sameUserPosts = ArrayList<Post>()
+//                    mDatabaseReference.child("Post").orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid).addListenerForSingleValueEvent(object :
+//                        ValueEventListener {
+//                        override fun onCancelled(error: DatabaseError) {
+//                        }
+//
+//                        override fun onDataChange(snapshot: DataSnapshot) {
+//                            sameUserPosts.clear()
+//                            for (data in snapshot.children) {
+//                                sameUserPosts.add(data.getValue<Post>()!!)
+//                            }
+//                            if (sameUserPosts.isEmpty()) {
+//                                println(sameUserPosts.size)
+//                                val intent2 = Intent(applicationContext, WritePostActivity::class.java)
+//                                intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+//                                startActivity(intent2)
+//                            } else {
+//                                MaterialAlertDialogBuilder(this@MainActivity).setMessage("이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?")
+//                                    .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
+//                                        val intent2 = Intent(applicationContext, WritePostActivity::class.java)
+//                                        intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+//                                        startActivity(intent2)
+//                                    })
+//                                    .setNegativeButton("취소") { _, _ -> }.show()
+//                            }
+//                        }
+//                    })
+                    val intent = Intent(applicationContext, WritePostActivity::class.java)
+                    intent.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+                    startActivity(intent)
+                    overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                    true
+                }
+                R.id.navigation_myPost -> {
+                    val intent = Intent(applicationContext, ManagePostActivity::class.java)
+                    intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivityIfNeeded(intent, 0)
+                    overridePendingTransition(R.anim.none, R.anim.none)
+                    true
+                }
+                R.id.navigation_myAccount -> {
+                    val intent = Intent(applicationContext, ManageAccountActivity::class.java)
+                    intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivityIfNeeded(intent, 0)
+                    overridePendingTransition(R.anim.none, R.anim.none)
+                    true
+                }
+                else -> false
+            }
+        }
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigationView.selectedItemId = R.id.navigation_home
+        observerData()
+    }
+
+
 
     fun changeListwithFoodCategory(v: View) {
         val foodCategory: String = v.tag.toString()
@@ -201,6 +278,8 @@ class MainActivity : BasicActivity() {
             mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("dorm").get().addOnSuccessListener {
                 userLocation = it.value.toString()
                 spinnerItem.setSelection(spinnerArray.indexOf(userLocation))
+                val app = applicationContext as GlobalVariable
+                app.setUserLocation(userLocation)
             }.addOnFailureListener {
                 Toast.makeText(this@MainActivity, "get() dorm failed", Toast.LENGTH_SHORT).show()
             }
@@ -213,6 +292,8 @@ class MainActivity : BasicActivity() {
         spinnerItem.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 userLocation = spinnerArray[position]
+                val app = applicationContext as GlobalVariable
+                app.setUserLocation(userLocation)
                 observerData()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -268,6 +349,7 @@ class MainActivity : BasicActivity() {
                 return false
             }
 
+            @SuppressLint("Range")
             override fun onSuggestionClick(position: Int): Boolean {
                 Fragment().hideKeyboard()
                 val cursor = searchView.suggestionsAdapter.getItem(position) as Cursor
