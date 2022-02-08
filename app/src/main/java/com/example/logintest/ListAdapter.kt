@@ -47,6 +47,13 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         holder.itemView.setOnClickListener {
             val intent = Intent(context, MessageActivity::class.java)
             intent.putExtra("postId", post.postId)
+            var chatRoomName : String? = null
+            chatRoomName = if (post.restaurantName == "미정"){
+                post.foodCategories!![0]
+            } else{
+                post.restaurantName
+            }
+            intent.putExtra("chatRoomName", chatRoomName)
             context.startActivity(intent)
         }
         ////////////////////

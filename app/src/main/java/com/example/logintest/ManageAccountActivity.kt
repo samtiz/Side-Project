@@ -29,6 +29,7 @@ class ManageAccountActivity : BasicActivity() {
             btnLogout.setOnClickListener{
                 mFirebaseAuth.signOut()
                 Toast.makeText(this@ManageAccountActivity, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show()
+                MySharedPreferences.clearUser(this)
                 val intent = Intent(this@ManageAccountActivity, LoginActivity::class.java)
                 startActivity(intent)
                 finish()

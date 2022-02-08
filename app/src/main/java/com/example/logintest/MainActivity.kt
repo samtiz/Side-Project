@@ -107,7 +107,7 @@ class MainActivity : BasicActivity() {
             val intent = Intent(applicationContext, WritePostActivity::class.java)
             intent.putExtra("uid", mFirebaseAuth.currentUser?.uid)
             startActivity(intent)
-            overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+            overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
 
 
         }
@@ -212,7 +212,7 @@ class MainActivity : BasicActivity() {
                     val intent = Intent(applicationContext, ManageAccountActivity::class.java)
                     intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                     startActivityIfNeeded(intent, 0)
-                    overridePendingTransition(R.anim.none, R.anim.none)
+                    //overridePendingTransition(R.anim.none, R.anim.none)
                     true
                 }
                 else -> false

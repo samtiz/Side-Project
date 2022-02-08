@@ -1,6 +1,7 @@
 package com.example.logintest
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -9,10 +10,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -23,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlinx.coroutines.*
 
 class MessageActivity : AppCompatActivity() {
 
@@ -36,6 +35,7 @@ class MessageActivity : AppCompatActivity() {
 
     private var chatRoomUid : String? = null
     private var postId : String? = null
+    private var chatRoomName : String? = null
     private val users : HashMap<String, String> = HashMap()
 
     private var recyclerView : RecyclerView? = null
@@ -56,10 +56,14 @@ class MessageActivity : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
         val curTime = dateFormat.format(Date(time)).toString()
 
-        // 클릭으로 넘어온 post Id
+        // 클릭으로 넘어온 post Id, chatRoomName
         postId = intent.getStringExtra("postId")
+        chatRoomName = intent.getStringExtra("chatRoomName")
         uid = mFirebaseAuth.currentUser?.uid!!
         recyclerView = findViewById(R.id.messageActivity_recyclerview)
+
+        // 채팅방 이름 설정
+        message_lists_top_name.text = chatRoomName
 
         // UserAccount 에서 현재 사용자 이름 받아오기
         mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
@@ -108,13 +112,20 @@ class MessageActivity : AppCompatActivity() {
                 imageView.isEnabled = false
                 mDatabaseReference.child("chatrooms").push().setValue(chatModel).addOnSuccessListener {
                     // 채팅방 생성
-                    checkChatRoom()
+                    runBlocking {
+                        val runCheckChatRoom = launch{
+                            checkChatRoom()
+                        }
+                        runCheckChatRoom.join()
+                    }
+                    mDatabaseReference.child("chatrooms").child(chatRoomUid.toString()).child("comments").push().setValue(comment)
+                    messageActivity_editText.text = null
                     // 메세지 보내기
-                    Handler().postDelayed({
-                        println(chatRoomUid)
-                        mDatabaseReference.child("chatrooms").child(chatRoomUid.toString()).child("comments").push().setValue(comment)
-                        messageActivity_editText.text = null
-                    }, 1000L)
+//                    Handler().postDelayed({
+//                        println(chatRoomUid)
+//                        mDatabaseReference.child("chatrooms").child(chatRoomUid.toString()).child("comments").push().setValue(comment)
+//                        messageActivity_editText.text = null
+//                    }, 1000L)
                     Log.d("chatUidNull dest", "$postId")
                 }
             }else{
@@ -122,6 +133,16 @@ class MessageActivity : AppCompatActivity() {
                 messageActivity_editText.text = null
                 Log.d("chatUidNotNull dest", "$postId")
             }
+        }
+
+        val btnExit: Button = findViewById(R.id.btn_exit)
+        btnExit.setOnClickListener{
+            // Post에 접근하여 uid 제거하기
+            mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
+            // 메인 화면으로 돌아가기
+            val intent = Intent(this@MessageActivity, MainActivity::class.java)
+            startActivity(intent)
+            finish()
         }
         checkChatRoom()
     }
@@ -160,17 +181,17 @@ class MessageActivity : AppCompatActivity() {
         private var post : Post? = null
         init{
             // 포스트 정보 받아오기
-            mDatabaseReference.child("post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
+            mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onCancelled(error: DatabaseError) {
                 }
 
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    post = snapshot.getValue<Post>()
-                    if (post?.restaurantName == "미정"){
-                        message_lists_top_name.text = post?.foodCategories!![0]
-                    }else{
-                        message_lists_top_name.text = post?.restaurantName
-                    }
+//                    post = snapshot.getValue<Post>()
+//                    if (post?.restaurantName == "미정"){
+//                        message_lists_top_name.text = post?.foodCategories!![0]
+//                    }else{
+//                        message_lists_top_name.text = post?.restaurantName
+//                    }
                     getMessageList()
                 }
             })
