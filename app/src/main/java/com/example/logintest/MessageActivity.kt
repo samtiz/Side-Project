@@ -105,7 +105,7 @@ class MessageActivity : AppCompatActivity() {
 //                }
 //            }
 //            chatModel.users.add(uid.toString())
-            chatModel.post.put(postId!!, true)
+            //chatModel.post.put(postId!!, true)
             val comment = ChatModel.Comment(uid, editText.text.toString(), curTime)
 
             if(chatRoomUid == null){
@@ -118,8 +118,10 @@ class MessageActivity : AppCompatActivity() {
                         }
                         runCheckChatRoom.join()
                     }
-                    mDatabaseReference.child("chatrooms").child(chatRoomUid.toString()).child("comments").push().setValue(comment)
-                    messageActivity_editText.text = null
+                    if (chatRoomUid != null){
+                        mDatabaseReference.child("chatrooms").child(chatRoomUid.toString()).child("comments").push().setValue(comment)
+                        messageActivity_editText.text = null
+                    }
                     // 메세지 보내기
 //                    Handler().postDelayed({
 //                        println(chatRoomUid)
@@ -148,14 +150,15 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun checkChatRoom(){
-        mDatabaseReference.child("chatrooms").orderByChild("post/$postId").equalTo(true)
+        mDatabaseReference.child("chatrooms").orderByChild("$postId")
             .addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onCancelled(error: DatabaseError) {
                 }
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (item in snapshot.children) {
                         print(item)
-                        chatRoomUid = item.key
+                        //chatRoomUid = item.key
+                        chatRoomUid = postId
                         messageActivity_ImageView.isEnabled = true
                         recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
                         recyclerView?.adapter = RecyclerViewAdapter()
