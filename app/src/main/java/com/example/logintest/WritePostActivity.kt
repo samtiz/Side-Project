@@ -1,6 +1,7 @@
 package com.example.logintest
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -21,6 +22,7 @@ import kotlinx.android.synthetic.main.activity_write_post.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class WritePostActivity: BasicActivity() {
 
@@ -36,9 +38,15 @@ class WritePostActivity: BasicActivity() {
     private lateinit var mTxtTimeWarning: TextView
     private lateinit var mEtMainText: EditText
     private lateinit var mBtnPost: Button
+    private lateinit var mEtLocation: EditText
+    private lateinit var mBtnLocation: Button
     private lateinit var mDatabaseReference: DatabaseReference  // Firebase real time database
 
+    private var users: HashMap<String, String>? = null
+    private var comments: HashMap<String, PostComment>? = null
     private var uid: String? = null
+    private var postId: String? = null
+    private var isModify: Boolean = false
 
     // 현태 수정 ///////
     private var userName: String? = null
@@ -50,6 +58,8 @@ class WritePostActivity: BasicActivity() {
 
     private val selectedItems = ArrayList<Int>()
     private val foods = arrayOf("한식", "치킨", "분식", "돈까스", "족발·보쌈", "찜·탕", "구이", "피자", "중식", "일식", "회·해물", "양식", "커피·차", "디저트", "아시안", "샌드위치", "샐러드", "버거", "멕시칸", "도시락", "죽")
+    private val locations = arrayOf("택시승강장", "쪽문", "세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
+            "여울/나들관", "다솜/희망관", "원내아파트", "나래/미르관", "나눔관", "문지관", "화암관")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +68,8 @@ class WritePostActivity: BasicActivity() {
         if (intent.hasExtra("uid")) {
             uid = intent.getStringExtra("uid")
         }
+
+
 
         setSupportActionBar(toolbar_write_post)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -76,6 +88,46 @@ class WritePostActivity: BasicActivity() {
         mTxtTimeWarning = findViewById(R.id.txt_timeWarning)
         mEtMainText = findViewById(R.id.edit_mainText)
         mBtnPost = findViewById(R.id.btn_post)
+        mEtLocation = findViewById(R.id.edit_location)
+        mBtnLocation = findViewById(R.id.btn_location)
+
+
+        val app = applicationContext as GlobalVariable
+        mEtLocation.setText(app.getUserLocation())
+        mBtnLocation.setOnClickListener{
+            val builder = AlertDialog.Builder(this@WritePostActivity)
+            builder.setTitle("배달 수령 위치").setItems(locations, DialogInterface.OnClickListener { _, which ->
+                mEtLocation.setText(locations[which])
+            })
+            builder.show()
+        }
+
+
+        if (intent.hasExtra("postId")) {
+            postId = intent.getStringExtra("postId")
+            isModify = true
+            mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
+                val pastPost = it.getValue(Post::class.java)
+                var temp: String = ""
+                for (cat in pastPost?.foodCategories!!) {
+                    if (cat.isNotEmpty()) {
+                        temp += cat
+                        temp += ", "
+                        selectedItems.add(foods.indexOf(cat))
+                    }
+                }
+                mEtFoodCategory.setText(temp.trim().substring(0, temp.trim().length-1))
+                mEtRestaurantName.setText(pastPost.restaurantName)
+                mCostSlider.setValues(pastPost.minDeliveryFee?.toFloat(), pastPost.maxDeliveryFee?.toFloat())
+                minCost = pastPost.minDeliveryFee
+                maxCost = pastPost.maxDeliveryFee
+                mEtMainText.setText(pastPost.mainText)
+                mEtTime.setText(pastPost.timeLimit)
+                mEtLocation.setText(pastPost.dorm)
+                users = pastPost.users
+                comments = pastPost.comments
+            }
+        }
 
 
         var inputRestaurantName: String? = null
@@ -120,10 +172,11 @@ class WritePostActivity: BasicActivity() {
             if (mEtFoodCategory.text.isBlank() || mEtRestaurantName.text.isBlank() || mEtTime.text.isBlank()) {
                 Toast.makeText(this@WritePostActivity, "음식 카테고리, 음식점, 모집만료시간을 모두 설정해주세요", Toast.LENGTH_SHORT).show()
             }
-            else if (mEtFoodCategory.text.split(' ').size > 4) {
+            else if (mEtFoodCategory.text.split(", ").size > 4) {
                 Toast.makeText(this@WritePostActivity, "음식 카테고리는 최대 4개까지만 설정 가능합니다.", Toast.LENGTH_SHORT).show()
             }
             else {
+
                 val post = Post()
                 val categoryList = ArrayList<String>()
                 for (i in selectedItems) {
@@ -139,15 +192,34 @@ class WritePostActivity: BasicActivity() {
                 post.mainText = mEtMainText.text.toString()
                 post.timeLimit = mEtTime.text.toString()
                 post.uid = uid
-                post.dorm = dorm
+                post.dorm = mEtLocation.text.toString()
+                post.visibility = true
 
-                val key = mDatabaseReference.child("Post").push().key
+                if (isModify) {
+                    post.postId = postId
+                    post.users = users!!
+                    post.comments = comments!!
+                    postId?.let { it1 -> mDatabaseReference.child("Post").child(it1).removeValue() }
+                    postId?.let { it1 -> mDatabaseReference.child("Post").child(it1).setValue(post) }
+                    Toast.makeText(this@WritePostActivity, "게시물을 수정하였습니다.", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    val key = mDatabaseReference.child("Post").push().key
 
-                // 현태가 수정한 부분 //////
-                // post Id에 자동으로 부여된 게시물 id 넣기
-                post.postId = key
-                // post에 참여한 user hashmap에 현재 사용자 넣기
-                post.users[uid!!] = userName!!
+                    // 현태가 수정한 부분 //////
+                    // post Id에 자동으로 부여된 게시물 id 넣기
+                    post.postId = key
+                    // post에 참여한 user hashmap에 현재 사용자 넣기
+                    post.users[uid!!] = userName!!
+                    if (key == null) {
+                        Toast.makeText(this@WritePostActivity, "게시를 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        mDatabaseReference.child("Post").child(key).setValue(post)
+                        Toast.makeText(this@WritePostActivity, "게시물을 올렸습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
                 //val userIdList = ArrayList<String>()
                 //userIdList.add(uid!!)
                 //post.usersId = userIdList
@@ -158,22 +230,13 @@ class WritePostActivity: BasicActivity() {
                 ///////////////////////
 
 
-                if (key == null) {
-                    Toast.makeText(this@WritePostActivity, "게시를 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-                }
-                else {
+
 //                    카테고리마다 차일드 만드는 주석
 //                    for (category in categoryList) {
 //                        if (category != "") {
 //                            mDatabaseReference.child("${category}").child(key).setValue(post)
 //                        }
 //                    }
-                    mDatabaseReference.child("Post").child(key).setValue(post)
-                    Toast.makeText(this@WritePostActivity, "게시물을 올렸습니다.", Toast.LENGTH_SHORT).show()
-                }
-
-                val intent = Intent(this@WritePostActivity, MainActivity::class.java)
-                startActivity(intent)
                 finish()
             }
 
@@ -187,6 +250,8 @@ class WritePostActivity: BasicActivity() {
             }
             TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),true).show()
         }
+
+
 
     }
 
@@ -203,7 +268,7 @@ class WritePostActivity: BasicActivity() {
 
     fun showFoodCategoryDialog(view: View) {
         selectedItems.clear()
-        MaterialAlertDialogBuilder(this).setTitle("배달 카테고리 모두 선택").setMultiChoiceItems(foods, null,  DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
+        MaterialAlertDialogBuilder(this@WritePostActivity).setTitle("배달 카테고리 모두 선택").setMultiChoiceItems(foods, null,  DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
             if (isChecked) {
                 // If the user checked the item, add it to the selected items
                 selectedItems.add(which)
@@ -214,9 +279,9 @@ class WritePostActivity: BasicActivity() {
                     var selectedFoodCategory: String = ""
                     for (i in selectedItems) {
                         selectedFoodCategory += foods[i]
-                        selectedFoodCategory += " "
+                        selectedFoodCategory += ", "
                     }
-                    mEtFoodCategory.setText(selectedFoodCategory.trim())
+                    mEtFoodCategory.setText(selectedFoodCategory.trim().substring(0, selectedFoodCategory.trim().length-1))
                 }.setNeutralButton("취소") { _, _ ->  }.show()
 
     }

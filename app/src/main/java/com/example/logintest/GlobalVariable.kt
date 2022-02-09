@@ -4,6 +4,7 @@ import android.app.Application
 
 class GlobalVariable : Application() {
     private var userLocation: String? = null
+    private var currentCommentId: String? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -13,11 +14,9 @@ class GlobalVariable : Application() {
         super.onTerminate()
     }
 
-    fun setUserLocation(loc: String?) {
-        userLocation = loc
-    }
+    fun setUserLocation(loc: String?) { userLocation = loc }
+    fun getUserLocation(): String? { return userLocation }
 
-    fun getUserLocation(): String? {
-        return userLocation
-    }
+    fun setCurrentCommentId(commentId: String?) { currentCommentId = commentId }
+    fun getCurrentCommentId(): String? { return currentCommentId }
 }

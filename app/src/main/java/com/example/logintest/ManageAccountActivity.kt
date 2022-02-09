@@ -135,13 +135,13 @@ class ManageAccountActivity : BasicActivity() {
                         overridePendingTransition(R.anim.horizon_enter, R.anim.none)
                         true
                     }
-                    R.id.navigation_myPost -> {
-                        val intent = Intent(applicationContext, ManagePostActivity::class.java)
-                        intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                        startActivityIfNeeded(intent, 0)
-                        overridePendingTransition(R.anim.none, R.anim.none)
-                        true
-                    }
+//                    R.id.navigation_myPost -> {
+//                        val intent = Intent(applicationContext, ManagePostActivity::class.java)
+//                        intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+//                        startActivityIfNeeded(intent, 0)
+//                        overridePendingTransition(R.anim.none, R.anim.none)
+//                        true
+//                    }
                     R.id.navigation_myAccount -> {
                         true
                     }

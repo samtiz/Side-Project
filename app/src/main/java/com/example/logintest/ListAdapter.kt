@@ -19,6 +19,7 @@ import kotlin.collections.ArrayList
 class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapter.ViewHolder>(), Filterable {
     private var postList = mutableListOf<Post>()
     private var postListFiltered = mutableListOf<Post>()
+    private lateinit var mFirebaseAuth: FirebaseAuth
 
     fun setListData(data: MutableList<Post>) {
         postList = data
@@ -42,11 +43,14 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         holder.timeLimit.text = post.timeLimit + "까지"
         holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
 
-        // 현태가 수정한 부분 ///
-        // 게시물을 클릭하면 채팅 activity로 넘어가게 함
+        // 현태가 수정한 부분 ///       //// ...을 수정
+        // 게시물을 클릭하면 자세히 보여줌
+        // TODO 수정해야함
         holder.itemView.setOnClickListener {
-            val intent = Intent(context, MessageActivity::class.java)
+            val intent = Intent(context, PostDetailActivity::class.java)
             intent.putExtra("postId", post.postId)
+            mFirebaseAuth = FirebaseAuth.getInstance()
+            intent.putExtra("uid", mFirebaseAuth.currentUser?.uid.toString())
             context.startActivity(intent)
         }
         ////////////////////
@@ -66,6 +70,7 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         val dorm: TextView = itemView.findViewById(R.id.txt_dorm)
         val timeLimit: TextView = itemView.findViewById(R.id.txt_timeLimit)
         val deliveryFee: TextView = itemView.findViewById(R.id.txt_deliveryFee)
+
     }
 
     override fun getFilter(): Filter {

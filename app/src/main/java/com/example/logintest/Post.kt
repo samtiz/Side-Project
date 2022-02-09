@@ -1,5 +1,9 @@
 package com.example.logintest
 
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+
 class Post {
     var dorm: String? = null
     var foodCategories: ArrayList<String>? = null
@@ -11,8 +15,11 @@ class Post {
     var uid: String? = null
     // 현태가 수정한 부분 /////
     var postId: String? = null
-    val users : HashMap<String, String> = HashMap()
+    var users : HashMap<String, String> = HashMap()
     //var usersId : ArrayList<String>? = null
     //val userName : MutableSet<String>? = null
+    var visibility: Boolean = true
+    // TODO 댓글 데이터 클래스 만들어서 val inquires 에 빈 ArrayList로 init
     //////////////////////
+    var comments: HashMap<String, PostComment> = HashMap()
 }

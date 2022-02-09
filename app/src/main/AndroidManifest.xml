@@ -26,7 +26,8 @@
         <activity android:name=".ManageAccountActivity" />
         <activity android:name=".BasicActivity" />
         <activity android:name=".WritePostActivity" />
-        <activity android:name=".ManagePostActivity"/>
+<!--        <activity android:name=".ManagePostActivity"/>-->
+        <activity android:name=".PostDetailActivity"/>
     </application>
 
 </manifest>

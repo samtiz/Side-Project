@@ -112,7 +112,7 @@ class MainActivity : BasicActivity() {
 
         }
 
-        adapter = ListAdapter(this)
+        adapter = ListAdapter(this@MainActivity)
 
 
         val recyclerView : RecyclerView = findViewById(R.id.recyclerView_main)
@@ -123,11 +123,14 @@ class MainActivity : BasicActivity() {
 
         mDatabaseReference.child("Post").addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val temp = snapshot.getValue(Post::class.java)
-                if (temp != null) {
-                    restaurantNameList.add(temp.restaurantName)
-                }
-                suggestions = restaurantNameList.distinct()
+//                if (snapshot.value is Post ) {
+//                    Log.d("111111111111111", "11111111111111111")
+                    val temp = snapshot.getValue(Post::class.java)
+                    if (temp != null) {
+                        restaurantNameList.add(temp.restaurantName)
+                    }
+                    suggestions = restaurantNameList.distinct()
+//                }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -136,11 +139,13 @@ class MainActivity : BasicActivity() {
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                val temp = snapshot.getValue(Post::class.java)
-                if (temp != null) {
-                    restaurantNameList.remove(temp.restaurantName)
-                }
-                suggestions = restaurantNameList.distinct()
+//                if (snapshot.value is Post ) {
+                    val temp = snapshot.getValue(Post::class.java)
+                    if (temp != null) {
+                        restaurantNameList.remove(temp.restaurantName)
+                    }
+                    suggestions = restaurantNameList.distinct()
+//                }
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
@@ -201,13 +206,13 @@ class MainActivity : BasicActivity() {
                     overridePendingTransition(R.anim.horizon_enter, R.anim.none)
                     true
                 }
-                R.id.navigation_myPost -> {
-                    val intent = Intent(applicationContext, ManagePostActivity::class.java)
-                    intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                    startActivityIfNeeded(intent, 0)
-                    overridePendingTransition(R.anim.none, R.anim.none)
-                    true
-                }
+//                R.id.navigation_myPost -> {
+//                    val intent = Intent(applicationContext, ManagePostActivity::class.java)
+//                    intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+//                    startActivityIfNeeded(intent, 0)
+//                    overridePendingTransition(R.anim.none, R.anim.none)
+//                    true
+//                }
                 R.id.navigation_myAccount -> {
                     val intent = Intent(applicationContext, ManageAccountActivity::class.java)
                     intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
@@ -247,7 +252,7 @@ class MainActivity : BasicActivity() {
     }
 
     fun selectArea(view: View) {
-        val dormCategory = arrayOf("전체", "같은 건물만", "북측기숙사", "서측기숙사", "동측기숙사", "문지캠", "화암캠")
+        val dormCategory = arrayOf("전체", "같은 위치만", "북측", "서측", "동측", "문지캠", "화암캠")
         MaterialAlertDialogBuilder(this@MainActivity).setTitle("지역 선택").setItems(dormCategory) { dialog, which ->
             // The 'which' argument contains the index position
             // of the selected item
@@ -264,7 +269,7 @@ class MainActivity : BasicActivity() {
 
         val searchView: SearchView = menuItem?.actionView as SearchView
 
-        val spinnerArray: Array<String> = arrayOf("세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
+        val spinnerArray: Array<String> = arrayOf("택시승강장" ,"쪽문", "세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
                 "여울/나들관", "다솜/희망관", "원내아파트", "나래/미르관", "나눔관", "문지관", "화암관")
 
         val loc_spinnerAdapter: ArrayAdapter<String> = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, spinnerArray)

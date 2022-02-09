@@ -17,11 +17,6 @@
         android:icon="@drawable/selector_bottom_navi_post_add_icon"/>
 
     <item
-        android:id="@+id/navigation_myPost"
-        android:title="내 게시물"
-        android:icon="@drawable/selector_bottom_navi_mypost_icon_unselected"/>
-
-    <item
         android:id="@+id/navigation_myAccount"
         android:title="내 계정"
         android:icon="@drawable/selector_bottom_navi_account_icon_unselected"/>
