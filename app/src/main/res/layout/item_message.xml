@@ -6,6 +6,24 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/messageItem_linearlayout_admin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#D2D4E1"
+        android:gravity="center"
+        >
+
+        <TextView
+            android:id="@+id/messageItem_textView_admin_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="관리자 메세지"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

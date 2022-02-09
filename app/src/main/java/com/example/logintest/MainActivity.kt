@@ -32,6 +32,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.reflect.Field
 
 
@@ -53,6 +55,11 @@ class MainActivity : BasicActivity() {
 //    private var fragPager: ViewPager? = null
 //    private var navigationBar: TabLayout? = null
 
+    private var postId : String? = null
+    private var chatroomName : String? = null
+    private var uid : String? = null
+    private var userName : String? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +76,25 @@ class MainActivity : BasicActivity() {
 
         setSupportActionBar(toolbar_main)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        uid = mFirebaseAuth.currentUser?.uid!!
+        // UserAccount 에서 현재 사용자 이름 받아오기
+        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
+            userName = it.value.toString()
+            //유저가 속해있는 postId 찾기
+            mDatabaseReference.child("Post").orderByChild("users/$uid").equalTo(userName)
+                .addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (item in snapshot.children){
+                            postId = item.key
+                        }
+                    }
+                })
+        }.addOnFailureListener {
+        }
 
         val btnAdd: FloatingActionButton = findViewById(R.id.btn_add)
         btnAdd.setOnClickListener {
@@ -105,7 +131,7 @@ class MainActivity : BasicActivity() {
 //                }
 //            })
             val intent = Intent(applicationContext, WritePostActivity::class.java)
-            intent.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+            intent.putExtra("uid", uid)
             startActivity(intent)
             overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
 
@@ -165,6 +191,10 @@ class MainActivity : BasicActivity() {
                     true
                 }
                 R.id.navigation_chat -> {
+                    val intent = Intent(applicationContext, MessageActivity::class.java)
+                    intent.putExtra("postId", postId)
+                    startActivity(intent)
+                    //intent.putExtra("chatRoomName")
                     true
                 }
                 R.id.navigation_add -> {
@@ -196,7 +226,7 @@ class MainActivity : BasicActivity() {
 //                        }
 //                    })
                     val intent = Intent(applicationContext, WritePostActivity::class.java)
-                    intent.putExtra("uid", mFirebaseAuth.currentUser?.uid)
+                    intent.putExtra("uid", uid)
                     startActivity(intent)
                     overridePendingTransition(R.anim.horizon_enter, R.anim.none)
                     true
@@ -275,7 +305,7 @@ class MainActivity : BasicActivity() {
 
         // userLocation 받아오기. 기본은 자기기숙사
         if (userLocation == null) {
-            mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("dorm").get().addOnSuccessListener {
+            mDatabaseReference.child("UserAccount").child(uid.toString()).child("dorm").get().addOnSuccessListener {
                 userLocation = it.value.toString()
                 spinnerItem.setSelection(spinnerArray.indexOf(userLocation))
                 val app = applicationContext as GlobalVariable
