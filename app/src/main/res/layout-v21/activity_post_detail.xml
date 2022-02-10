@@ -156,7 +156,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="채팅방 참여"
+                android:text="채팅방 바로가기"
                 android:textSize="13dp"
                 app:layout_constraintEnd_toEndOf="@+id/txt_detail_maintext"
                 app:layout_constraintTop_toBottomOf="@+id/txt_detail_maintext" />

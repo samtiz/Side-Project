@@ -80,6 +80,7 @@ class PostDetailActivity : BasicActivity(){
 
 
 
+
         txtPostDetailToolbarTitle = findViewById(R.id.txt_post_detail_toolbar_title)
         txtResName = findViewById(R.id.txt_detail_resname)
         txtResCategory1 = findViewById(R.id.txt_detail_rescategory1)
@@ -145,13 +146,29 @@ class PostDetailActivity : BasicActivity(){
             }
             else {
                 btnJoinChat?.setOnClickListener {
-                    MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("${post?.restaurantName} 모집 채팅방에 참여하시겠습니까?")
-                            .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
-                                val intent = Intent(this@PostDetailActivity, MessageActivity::class.java)
-                                intent.putExtra("postId", postId)
-                                startActivity(intent)
-                            })
-                            .setNegativeButton("취소") { _, _ -> }.show()
+                    mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("postId").get().addOnSuccessListener {
+                        var userpostId = it.value.toString()
+                        if (userpostId == postId){
+                            val intent = Intent(this@PostDetailActivity, MessageActivity::class.java)
+                            intent.putExtra("postId", postId)
+                            startActivity(intent)
+                        }
+                        else if(userpostId == "null"){
+                            MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("${post?.restaurantName} 모집 채팅방에 참여하시겠습니까?")
+                                .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
+                                    val intent = Intent(this@PostDetailActivity, MessageActivity::class.java)
+                                    intent.putExtra("postId", postId)
+                                    mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("postId").setValue(postId)
+                                    startActivity(intent)
+                                })
+                                .setNegativeButton("취소") { _, _ -> }.show()
+                        }
+                        else{
+                            Toast.makeText(applicationContext, "이미 참여한 모집방이 존재합니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }.addOnFailureListener {
+                    }
+
                 }
                 btnInquire.setOnClickListener{
                     layoutReply.visibility = GONE
@@ -259,6 +276,9 @@ class PostDetailActivity : BasicActivity(){
     private fun deletePost() {
         postId?.let { mDatabaseReference.child("Post").child(it).removeValue() }
         postId?.let { mDatabaseReference.child("chatrooms").child(it).removeValue() }
+        // 현태 수정 ///
+        mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("postId").removeValue()
+        //////////////
         // or
         // postId?.let { mDatabaseReference.child("Post").child(it).child("visibility").setValue(false) }
     }

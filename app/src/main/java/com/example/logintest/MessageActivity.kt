@@ -39,7 +39,8 @@ class MessageActivity : AppCompatActivity() {
     private var chatRoomUid : String? = null
     private var postId : String? = null
     private var post : Post? = null
-    private var chatRoomName : String? = null
+    private var postMaster : String? = null
+    //private var chatRoomName : String? = null
     private val users : HashMap<String, String> = HashMap()
 
     private var recyclerView : RecyclerView? = null
@@ -66,6 +67,7 @@ class MessageActivity : AppCompatActivity() {
         uid = mFirebaseAuth.currentUser?.uid!!
         recyclerView = findViewById(R.id.messageActivity_recyclerview)
 
+
         // 채팅방 이름 설정
         // 포스트 정보 받아오기
         mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
@@ -79,9 +81,9 @@ class MessageActivity : AppCompatActivity() {
                     }else{
                         message_lists_top_name.text = post?.restaurantName
                     }
+                    postMaster = post?.uid
             }
         })
-        //message_lists_top_name.text = chatRoomName
 
         // UserAccount 에서 현재 사용자 이름 받아오기
         mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
@@ -109,7 +111,8 @@ class MessageActivity : AppCompatActivity() {
             if (users!!.containsKey(uid)){
             }else{
                 users.put(uid!!, userName!!)
-                println(users)
+                println("아뭔데진짜")
+                println(postId)
                 mDatabaseReference.child("Post").child(postId.toString()).child("users").setValue(users)
 
                 //입장 알람
@@ -170,16 +173,28 @@ class MessageActivity : AppCompatActivity() {
         }
 
         val btnExit: Button = findViewById(R.id.btn_exit)
-        btnExit.setOnClickListener{
-            // Post에 접근하여 uid 제거하기
-            mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
-            // 메인 화면으로 돌아가기
-            val intent = Intent(this@MessageActivity, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-            // 퇴장 알림
-            val exitAlarm = ChatModel.Comment("Admin", "${userName}이 퇴장하셨습니다.", curTime)
-            mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm)
+        val btnEnd : Button = findViewById(R.id.btn_end)
+        if (postMaster == uid){ // 내가 만든 채팅방
+            btnExit.visibility = View.GONE
+            btnEnd.setOnClickListener{
+
+            }
+        }
+        else{ // 남이 만든 채팅방
+            btnEnd.visibility = View.GONE
+            btnExit.setOnClickListener{
+                // Post에 접근하여 uid 제거하기
+                mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
+                // UserAccount에 접근하여 postId 제거하기
+                mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
+                // 메인 화면으로 돌아가기
+                val intent = Intent(this@MessageActivity, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+                // 퇴장 알림
+                val exitAlarm = ChatModel.Comment("Admin", "${userName}이 퇴장하셨습니다.", curTime)
+                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm)
+            }
         }
         checkChatRoom()
     }

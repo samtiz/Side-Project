@@ -16,6 +16,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
 import android.widget.Spinner
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -56,7 +57,6 @@ class MainActivity : BasicActivity() {
 //    private var navigationBar: TabLayout? = null
 
     private var postId : String? = null
-    private var chatroomName : String? = null
     private var uid : String? = null
     private var userName : String? = null
 
@@ -78,21 +78,9 @@ class MainActivity : BasicActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         uid = mFirebaseAuth.currentUser?.uid!!
-        // UserAccount 에서 현재 사용자 이름 받아오기
-        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
-            userName = it.value.toString()
-            //유저가 속해있는 postId 찾기
-            mDatabaseReference.child("Post").orderByChild("users/$uid").equalTo(userName)
-                .addListenerForSingleValueEvent(object : ValueEventListener{
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        for (item in snapshot.children){
-                            postId = item.key
-                        }
-                    }
-                })
+        // UserAccount 에서 속해있는 postId 받아오기
+        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+            postId = it.value.toString()
         }.addOnFailureListener {
         }
 
@@ -154,11 +142,23 @@ class MainActivity : BasicActivity() {
                     true
                 }
                 R.id.navigation_chat -> {
-                    val intent = Intent(applicationContext, MessageActivity::class.java)
-                    intent.putExtra("postId", postId)
-                    startActivity(intent)
-                    //intent.putExtra("chatRoomName")
-                    true
+
+                    if (postId == "null"){
+                        // 참가해있는 채팅방이 없으면 팝업창
+                        val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity,  android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                        //dlg.setTitle("공지") //제목
+                        dlg.setMessage("참여하신 모집방이 존재하지 않습니다.") // 메시지
+                        dlg.setPositiveButton("확인"){ _,_ ->
+                        }
+                        dlg.show()
+
+                    }
+                    else{
+                        val intent = Intent(applicationContext, MessageActivity::class.java)
+                        intent.putExtra("postId", postId)
+                        startActivity(intent)
+                    }
+                true
                 }
                 R.id.navigation_add -> {
 //                    val sameUserPosts = ArrayList<Post>()
@@ -188,10 +188,15 @@ class MainActivity : BasicActivity() {
 //                            }
 //                        }
 //                    })
-                    val intent = Intent(applicationContext, WritePostActivity::class.java)
-                    intent.putExtra("uid", uid)
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                    if(postId == "null"){
+                        val intent = Intent(applicationContext, WritePostActivity::class.java)
+                        intent.putExtra("uid", uid)
+                        startActivity(intent)
+                        overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                    }
+                    else{
+                        Toast.makeText(applicationContext, "이미 참여한 모집방이 존재합니다.", Toast.LENGTH_SHORT).show()
+                    }
                     true
                 }
 //                R.id.navigation_myPost -> {
