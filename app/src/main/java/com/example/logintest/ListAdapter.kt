@@ -70,7 +70,6 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         val dorm: TextView = itemView.findViewById(R.id.txt_dorm)
         val timeLimit: TextView = itemView.findViewById(R.id.txt_timeLimit)
         val deliveryFee: TextView = itemView.findViewById(R.id.txt_deliveryFee)
-
     }
 
     override fun getFilter(): Filter {
