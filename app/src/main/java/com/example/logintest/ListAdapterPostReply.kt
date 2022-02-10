@@ -15,6 +15,9 @@ class ListAdapterPostReply(private val context: Context): RecyclerView.Adapter<L
         for ((key, value) in data) {
             replyList.add(value)
         }
+        replyList.sortBy {
+            it.time
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListAdapterPostReply.ViewHolder {

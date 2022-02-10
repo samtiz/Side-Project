@@ -23,7 +23,7 @@ class RepoComment {
     fun getData(postId: String): LiveData<MutableList<PostComment>> {
         val mutableData = MutableLiveData<MutableList<PostComment>>()
         val myRef = FirebaseDatabase.getInstance().getReference("logintest/Post/${postId}/comments")
-        myRef.addValueEventListener(object : ValueEventListener {
+        myRef.orderByChild("time").addValueEventListener(object : ValueEventListener {
             val listData: MutableList<PostComment> = mutableListOf<PostComment>()
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){

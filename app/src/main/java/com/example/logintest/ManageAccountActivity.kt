@@ -1,22 +1,21 @@
 package com.example.logintest
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.getValue
 
 class ManageAccountActivity : BasicActivity() {
 
         private lateinit var mFirebaseAuth: FirebaseAuth
         private lateinit var mDatabaseReference: DatabaseReference
+        private lateinit var adapter: ManageAccountListAdapter
+        private lateinit var txtName: TextView
+        private lateinit var txtEmail: TextView
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -25,50 +24,67 @@ class ManageAccountActivity : BasicActivity() {
             mFirebaseAuth = FirebaseAuth.getInstance()
             mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
 
-            val btnLogout: Button = findViewById(R.id.btn_logout)
-            btnLogout.setOnClickListener{
-                mFirebaseAuth.signOut()
-                Toast.makeText(this@ManageAccountActivity, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show()
-                MySharedPreferences.clearUser(this)
-                val intent = Intent(this@ManageAccountActivity, LoginActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
+            val uid = mFirebaseAuth.currentUser?.uid
 
-            val btnSecession: Button = findViewById(R.id.btn_secession)
-            btnSecession.setOnClickListener {
-                val mFirebaseUser: FirebaseUser? = mFirebaseAuth.currentUser
-                lateinit var  strPwd: String
-                mFirebaseUser?.uid.let { it1 ->
-                    if (it1 != null) {
-                        strPwd = mDatabaseReference.child("UserAccount").child(it1).child("password").toString()
-                        mDatabaseReference.child("UserAccount").child(it1).removeValue()
+            txtName = findViewById(R.id.txt_manage_username)
+            txtEmail = findViewById(R.id.txt_manage_email)
+            mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
+                val username = it.value as String
+                txtName.text = username
+            }.addOnFailureListener { Toast.makeText(this, "nickname get Failed", Toast.LENGTH_SHORT).show() }
+            txtEmail.text = mFirebaseAuth.currentUser?.email.toString()
 
+            adapter = ManageAccountListAdapter(this@ManageAccountActivity)
 
-                        mFirebaseUser?.delete()?.addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Toast.makeText(this@ManageAccountActivity, "성공적으로 계정을 삭제하였습니다.", Toast.LENGTH_SHORT).show()
-                                val intent = Intent(this@ManageAccountActivity, LoginActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            }
-                            else {
-                                Toast.makeText(this@ManageAccountActivity, "계정 삭제에 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-                                val account = UserAccount()
-                                account.emailId = mFirebaseUser?.email
-                                account.idToken = mFirebaseUser?.uid
-                                account.password = strPwd
+            val recyclerView: RecyclerView = findViewById(R.id.recyclerView_manage_account)
+            recyclerView.layoutManager = WrapContentLinearLayoutManager(this@ManageAccountActivity)
+            recyclerView.adapter = adapter
+            adapter.notifyDataSetChanged()
 
-                                mFirebaseUser?.uid?.let { it2 -> mDatabaseReference.child("UserAccount").child(it2).setValue(account) }
-                            }
-                        }
-
-                    }
-                    else{
-                        Toast.makeText(this@ManageAccountActivity, "사용자 데이터를 지우는데 실패하셨습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+//            val btnLogout: Button = findViewById(R.id.btn_logout)
+//            btnLogout.setOnClickListener{
+//                mFirebaseAuth.signOut()
+//                Toast.makeText(this@ManageAccountActivity, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show()
+//                MySharedPreferences.clearUser(this)
+//                val intent = Intent(this@ManageAccountActivity, LoginActivity::class.java)
+//                startActivity(intent)
+//                finish()
+//            }
+//
+//            val btnSecession: Button = findViewById(R.id.btn_secession)
+//            btnSecession.setOnClickListener {
+//                val mFirebaseUser: FirebaseUser? = mFirebaseAuth.currentUser
+//                lateinit var  strPwd: String
+//                mFirebaseUser?.uid.let { it1 ->
+//                    if (it1 != null) {
+//                        strPwd = mDatabaseReference.child("UserAccount").child(it1).child("password").toString()
+//                        mDatabaseReference.child("UserAccount").child(it1).removeValue()
+//
+//
+//                        mFirebaseUser?.delete()?.addOnCompleteListener { task ->
+//                            if (task.isSuccessful) {
+//                                Toast.makeText(this@ManageAccountActivity, "성공적으로 계정을 탈퇴하였습니다.", Toast.LENGTH_SHORT).show()
+//                                val intent = Intent(this@ManageAccountActivity, LoginActivity::class.java)
+//                                startActivity(intent)
+//                                finish()
+//                            }
+//                            else {
+//                                Toast.makeText(this@ManageAccountActivity, "계정 삭제에 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+//                                val account = UserAccount()
+//                                account.emailId = mFirebaseUser?.email
+//                                account.idToken = mFirebaseUser?.uid
+//                                account.password = strPwd
+//
+//                                mFirebaseUser?.uid?.let { it2 -> mDatabaseReference.child("UserAccount").child(it2).setValue(account) }
+//                            }
+//                        }
+//
+//                    }
+//                    else{
+//                        Toast.makeText(this@ManageAccountActivity, "사용자 데이터를 지우는데 실패하셨습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
 
             val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
             bottomNavigationView.selectedItemId = R.id.navigation_myAccount
@@ -156,6 +172,7 @@ class ManageAccountActivity : BasicActivity() {
         super.onResume()
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.navigation_myAccount
+        adapter.notifyDataSetChanged()
     }
 
 

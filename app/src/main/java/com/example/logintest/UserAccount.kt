@@ -8,4 +8,5 @@ class UserAccount{
     var idToken: String? = null
     var dorm: String? = null
     var nickname: String? = null
+    var postId: String? = null
 }

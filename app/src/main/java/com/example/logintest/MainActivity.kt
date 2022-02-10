@@ -96,48 +96,6 @@ class MainActivity : BasicActivity() {
         }.addOnFailureListener {
         }
 
-        val btnAdd: FloatingActionButton = findViewById(R.id.btn_add)
-        btnAdd.setOnClickListener {
-
-            //근데 데이터 구조 보다가 본건데 회원 정보는 realtime database가 아니라 storage에 넣어주는게 좋지 않을까
-//
-//            val sameUserPosts = ArrayList<Post>()
-//            mDatabaseReference.child("Post").orderByChild("uid").equalTo(mFirebaseAuth.currentUser?.uid).addListenerForSingleValueEvent(object :
-//                ValueEventListener {
-//                override fun onCancelled(error: DatabaseError) {
-//                }
-//
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    sameUserPosts.clear()
-//                    for (data in snapshot.children) {
-//                        sameUserPosts.add(data.getValue<Post>()!!)
-//                    }
-//                    if (sameUserPosts.isEmpty()) {
-//                        println(sameUserPosts.size)
-//                        val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
-//                        intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
-//                        startActivity(intent2)
-//                        overridePendingTransition(R.anim.horizon_enter, R.anim.none)
-//                    } else {
-//                        MaterialAlertDialogBuilder(this@MainActivity).setMessage("이미 작성한 게시물이 ${sameUserPosts.size}개 있습니다. 또 작성하시겠습니까?")
-//                            .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
-//                                val intent2 = Intent(this@MainActivity, WritePostActivity::class.java)
-//                                intent2.putExtra("uid", mFirebaseAuth.currentUser?.uid)
-//                                startActivity(intent2)
-//                                overridePendingTransition(R.anim.horizon_enter, R.anim.none)
-//                            })
-//                            .setNegativeButton("취소") { _, _ -> }.show()
-//                    }
-//                }
-//            })
-            val intent = Intent(applicationContext, WritePostActivity::class.java)
-            intent.putExtra("uid", uid)
-            startActivity(intent)
-            overridePendingTransition(R.anim.horizon_enter, R.anim.horizon_exit)
-
-
-        }
-
         adapter = ListAdapter(this@MainActivity)
 
 

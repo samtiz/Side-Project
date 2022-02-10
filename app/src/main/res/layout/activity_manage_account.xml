@@ -7,37 +7,17 @@
     tools:context=".ManageAccountActivity">
 
     <TextView
-        android:id="@+id/txt_manage"
+        android:id="@+id/txt_manage_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        android:text="계정 관리"
-        android:textSize="18dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:textStyle="bold"
+        android:text="유저닉네임"
         android:textColor="@color/black"
-        app:layout_constraintHorizontal_bias="0.498"
+        android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="로그아웃"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_manage" />
-
-    <Button
-        android:id="@+id/btn_secession"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="계정 삭제"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_logout" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -51,5 +31,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/menu_navigation" />
+
+    <TextView
+        android:id="@+id/txt_manage_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="16dp"
+        android:text="example@kaist.ac.kr"
+        app:layout_constraintStart_toStartOf="@+id/txt_manage_username"
+        app:layout_constraintTop_toBottomOf="@+id/txt_manage_username" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_manage_account"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_manage_email" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
