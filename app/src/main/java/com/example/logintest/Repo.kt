@@ -19,7 +19,7 @@ class Repo {
                 if (snapshot.exists()){
                     for (PostSnapshot in snapshot.children){
                         val getData = PostSnapshot.getValue(Post::class.java)
-                        if (category == "전체" || getData?.foodCategories?.contains(category)!! || getData.visibility) {
+                        if ((category == "전체" || getData?.foodCategories?.contains(category)!!) && (getData?.visibility!!)) {
                             if (selectedDormCategory == "전체") {
                                 listData.add(getData!!)
                             }

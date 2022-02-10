@@ -218,6 +218,8 @@ class WritePostActivity: BasicActivity() {
                         mDatabaseReference.child("Post").child(key).setValue(post)
                         Toast.makeText(this@WritePostActivity, "게시물을 올렸습니다.", Toast.LENGTH_SHORT).show()
                     }
+                    //UserAccount에 postId 넣기
+                    mDatabaseReference.child("UserAccount").child(uid!!).child("postId").setValue(post.postId)
                 }
 
                 //val userIdList = ArrayList<String>()
