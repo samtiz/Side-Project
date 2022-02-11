@@ -73,6 +73,8 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                     }.setPositiveButton("확인") { _, _ ->
                         mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("dorm").setValue(selectedDorm).addOnSuccessListener {
                             Toast.makeText(context, "기본 기숙사를 ${selectedDorm}으로 변경하였습니다.", Toast.LENGTH_SHORT).show()
+                            val app = context.applicationContext as GlobalVariable
+                            app.setUserLocation(selectedDorm)
                         }.addOnFailureListener { Toast.makeText(context, "기숙사 변경에 실패하였습니다. 다시 시도하여주세요.", Toast.LENGTH_SHORT).show() }
                     }.setNeutralButton("취소") { _, _ ->  }.show()
                 }
@@ -117,6 +119,9 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                         }
                         if (isSuccess) {
                             Toast.makeText(context, "닉네임이 ${et.text}으로 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                            val con = context as ManageAccountActivity
+                            val txtName = con.findViewById<TextView>(R.id.txt_manage_username)
+                            txtName.text = et.text.toString()
                         }
                     }.setNegativeButton("취소") { _, _ -> }.show()
                 }
@@ -133,6 +138,8 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                     val params: FrameLayout.LayoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                     params.leftMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
                     params.rightMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
+                    params.topMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
+                    params.bottomMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
                     et.layoutParams = params
                     et.hint = "새 비밀번호를 입력하세요"
                     container.addView(et)
@@ -175,7 +182,7 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                 holder.itemView.setOnClickListener {
                     val builder: AlertDialog.Builder = AlertDialog.Builder(context)
                     builder.setTitle("피드백 무조건 환영 >_<")
-                    builder.setMessage("samtiz@kaist.ac.kr\n위 주소로 메일주세요!")
+                    builder.setMessage("\nsamtiz@kaist.ac.kr\n위 주소로 메일주세요!\n")
                     builder.setPositiveButton("확인") { _, _ -> }
                     builder.show()
                 }
@@ -188,7 +195,20 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                 holder.itemView.setOnClickListener {
                     val builder: AlertDialog.Builder = AlertDialog.Builder(context)
                     builder.setTitle("사용 가이드")
-                    builder.setMessage("1. 어쩌구 저쩌구") //TODO
+                    builder.setMessage("\n1. 홈\n" +
+                            "홈 화면에서 원하는 음식점 배달 모집 글이 있나 찾아보세요. " +
+                            "배달 지역과 음식 카테고리를 설정하여 모집 글을 찾을 수 있으며 왼쪽 상단의 현재 위치 표시를 눌러 현재 위치를 변경할 수 있습니다. " +
+                            "원하는 음식점이 있다면 오른쪽 상단의 검색을 활용해보세요\n" +
+                            "\n2. 모집 글 작성\n" +
+                            "원하는 음식점 모집 글이 존재하지 않는다면 직접 모집 글을 작성하여 보세요! " +
+                            "하단의 모집하기 버튼을 눌러 모집 글 작성을 시작할 수 있습니다. " +
+                            "단, 한 번에 하나의 모집 글만 작성할 수 있다는 점 명심해주세요.\n" +
+                            "\n3. 채팅\n" +
+                            "원하는 모집 글을 찾은 경우 홈 화면에서 모집글을 눌러 자세히 볼 수 있습니다. " +
+                            "배달 수령 위치, 모집 완료 시간 등을 확인한 후, 배달 팟에 참여하고 싶다면 채팅방 바로가기 버튼을 눌러 게시물의 채팅방에 참여하세요. " +
+                            "다른 사람들과 채팅으로 주문 시간, 주문 메뉴, 배달 수령 위치 등릉 세부적으로 조정하시면 됩니다. " +
+                            "이 또한 한 번에 하나의 채팅방에만 참여할 수 있으며, 참여하고 있는 채팅방의 경우 하단의 채팅방 버튼을 통해 바로 들어가실 수 있습니다. (작성자의 경우 하단 버튼을 통해 자신이 쓴 모집글의 채팅방에 바로 들어가실 수 있습니다. " +
+                            "배달이 완료되어 모두가 음식을 받았다면 채팅방을 나가시면 되고, 모집글 작성자는 채팅방을 터트려주시면 됩니다.") //TODO
                     builder.setPositiveButton("확인") { _, _ -> }
                     builder.show()
                 }
@@ -199,14 +219,17 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                 img.setBounds(0, 0, 120, 120)
                 holder.text.setCompoundDrawables(img, null, null, null)
                 holder.itemView.setOnClickListener {
-                    //TODO logout 할거냐 dialog
-                    mFirebaseAuth.signOut()
-                    Toast.makeText(context, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show()
-                    MySharedPreferences.clearUser(context)
-                    val intent = Intent(context, LoginActivity::class.java)
-                    context.startActivity(intent)
-                    val activity: ManageAccountActivity = context as ManageAccountActivity
-                    activity.finishAffinity()
+                    MaterialAlertDialogBuilder(context).setMessage("로그아웃 하시겠습니까? 작성하신 모집글이나 참여중인 채팅방은 유지됩니다.")
+                            .setPositiveButton("확인") { _, _ ->
+                                mFirebaseAuth.signOut()
+                                Toast.makeText(context, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show()
+                                MySharedPreferences.clearUser(context)
+                                val intent = Intent(context, LoginActivity::class.java)
+                                context.startActivity(intent)
+                                val activity: ManageAccountActivity = context as ManageAccountActivity
+                                activity.finishAffinity()
+                            }.setNegativeButton("취소") { _, _ -> }.show()
+
                 }
             }
             6 -> {
@@ -216,37 +239,63 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                 holder.text.setCompoundDrawables(img, null, null, null)
                 holder.itemView.setOnClickListener {
                     //TODO 채팅방나가주고 게시물 지워줘야함, 정말로 탈퇴할거냐 dialog, 비번변경처럼 reauth
-
-                    val mFirebaseUser: FirebaseUser? = mFirebaseAuth.currentUser
-                    lateinit var  strPwd: String
-                    mFirebaseUser?.uid.let { it1 ->
-                        if (it1 != null) {
-                            strPwd = mDatabaseReference.child("UserAccount").child(it1).child("password").toString()
-                            mDatabaseReference.child("UserAccount").child(it1).removeValue()
-                            mFirebaseUser?.delete()?.addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    Toast.makeText(context, "성공적으로 계정을 탈퇴하였습니다.", Toast.LENGTH_SHORT).show()
-                                    val intent = Intent(context, LoginActivity::class.java)
-                                    context.startActivity(intent)
-                                    val activity: ManageAccountActivity = context as ManageAccountActivity
-                                    activity.finishAffinity()
+                    MaterialAlertDialogBuilder(context).setMessage("정말로 탈퇴하시겠습니까? 회원 정보 및 모집글, 참여중인 채팅방 정보가 모두 삭제됩니다.")
+                            .setPositiveButton("확인") { _, _ ->
+                                val mFirebaseUser: FirebaseUser? = mFirebaseAuth.currentUser
+                                val strEmail = mFirebaseUser?.email.toString()
+                                val uid = mFirebaseUser?.uid
+                                lateinit var  strPwd: String
+                                mFirebaseUser?.uid.let { it1 ->
+                                    if (it1 != null) {
+                                        mDatabaseReference.child("UserAccount").child(it1).child("password").get().addOnSuccessListener {
+                                            strPwd = it.value.toString()
+                                            val credential: AuthCredential = EmailAuthProvider.getCredential(strEmail, strPwd)
+                                            mFirebaseAuth.currentUser?.reauthenticate(credential)?.addOnCompleteListener { task0 ->
+                                                if (task0.isSuccessful) {
+                                                    mFirebaseUser?.delete()?.addOnCompleteListener { task1 ->
+                                                        if (task1.isSuccessful) {
+                                                            mDatabaseReference.child("UserAccount").child(it1).child("postId").get().addOnSuccessListener { it2 ->
+                                                                if (it2.value != null) {
+                                                                    val postId = it2.value.toString()
+                                                                    mDatabaseReference.child("Post").child(postId).child("users").child(uid!!).removeValue()
+                                                                }
+                                                            }
+                                                            mDatabaseReference.child("UserAccount").child(it1).removeValue().addOnCompleteListener { task2 ->
+                                                                if (task2.isSuccessful) {
+                                                                    MySharedPreferences.clearUser(context)
+                                                                    Toast.makeText(context, "성공적으로 계정을 탈퇴하였습니다.", Toast.LENGTH_SHORT).show()
+                                                                    val intent = Intent(context, LoginActivity::class.java)
+                                                                    context.startActivity(intent)
+                                                                    val activity: ManageAccountActivity = context as ManageAccountActivity
+                                                                    activity.finishAffinity()
+                                                                }
+                                                                else {
+                                                                    Toast.makeText(context, "firebase useraccount removeValue failed", Toast.LENGTH_SHORT).show()
+                                                                    mFirebaseAuth.createUserWithEmailAndPassword(strEmail, strPwd).addOnCompleteListener{ task3 ->
+                                                                        if (task3.isSuccessful) { }
+                                                                        else {
+                                                                            Toast.makeText(context, "Do not reach here. Plz contact developer.", Toast.LENGTH_SHORT).show()
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        else {
+                                                            Toast.makeText(context, "계정 삭제에 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    Toast.makeText(context, "firebase reauthenticate failed", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        }.addOnFailureListener { Toast.makeText(context, "get user passwd failed", Toast.LENGTH_SHORT).show() }
+                                    }
+                                    else{
+                                        Toast.makeText(context, "사용자 데이터를 지우는데 실패하셨습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
-                                else {
-                                    Toast.makeText(context, "계정 삭제에 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-                                    val account = UserAccount()
-                                    account.emailId = mFirebaseUser.email
-                                    account.idToken = mFirebaseUser.uid
-                                    account.password = strPwd
-
-                                    mFirebaseUser.uid.let { it2 -> mDatabaseReference.child("UserAccount").child(it2).setValue(account) }
-                                }
-                            }
-
-                        }
-                        else{
-                            Toast.makeText(context, "사용자 데이터를 지우는데 실패하셨습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                            }.setNegativeButton("취소") {_, _ -> }.show()
                 }
             }
         }

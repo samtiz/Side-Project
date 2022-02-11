@@ -64,7 +64,7 @@ class LoginActivity : BasicActivity() {
                     finish()
                 }
                 else {
-                    Toast.makeText(this@LoginActivity, "로그인에 실패하셨습니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, "로그인에 실패하셨습니다. 이메일과 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
