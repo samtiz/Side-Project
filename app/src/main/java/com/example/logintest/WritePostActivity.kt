@@ -152,14 +152,14 @@ class WritePostActivity: BasicActivity() {
 
         mCostSlider.addOnSliderTouchListener(rangeSliderTouchListener)
 
-        /// 현태 수정 ////////
-        // 현재 사용자 닉네임 받아오기
-        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
-            userName = it.value.toString()
-        }.addOnFailureListener {
-            Toast.makeText(this@WritePostActivity, "get() username failed", Toast.LENGTH_SHORT).show()
-        }
-        /////////////////////
+//        /// 현태 수정 ////////
+//        // 현재 사용자 닉네임 받아오기
+//        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
+//            userName = it.value.toString()
+//        }.addOnFailureListener {
+//            Toast.makeText(this@WritePostActivity, "get() username failed", Toast.LENGTH_SHORT).show()
+//        }
+//        /////////////////////
 
         mDatabaseReference.child("UserAccount").child(uid!!).child("dorm").get().addOnSuccessListener {
             dorm = it.value.toString()
@@ -210,16 +210,21 @@ class WritePostActivity: BasicActivity() {
                     // post Id에 자동으로 부여된 게시물 id 넣기
                     post.postId = key
                     // post에 참여한 user hashmap에 현재 사용자 넣기
-                    post.users[uid!!] = userName!!
+                    //post.users[uid!!] = userName!!
                     if (key == null) {
                         Toast.makeText(this@WritePostActivity, "게시를 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
                     }
                     else {
                         mDatabaseReference.child("Post").child(key).setValue(post)
                         Toast.makeText(this@WritePostActivity, "게시물을 올렸습니다.", Toast.LENGTH_SHORT).show()
+                        //UserAccount에 postId 넣기
+                        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").setValue(key)
+                        //Message 창으로 넘어가기
+                        val intent = Intent(this@WritePostActivity, MessageActivity::class.java)
+                        intent.putExtra("postId", key)
+                        startActivity(intent)
                     }
-                    //UserAccount에 postId 넣기
-                    mDatabaseReference.child("UserAccount").child(uid!!).child("postId").setValue(post.postId)
+
                 }
 
                 //val userIdList = ArrayList<String>()

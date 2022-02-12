@@ -7,6 +7,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
+import android.os.Handler
 import android.provider.BaseColumns
 import android.util.Log
 import android.view.Menu
@@ -79,10 +80,10 @@ class MainActivity : BasicActivity() {
 
         uid = mFirebaseAuth.currentUser?.uid!!
         // UserAccount 에서 속해있는 postId 받아오기
-        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
-            postId = it.value.toString()
-        }.addOnFailureListener {
-        }
+//        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+//            postId = it.value.toString()
+//        }.addOnFailureListener {
+//        }
 
         adapter = ListAdapter(this@MainActivity)
 
@@ -142,22 +143,22 @@ class MainActivity : BasicActivity() {
                     true
                 }
                 R.id.navigation_chat -> {
+                    mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+                        postId = it.value.toString()
+                        if (postId == "null"){
+                            Toast.makeText(applicationContext, "참여하신 채팅방이 없습니다.", Toast.LENGTH_SHORT).show()
 
-                    if (postId == "null"){
-                        // 참가해있는 채팅방이 없으면 팝업창
-                        val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity,  android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
-                        //dlg.setTitle("공지") //제목
-                        dlg.setMessage("참여하신 모집방이 존재하지 않습니다.") // 메시지
-                        dlg.setPositiveButton("확인"){ _,_ ->
+
                         }
-                        dlg.show()
+                        else{
+                            val intent = Intent(applicationContext, MessageActivity::class.java)
+                            intent.putExtra("postId", postId)
+                            startActivity(intent)
+                        }
+                    }.addOnFailureListener {
+                    }
 
-                    }
-                    else{
-                        val intent = Intent(applicationContext, MessageActivity::class.java)
-                        intent.putExtra("postId", postId)
-                        startActivity(intent)
-                    }
+
                 true
                 }
                 R.id.navigation_add -> {
@@ -188,15 +189,20 @@ class MainActivity : BasicActivity() {
 //                            }
 //                        }
 //                    })
-                    if(postId == "null"){
-                        val intent = Intent(applicationContext, WritePostActivity::class.java)
-                        intent.putExtra("uid", uid)
-                        startActivity(intent)
-                        overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                    mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+                        postId = it.value.toString()
+                        if(postId == "null"){
+                            val intent = Intent(applicationContext, WritePostActivity::class.java)
+                            intent.putExtra("uid", uid)
+                            startActivity(intent)
+                            overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                        }
+                        else{
+                            Toast.makeText(applicationContext, "이미 참여한 모집방이 존재합니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }.addOnFailureListener {
                     }
-                    else{
-                        Toast.makeText(applicationContext, "이미 참여한 모집방이 존재합니다.", Toast.LENGTH_SHORT).show()
-                    }
+
                     true
                 }
 //                R.id.navigation_myPost -> {

@@ -129,7 +129,10 @@ class PostDetailActivity : BasicActivity(){
                     MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("정말로 이 게시물을 삭제하시겠습니까?\n게시물을 삭제하면 이 게시물의 모집 채팅방도 같이 삭제됩니다.")
                             .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
                                 deletePost()
-                                finish()
+                                finishAffinity()
+                                val intent = Intent(applicationContext, MainActivity::class.java)
+                                startActivity(intent)
+                                overridePendingTransition(R.anim.none, R.anim.none)
                             })
                             .setNegativeButton("취소") { _, _ -> }.show()
                 }
