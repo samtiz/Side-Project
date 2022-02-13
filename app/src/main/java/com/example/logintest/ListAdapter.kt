@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -50,10 +51,18 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         // 게시물을 클릭하면 채팅 activity로 넘어가게 함
         holder.itemView.setOnClickListener {
 
-            val intent = Intent(context, PostDetailActivity::class.java)
-            intent.putExtra("postId", post.postId)
-            intent.putExtra("uid", uid)
-            context.startActivity(intent)
+            mDatabaseReference.child("Post").child(post.postId.toString()).get().addOnSuccessListener {
+                if (it.value != null){
+                    val intent = Intent(context, PostDetailActivity::class.java)
+                    intent.putExtra("postId", post.postId)
+                    intent.putExtra("uid", uid)
+                    context.startActivity(intent)
+                }
+                else{
+                    Toast.makeText(context, "이미 삭제된 게시물입니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
 
         }
         ////////////////////

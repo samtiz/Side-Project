@@ -6,6 +6,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -55,6 +57,7 @@ class MessageActivity : AppCompatActivity() {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
 
         val imageView = findViewById<ImageView>(R.id.messageActivity_ImageView)
+        val imageView_photo = findViewById<ImageView>(R.id.messageActivity_ImageView_photo)
         val editText = findViewById<TextView>(R.id.messageActivity_editText)
 
         // 메세지를 보낸 시간
@@ -68,6 +71,32 @@ class MessageActivity : AppCompatActivity() {
         uid = mFirebaseAuth.currentUser?.uid!!
         recyclerView = findViewById(R.id.messageActivity_recyclerview)
 
+        //글창에 글 없으면 이미지 추가 버튼, 글 있으면 전송 버튼
+        //imageView.visibility = View.INVISIBLE
+        imageView.visibility = View.INVISIBLE
+        imageView_photo.visibility = View.VISIBLE
+        editText.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                if(editText.text.isEmpty()){
+                    imageView.visibility = View.INVISIBLE
+                    imageView_photo.visibility = View.VISIBLE
+                }
+                imageView.visibility = View.VISIBLE
+                imageView_photo.visibility = View.INVISIBLE
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+            }
+        })
+//        if(editText.text.isEmpty()){
+//            imageView.visibility = View.INVISIBLE
+//        }
+//        else{
+//            imageView_photo.visibility = View.INVISIBLE
+//        }
 
         // 채팅방 이름 설정
         // 포스트 정보 받아오기
@@ -148,6 +177,12 @@ class MessageActivity : AppCompatActivity() {
                 messageActivity_editText.text = null
                 Log.d("chatUidNotNull dest", "$postId")
             }
+//            if(editText.text.isEmpty()){
+//                imageView.visibility = View.INVISIBLE
+//                imageView_photo.visibility = View.VISIBLE
+//            }
+            imageView.visibility = View.INVISIBLE
+            imageView_photo.visibility = View.VISIBLE
         }
 
         recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
@@ -225,8 +260,8 @@ class MessageActivity : AppCompatActivity() {
         // UserAccount에 접근하여 postId 제거하기
         mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
         // 메인 화면으로 돌아가기
-        val intent = Intent(this@MessageActivity, MainActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this@MessageActivity, MainActivity::class.java)
+//        startActivity(intent)
         finish()
         // 퇴장 알림
         val exitAlarm = ChatModel.Comment("Admin", "${userName}님이 퇴장하셨습니다.", "exit")
@@ -252,8 +287,8 @@ class MessageActivity : AppCompatActivity() {
         // UserAccount에 접근하여 postId 제거하기
         mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
         // 메인 화면으로 돌아가기
-        val intent = Intent(this@MessageActivity, MainActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this@MessageActivity, MainActivity::class.java)
+//        startActivity(intent)
         finish()
 
 
