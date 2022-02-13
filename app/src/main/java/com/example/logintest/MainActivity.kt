@@ -2,13 +2,11 @@ package com.example.logintest
 
 import android.annotation.SuppressLint
 import android.app.SearchManager
-import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,22 +17,12 @@ import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.getValue
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.lang.reflect.Field
 
 
 class MainActivity : BasicActivity() {
@@ -56,7 +44,6 @@ class MainActivity : BasicActivity() {
 //    private var navigationBar: TabLayout? = null
 
     private var postId : String? = null
-    private var chatroomName : String? = null
     private var uid : String? = null
     private var userName : String? = null
 
@@ -78,26 +65,19 @@ class MainActivity : BasicActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         uid = mFirebaseAuth.currentUser?.uid!!
-        // UserAccount 에서 현재 사용자 이름 받아오기
-        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
-            userName = it.value.toString()
-            //유저가 속해있는 postId 찾기
-            mDatabaseReference.child("Post").orderByChild("users/$uid").equalTo(userName)
-                .addListenerForSingleValueEvent(object : ValueEventListener{
-                    override fun onCancelled(error: DatabaseError) {
-                    }
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        for (item in snapshot.children){
-                            postId = item.key
-                        }
-                    }
-                })
-        }.addOnFailureListener {
-        }
+        // UserAccount 에서 속해있는 postId 받아오기
+//        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+//            postId = it.value.toString()
+//        }.addOnFailureListener {
+//        }
 
         adapter = ListAdapter(this@MainActivity)
 
+        // swipe로 refresh하기
+        swipeRefreshLayout.setOnRefreshListener {
+            observerData()
+            swipeRefreshLayout.isRefreshing = false
+        }
 
         val recyclerView : RecyclerView = findViewById(R.id.recyclerView_main)
         recyclerView.layoutManager = WrapContentLinearLayoutManager(this@MainActivity) // recyclerView의 안정성을 위함
@@ -154,11 +134,23 @@ class MainActivity : BasicActivity() {
                     true
                 }
                 R.id.navigation_chat -> {
-                    val intent = Intent(applicationContext, MessageActivity::class.java)
-                    intent.putExtra("postId", postId)
-                    startActivity(intent)
-                    //intent.putExtra("chatRoomName")
-                    true
+                    mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+                        postId = it.value.toString()
+                        if (postId == "null"){
+                            Toast.makeText(applicationContext, "참여하신 채팅방이 없습니다.", Toast.LENGTH_SHORT).show()
+
+
+                        }
+                        else{
+                            val intent = Intent(applicationContext, MessageActivity::class.java)
+                            intent.putExtra("postId", postId)
+                            startActivity(intent)
+                        }
+                    }.addOnFailureListener {
+                    }
+
+
+                true
                 }
                 R.id.navigation_add -> {
 //                    val sameUserPosts = ArrayList<Post>()
@@ -188,10 +180,20 @@ class MainActivity : BasicActivity() {
 //                            }
 //                        }
 //                    })
-                    val intent = Intent(applicationContext, WritePostActivity::class.java)
-                    intent.putExtra("uid", uid)
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                    mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+                        postId = it.value.toString()
+                        if(postId == "null"){
+                            val intent = Intent(applicationContext, WritePostActivity::class.java)
+                            intent.putExtra("uid", uid)
+                            startActivity(intent)
+                            overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                        }
+                        else{
+                            Toast.makeText(applicationContext, "이미 참여한 모집방이 존재합니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }.addOnFailureListener {
+                    }
+
                     true
                 }
 //                R.id.navigation_myPost -> {

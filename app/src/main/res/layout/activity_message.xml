@@ -39,7 +39,28 @@
     </LinearLayout>
     -->
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_message"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#3F51B5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/message_lists_top_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="채팅방 제목"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="left" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!--<androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearlayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -81,7 +102,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/btn_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="3dp"
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif"
+            android:text="모집 완료"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>-->
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -105,7 +142,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
         <!--       원래  app:layout_constraintBottom_toBottomOf="parent"-->
@@ -141,17 +178,6 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 <!--    나중에 채팅방 목록 activity 만들어서 거기에 옮기고 여기선 지워야함-->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:itemBackground="@color/white"
-        app:itemIconTint="@drawable/selector"
-        app:itemTextColor="@drawable/selector"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/menu_navigation" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

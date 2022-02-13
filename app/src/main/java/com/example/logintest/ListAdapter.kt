@@ -8,18 +8,16 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import java.util.*
+import com.google.firebase.database.*
 import kotlin.collections.ArrayList
 
 class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapter.ViewHolder>(), Filterable {
     private var postList = mutableListOf<Post>()
     private var postListFiltered = mutableListOf<Post>()
     private lateinit var mFirebaseAuth: FirebaseAuth
+    private lateinit var mDatabaseReference : DatabaseReference
 
     fun setListData(data: MutableList<Post>) {
         postList = data
@@ -33,6 +31,11 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
 
     override fun onBindViewHolder(holder: ListAdapter.ViewHolder, position: Int) {
         val post: Post = postListFiltered[position]
+
+        mFirebaseAuth = FirebaseAuth.getInstance()
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
+        val uid = mFirebaseAuth.currentUser?.uid!!
+
         holder.restaurantName.text = post.restaurantName
         holder.restaurantCategory1.text = post.foodCategories?.get(0).toString()
         holder.restaurantCategory2.text = post.foodCategories?.get(1).toString()
@@ -43,15 +46,15 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         holder.timeLimit.text = post.timeLimit + "까지"
         holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
 
-        // 현태가 수정한 부분 ///       //// ...을 수정
-        // 게시물을 클릭하면 자세히 보여줌
-        // TODO 수정해야함
+        // 현태가 수정한 부분 ///
+        // 게시물을 클릭하면 채팅 activity로 넘어가게 함
         holder.itemView.setOnClickListener {
+
             val intent = Intent(context, PostDetailActivity::class.java)
             intent.putExtra("postId", post.postId)
-            mFirebaseAuth = FirebaseAuth.getInstance()
-            intent.putExtra("uid", mFirebaseAuth.currentUser?.uid.toString())
+            intent.putExtra("uid", uid)
             context.startActivity(intent)
+
         }
         ////////////////////
     }
