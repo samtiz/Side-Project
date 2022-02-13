@@ -8,11 +8,9 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapter.ViewHolder>(), Filterable {

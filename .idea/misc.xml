@@ -3,7 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/drawable_view_focused.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/selector.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/selector_view.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout-v21/activity_main.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_login.xml" value="0.2046875" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_manage_account.xml" value="0.36614583333333334" />

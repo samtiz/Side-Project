@@ -86,6 +86,8 @@ class MessageActivity : AppCompatActivity() {
             }
         })
 
+
+
         // UserAccount 에서 현재 사용자 이름 받아오기
         mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
             userName = it.value.toString()
@@ -99,11 +101,13 @@ class MessageActivity : AppCompatActivity() {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
+                users.clear()
                 for (data in snapshot.children){
                     val key = data.key
                     val item = data.value
                     users.put(key.toString(), item.toString())
                 }
+
             }
         })
 
@@ -151,12 +155,23 @@ class MessageActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (uid == postMaster){
-            menuInflater.inflate(R.menu.menu_message_master, menu)
-        }
-        else{
-            menuInflater.inflate(R.menu.menu_message, menu)
-        }
+
+        mDatabaseReference.child("Post").child(postId.toString()).child("uid").addValueEventListener(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                postMaster = snapshot.getValue<String>()
+                menu?.clear()
+                if (uid == postMaster){
+                    menuInflater.inflate(R.menu.menu_message_master, menu)
+                }
+                else{
+                    menuInflater.inflate(R.menu.menu_message, menu)
+                }
+            }
+        })
+
         //menuInflater.inflate(R.menu.menu_message_master, menu)
         return true
     }
@@ -217,16 +232,16 @@ class MessageActivity : AppCompatActivity() {
         val exitAlarm = ChatModel.Comment("Admin", "${userName}님이 퇴장하셨습니다.", "exit")
         mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm)
 
-        // 마지막 남은 사람인지 확인하고 맞다면 채팅방 폭파
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").get().addOnSuccessListener {
-            if (it.value == null){
-                //post 제거
-                mDatabaseReference.child("Post").child(postId.toString()).removeValue()
-                //chatroom 제거
-                mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
-            }
-        }.addOnFailureListener {
-        }
+//        // 마지막 남은 사람인지 확인하고 맞다면 채팅방 폭파
+//        mDatabaseReference.child("Post").child(postId.toString()).child("users").get().addOnSuccessListener {
+//            if (it.value == null){
+//                //post 제거
+//                mDatabaseReference.child("Post").child(postId.toString()).removeValue()
+//                //chatroom 제거
+//                mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
+//            }
+//        }.addOnFailureListener {
+//        }
     }
 
     private fun exitMasterPost() {
@@ -241,39 +256,64 @@ class MessageActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
 
-        // 방장 넘기기
 
         mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.children == null){ // 채팅방에서 모두 나갔는지 확인
+                currentUsers.clear()
+                for (data in snapshot.children){
+                    val key = data.key
+                    val item = data.value
+
+                    currentUsers.put(key.toString(), item.toString())
+                }
+                if (currentUsers.isEmpty()){
                     //post 제거
                     mDatabaseReference.child("Post").child(postId.toString()).removeValue()
                     //chatroom 제거
                     mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
                 }
-                else{ // 방장 넘기기
-                    for (data in snapshot.children){
-                        val key = data.key
-                        val item = data.value
-
-                        currentUsers.put(key.toString(), item.toString())
-                    }
+                else{
                     nextMaster = currentUsers.keys.toTypedArray()[0]
                     mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
+
+                    // 퇴장 알림
+                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", "exit")
+                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${currentUsers.get(nextMaster)}님으로 변경되었습니다.", "exit")
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
                 }
+
+//                if (snapshot.children == null){ // 채팅방에서 모두 나갔는지 확인
+//                    //post 제거
+//                    mDatabaseReference.child("Post").child(postId.toString()).removeValue()
+//                    //chatroom 제거
+//                    mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
+//                }
+//                else{ // 방장 넘기기
+//                    for (data in snapshot.children){
+//                        val key = data.key
+//                        val item = data.value
+//
+//                        currentUsers.put(key.toString(), item.toString())
+//                    }
+//                    nextMaster = currentUsers.keys.toTypedArray()[0]
+//                    mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
+//
+//                    // 퇴장 알림
+//                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", "exit")
+//                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${currentUsers.get(nextMaster)}님으로 변경되었습니다.", "exit")
+//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
+//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
+//                }
             }
         })
 
 //        val nextMaster = users.keys.toTypedArray()[0]
 //        mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
-        // 퇴장 알림
-        val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", "exit")
-        val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${currentUsers.get(nextMaster)}님으로 변경되었습니다.", "exit")
-        mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
-        mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
+
 
 
 
@@ -322,7 +362,6 @@ class MessageActivity : AppCompatActivity() {
                     for (data in snapshot.children){
                         val item = data.getValue<ChatModel.Comment>()
                         comments.add(item!!)
-                        println(comments)
                     }
                     notifyDataSetChanged()
                     recyclerView?.scrollToPosition(comments.size - 1)

@@ -2,14 +2,11 @@ package com.example.logintest
 
 import android.annotation.SuppressLint
 import android.app.SearchManager
-import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
-import android.os.Handler
 import android.provider.BaseColumns
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -17,26 +14,15 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
 import android.widget.Spinner
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.getValue
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.lang.reflect.Field
 
 
 class MainActivity : BasicActivity() {
@@ -87,6 +73,11 @@ class MainActivity : BasicActivity() {
 
         adapter = ListAdapter(this@MainActivity)
 
+        // swipe로 refresh하기
+        swipeRefreshLayout.setOnRefreshListener {
+            observerData()
+            swipeRefreshLayout.isRefreshing = false
+        }
 
         val recyclerView : RecyclerView = findViewById(R.id.recyclerView_main)
         recyclerView.layoutManager = WrapContentLinearLayoutManager(this@MainActivity) // recyclerView의 안정성을 위함
