@@ -172,7 +172,7 @@
                 app:tint="#888888" />
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/txt_num_inquire"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -188,7 +188,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:nestedScrollingEnabled="false"
-                app:layout_constraintTop_toBottomOf="@+id/textView11" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_num_inquire" />
 <!--                    android:overScrollMode="never"-->
 
 
@@ -211,7 +211,7 @@
                 android:id="@+id/btn_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginRight="20dp"
                 android:text="삭제"
@@ -223,7 +223,7 @@
                 android:id="@+id/btn_modify"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="132dp"
                 android:layout_marginRight="132dp"
                 android:text="수정"
@@ -240,7 +240,7 @@
                 android:text="문의하기"
                 android:textSize="13dp"
                 app:layout_constraintBottom_toBottomOf="@+id/btn_join_chat"
-                app:layout_constraintStart_toEndOf="@+id/textView11" />
+                app:layout_constraintStart_toEndOf="@+id/txt_num_inquire" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

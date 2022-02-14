@@ -47,6 +47,7 @@ class WritePostActivity: BasicActivity() {
     private var uid: String? = null
     private var postId: String? = null
     private var isModify: Boolean = false
+    private var realTimeLimit: String? = null
 
     // 현태 수정 ///////
     private var userName: String? = null
@@ -190,7 +191,7 @@ class WritePostActivity: BasicActivity() {
                 post.minDeliveryFee = minCost
                 post.maxDeliveryFee = maxCost
                 post.mainText = mEtMainText.text.toString()
-                post.timeLimit = mEtTime.text.toString()
+                post.timeLimit = realTimeLimit
                 post.uid = uid
                 post.dorm = mEtLocation.text.toString()
                 post.visibility = true
@@ -252,10 +253,12 @@ class WritePostActivity: BasicActivity() {
         mBtnTime.setOnClickListener {
             val cal = Calendar.getInstance()
             val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hour, minute ->
-                val timeString = "${hour}:${minute}"
-                mEtTime.setText(timeString)
+                val strHour = if (hour < 10) { "0${hour}" } else { "$hour" }
+                val strMin = if (minute < 10) { "0${minute}" } else { "$minute" }
+                realTimeLimit = "${hour}:${minute}"
+                mEtTime.setText("${strHour}:${strMin}")
             }
-            TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),true).show()
+            TimePickerDialog(this, timeSetListener, (cal.get(Calendar.HOUR_OF_DAY)+9)%24, cal.get(Calendar.MINUTE),true).show()
         }
 
 

@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_post_detail.*
+import org.w3c.dom.Text
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -52,6 +53,7 @@ class PostDetailActivity : BasicActivity(){
     private lateinit var btnPostReply: Button
     private lateinit var layoutInquire: ConstraintLayout
     private lateinit var layoutReply: ConstraintLayout
+    private lateinit var txtNumInquire: TextView
 
 
 
@@ -100,6 +102,7 @@ class PostDetailActivity : BasicActivity(){
         btnInquire = findViewById(R.id.btn_inquire)
         layoutInquire = findViewById(R.id.inquire_constraintLayout)
         layoutReply = findViewById(R.id.reply_constraintLayout)
+        txtNumInquire = findViewById(R.id.txt_num_inquire)
 
 
         mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
@@ -120,6 +123,21 @@ class PostDetailActivity : BasicActivity(){
             txtTime.text = "모집 만료 시간: ${post?.timeLimit}" // TODO 시간 포맷 바꿔서 적용
             txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
             txtMain.text = post?.mainText
+            if (post?.comments?.isEmpty()!!) {
+                txtNumInquire.text = " 모집 0"
+            }
+            else {
+                var numInquire = 0
+                for ((key1, value1) in post?.comments!!) {
+                    numInquire += 1
+                    if (value1.replys.isNotEmpty()) {
+                        for ((key2, value2) in value1.replys) {
+                            numInquire += 1
+                        }
+                    }
+                }
+                txtNumInquire.text = " 문의 ${numInquire}"
+            }
             if (isMyPost!!) {
                 btnDelete?.visibility = VISIBLE
                 btnModify?.visibility = VISIBLE

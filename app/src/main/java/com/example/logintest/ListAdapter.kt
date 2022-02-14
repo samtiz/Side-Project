@@ -43,7 +43,12 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         holder.restaurantCategory4.text = post.foodCategories?.get(3).toString()
         holder.mainText.text = post.mainText
         holder.dorm.text = post.dorm
-        holder.timeLimit.text = post.timeLimit + "까지"
+        val time = post.timeLimit?.split(":")
+        var strTime: String = ""
+        strTime += if (time?.get(0)?.toInt()!! < 10) { "0${time[0]}" } else { time[0] }
+        strTime += ":"
+        strTime += if (time[1].toInt() < 10) { "0${time[1]}" } else { time[1] }
+        holder.timeLimit.text = strTime + " 까지"
         holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
 
         // 현태가 수정한 부분 ///
