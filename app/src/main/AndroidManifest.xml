@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.logintest">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:name=".GlobalVariable"
         android:allowBackup="true"
@@ -10,6 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Logintest">
+        <activity
+            android:name=".imagePickerActivity"
+            android:exported="false" />
         <activity
             android:name=".MessageActivity"
             android:exported="false" />
@@ -21,13 +26,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.Bridge" />
         <activity android:name=".ManageAccountActivity" />
         <activity android:name=".BasicActivity" />
-        <activity android:name=".WritePostActivity" />
-<!--        <activity android:name=".ManagePostActivity"/>-->
-        <activity android:name=".PostDetailActivity"/>
+        <activity android:name=".WritePostActivity" /> <!-- <activity android:name=".ManagePostActivity"/> -->
+        <activity android:name=".PostDetailActivity" />
     </application>
 
 </manifest>

@@ -1,8 +1,11 @@
 package com.example.logintest
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -12,12 +15,16 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_message.*
 import kotlinx.android.synthetic.main.activity_write_post.*
 import java.text.SimpleDateFormat
@@ -25,6 +32,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlinx.coroutines.*
+import java.io.File
+import java.util.jar.Manifest
 
 class MessageActivity : AppCompatActivity() {
 
@@ -36,13 +45,21 @@ class MessageActivity : AppCompatActivity() {
     private var uid : String? = null
     private var userName : String? = null
 
-    private var chatRoomUid : String? = null
     private var postId : String? = null
     private var post : Post? = null
     private var postMaster : String? = null
     private val users : HashMap<String, String> = HashMap()
 
+
     private var recyclerView : RecyclerView? = null
+
+    private var pickImageFromElbum = 0
+    private var uriPhoto : Uri? = null
+
+    // 메세지를 보낸 시간
+    val time = System.currentTimeMillis() + 32400000
+    private val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
+    private val curTime = dateFormat.format(Date(time)).toString()
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,14 +73,11 @@ class MessageActivity : AppCompatActivity() {
         mFirebaseAuth = FirebaseAuth.getInstance()
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
 
-        val imageView = findViewById<ImageView>(R.id.messageActivity_ImageView)
         val imageView_photo = findViewById<ImageView>(R.id.messageActivity_ImageView_photo)
+        val imageView = findViewById<ImageView>(R.id.messageActivity_ImageView)
         val editText = findViewById<TextView>(R.id.messageActivity_editText)
 
-        // 메세지를 보낸 시간
-        val time = System.currentTimeMillis() + 32400000
-        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
-        val curTime = dateFormat.format(Date(time)).toString()
+
 
         // 클릭으로 넘어온 post Id, chatRoomName
         postId = intent.getStringExtra("postId")
@@ -91,12 +105,6 @@ class MessageActivity : AppCompatActivity() {
             override fun afterTextChanged(p0: Editable?) {
             }
         })
-//        if(editText.text.isEmpty()){
-//            imageView.visibility = View.INVISIBLE
-//        }
-//        else{
-//            imageView_photo.visibility = View.INVISIBLE
-//        }
 
         // 채팅방 이름 설정
         // 포스트 정보 받아오기
@@ -149,10 +157,10 @@ class MessageActivity : AppCompatActivity() {
 
                 //입장 알람
                 if (uid == postMaster){
-                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime)
+                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime, false)
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
                 }else{
-                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime)
+                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime, false)
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
                 }
 
@@ -168,11 +176,31 @@ class MessageActivity : AppCompatActivity() {
             }
         },1000L)
 
+        imageView_photo.setOnClickListener {
+            when{
+                ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+                )==PackageManager.PERMISSION_GRANTED ->{
+                    // 권한이 잘 부여 되었을 때 갤러리에서 사진을 선택하는 기능
+                    navigatesPhotos()
+                }
+                shouldShowRequestPermissionRationale(android.Manifest.permission.READ_EXTERNAL_STORAGE)->{
+                    // 교육용 팝 확인 후 권한 팝업 띄우는 기능
 
-        // 전송 버튼 누르면
+                    showContextPopupPermission()
+                }
+                else ->{
+                    requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),1000)
+                }
+            }
+        }
+
+
+        // 글 전송 버튼 누르면
         imageView.setOnClickListener {
             if(!editText.text.isEmpty()){
-                val comment = ChatModel.Comment(uid, editText.text.toString(), curTime)
+                val comment = ChatModel.Comment(uid, editText.text.toString(), curTime, false)
                 mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(comment)
                 messageActivity_editText.text = null
                 Log.d("chatUidNotNull dest", "$postId")
@@ -188,6 +216,47 @@ class MessageActivity : AppCompatActivity() {
         recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
         recyclerView?.adapter = RecyclerViewAdapter()
     }
+
+    private fun showContextPopupPermission() {
+//        AlertDialog.Builder(this).setTitle("권한 요청")
+//            .setMessage("사진을 불러오기 위해 권한이 필요합니다.")
+//            .setPositiveButton("동의") {_,_ ->
+//                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)
+//            }
+//            .setNegativeButton("취소"){_,_ ->
+//            }
+//            .create()
+//            .show()
+        Toast.makeText(applicationContext, "사진을 불러오기 위해 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun navigatesPhotos() {
+        val intent = Intent(this, imagePickerActivity::class.java)
+        startActivityForResult(intent, 2000)
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 2000) {
+            var path = data?.getStringExtra("image")
+            if (data != null){
+                // 데이터 가져옴
+                uriPhoto = Uri.fromFile(File(path))
+                val photoComments = ChatModel.Comment(uid, uriPhoto.toString(), curTime, true)
+                val messageId = mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push()
+                FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).child(messageId.getKey().toString()).putFile(uriPhoto!!).addOnSuccessListener {
+                    Toast.makeText(applicationContext, "업로드 완료!", Toast.LENGTH_SHORT).show()
+                    Handler().postDelayed({
+                        messageId.setValue(photoComments)
+                    },10000L)
+
+                }
+
+            }
+        }
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
@@ -250,7 +319,7 @@ class MessageActivity : AppCompatActivity() {
     private fun finishPost() {
         mDatabaseReference.child("Post").child(postId.toString()).child("visibility").setValue(false)
         // 모집마감 알림
-        val finishAlarm = ChatModel.Comment("Admin", "모집이 마감되었습니다.", "end")
+        val finishAlarm = ChatModel.Comment("Admin", "모집이 마감되었습니다.", curTime, false)
         mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(finishAlarm)
     }
 
@@ -264,7 +333,7 @@ class MessageActivity : AppCompatActivity() {
 //        startActivity(intent)
         finish()
         // 퇴장 알림
-        val exitAlarm = ChatModel.Comment("Admin", "${userName}님이 퇴장하셨습니다.", "exit")
+        val exitAlarm = ChatModel.Comment("Admin", "${userName}님이 퇴장하셨습니다.", curTime, false)
         mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm)
 
 //        // 마지막 남은 사람인지 확인하고 맞다면 채팅방 폭파
@@ -315,8 +384,8 @@ class MessageActivity : AppCompatActivity() {
                     mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
 
                     // 퇴장 알림
-                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", "exit")
-                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${currentUsers.get(nextMaster)}님으로 변경되었습니다.", "exit")
+                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
+                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${currentUsers.get(nextMaster)}님으로 변경되었습니다.", curTime, false)
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
                 }
@@ -369,6 +438,7 @@ class MessageActivity : AppCompatActivity() {
     inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.MessageViewHolder>() {
 
         private val comments = ArrayList<ChatModel.Comment>()
+        private val keys = ArrayList<String>()
         private var post : Post? = null
         init{
             // 포스트 정보 받아오기
@@ -396,7 +466,9 @@ class MessageActivity : AppCompatActivity() {
                     comments.clear()
                     for (data in snapshot.children){
                         val item = data.getValue<ChatModel.Comment>()
+                        val key = data.key
                         comments.add(item!!)
+                        keys.add(key!!)
                     }
                     notifyDataSetChanged()
                     recyclerView?.scrollToPosition(comments.size - 1)
@@ -419,12 +491,41 @@ class MessageActivity : AppCompatActivity() {
             holder: MessageViewHolder,
             position: Int
         ) {
+            // 사진이면 사진 받아오기
+            var isPhoto = comments[position].isPhoto
+            if (isPhoto!!){
+                FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).child(keys[position]).downloadUrl
+                    .addOnSuccessListener {
+                        Glide.with(holder.itemView.context)
+                            .load(it).into(holder.imageView_message)
+                    }.addOnFailureListener{
+                        Toast.makeText(applicationContext, "실패!", Toast.LENGTH_SHORT).show()
+                    }
+            }
+
             holder.textView_message.textSize = 20F
+
             val speakingUserId = comments[position].uid
             var speakingUserName = users?.get(speakingUserId!!)
             holder.textView_time.text = comments[position].time
+            holder.imageView_message.visibility = View.INVISIBLE
 
             if (speakingUserId.equals(uid)){// 본인 채팅
+//                if (isPhoto!!){
+//                    holder.imageView_message.visibility = View.VISIBLE
+//
+//                }
+//                else{
+//                    holder.textView_message.text = comments[position].message
+//                    holder.textView_message.setBackgroundResource(R.drawable.rightbubble)
+//                    holder.textView_name.visibility = View.INVISIBLE
+//                    holder.layout_destination.visibility = View.INVISIBLE
+//                    holder.layout_main.gravity = Gravity.RIGHT
+//
+//                    holder.layout_admin.visibility = View.GONE
+//                    holder.textView_admin_message.visibility = View.GONE
+//                }
+                holder.imageView_message.visibility = View.VISIBLE
                 holder.textView_message.text = comments[position].message
                 holder.textView_message.setBackgroundResource(R.drawable.rightbubble)
                 holder.textView_name.visibility = View.INVISIBLE
@@ -433,6 +534,7 @@ class MessageActivity : AppCompatActivity() {
 
                 holder.layout_admin.visibility = View.GONE
                 holder.textView_admin_message.visibility = View.GONE
+
 
             }
             else if(speakingUserId.equals("Admin")){
@@ -461,6 +563,7 @@ class MessageActivity : AppCompatActivity() {
         inner class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view){
             val textView_message: TextView = view.findViewById(R.id.messageItem_textView_message)
             val textView_name: TextView = view.findViewById(R.id.messageItem_textview_name)
+            val imageView_message: ImageView = view.findViewById(R.id.messageItem_imageview_message)
             //val imageView_profile: ImageView = view.findViewById(R.id.messageItem_imageview_profile)
             val layout_destination: LinearLayout = view.findViewById(R.id.messageItem_layout_destination)
             val layout_main: LinearLayout = view.findViewById(R.id.messageItem_linearlayout_main)
