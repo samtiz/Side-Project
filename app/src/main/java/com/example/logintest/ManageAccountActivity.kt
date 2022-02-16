@@ -98,6 +98,20 @@ class ManageAccountActivity : BasicActivity() {
                         true
                     }
                     R.id.navigation_chat -> {
+                        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
+                            val postId = it.value.toString()
+                            if (postId == "null"){
+                                Toast.makeText(applicationContext, "참여하신 채팅방이 없습니다.", Toast.LENGTH_SHORT).show()
+                                bottomNavigationView.selectedItemId = R.id.navigation_myAccount
+
+                            }
+                            else{
+                                val intent = Intent(applicationContext, MessageActivity::class.java)
+                                intent.putExtra("postId", postId)
+                                startActivity(intent)
+                            }
+                        }.addOnFailureListener {
+                        }
                         true
                     }
                     R.id.navigation_add -> {
@@ -146,10 +160,20 @@ class ManageAccountActivity : BasicActivity() {
 //                            }
 //                        })
 
-                        val intent = Intent(applicationContext, WritePostActivity::class.java)
-                        intent.putExtra("uid", mFirebaseAuth.currentUser?.uid)
-                        startActivity(intent)
-                        overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                        mDatabaseReference.child("UserAccount").child(uid).child("postId").get().addOnSuccessListener {
+                            val postId = it.value.toString()
+                            if(postId == "null"){
+                                val intent = Intent(applicationContext, WritePostActivity::class.java)
+                                intent.putExtra("uid", uid)
+                                startActivity(intent)
+                                overridePendingTransition(R.anim.horizon_enter, R.anim.none)
+                            }
+                            else{
+                                Toast.makeText(applicationContext, "이미 참여한 모집방이 존재합니다.", Toast.LENGTH_SHORT).show()
+                                bottomNavigationView.selectedItemId = R.id.navigation_myAccount
+                            }
+                        }.addOnFailureListener {
+                        }
                         true
                     }
 //                    R.id.navigation_myPost -> {

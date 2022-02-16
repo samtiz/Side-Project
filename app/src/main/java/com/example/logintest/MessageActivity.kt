@@ -17,6 +17,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -27,6 +28,7 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_message.*
 import kotlinx.android.synthetic.main.activity_write_post.*
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -45,6 +47,7 @@ class MessageActivity : AppCompatActivity() {
     private var uid : String? = null
     private var userName : String? = null
 
+    private var chatRoomUid : String? = null
     private var postId : String? = null
     private var post : Post? = null
     private var postMaster : String? = null
@@ -85,6 +88,7 @@ class MessageActivity : AppCompatActivity() {
         uid = mFirebaseAuth.currentUser?.uid!!
         recyclerView = findViewById(R.id.messageActivity_recyclerview)
 
+        mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(true)
         //글창에 글 없으면 이미지 추가 버튼, 글 있으면 전송 버튼
         //imageView.visibility = View.INVISIBLE
         imageView.visibility = View.INVISIBLE
@@ -108,18 +112,18 @@ class MessageActivity : AppCompatActivity() {
 
         // 채팅방 이름 설정
         // 포스트 정보 받아오기
-        mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
+        mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                    post = snapshot.getValue<Post>()
-                    if (post?.restaurantName == "미정"){
-                        message_lists_top_name.text = post?.foodCategories!![0]
-                    }else{
-                        message_lists_top_name.text = post?.restaurantName
-                    }
-                    postMaster = post?.uid
+                post = snapshot.getValue<Post>()
+                if (post?.restaurantName == "미정") {
+                    message_lists_top_name.text = post?.foodCategories!![0]
+                } else {
+                    message_lists_top_name.text = post?.restaurantName
+                }
+                postMaster = post?.uid
             }
         })
 
@@ -133,13 +137,13 @@ class MessageActivity : AppCompatActivity() {
         }
 
         // 해당 포스트의 채팅방에 참여중인 유저 가져오기
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener{
+        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 users.clear()
-                for (data in snapshot.children){
+                for (data in snapshot.children) {
                     val key = data.key
                     val item = data.value
                     users.put(key.toString(), item.toString())
@@ -150,8 +154,8 @@ class MessageActivity : AppCompatActivity() {
 
         // 유저 id 추가(처음 들어오는 유저만)
         Handler().postDelayed({
-            if (users!!.containsKey(uid)){
-            }else{
+            if (users!!.containsKey(uid)) {
+            } else {
                 users.put(uid!!, userName!!)
                 mDatabaseReference.child("Post").child(postId.toString()).child("users").setValue(users)
 
@@ -165,16 +169,16 @@ class MessageActivity : AppCompatActivity() {
                 }
 
                 // 입장할 때 공지사항
-                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity,  android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
                 dlg.setTitle("공지") //제목
                 dlg.setMessage("1. 각자 원하시는 메뉴를 말씀해주세요.\n" +
                         "2. 음식을 받을 위치를 결정해주세요.\n" +
                         "3. 시키시는 분(방장)은 계좌번호를 알려주세요.") // 메시지
-                dlg.setPositiveButton("확인"){ _,_ ->
+                dlg.setPositiveButton("확인") { _, _ ->
                 }
                 dlg.show()
             }
-        },1000L)
+        }, 1000L)
 
         imageView_photo.setOnClickListener {
             when{
@@ -215,6 +219,16 @@ class MessageActivity : AppCompatActivity() {
 
         recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
         recyclerView?.adapter = RecyclerViewAdapter()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(false)
     }
 
     private fun showContextPopupPermission() {
@@ -260,17 +274,16 @@ class MessageActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
-        mDatabaseReference.child("Post").child(postId.toString()).child("uid").addValueEventListener(object : ValueEventListener{
+        mDatabaseReference.child("Post").child(postId.toString()).child("uid").addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 postMaster = snapshot.getValue<String>()
                 menu?.clear()
-                if (uid == postMaster){
+                if (uid == postMaster) {
                     menuInflater.inflate(R.menu.menu_message_master, menu)
-                }
-                else{
+                } else {
                     menuInflater.inflate(R.menu.menu_message, menu)
                 }
             }
@@ -283,32 +296,40 @@ class MessageActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                finish()
-                overridePendingTransition(R.anim.none, R.anim.none)
+                if (isTaskRoot) {
+                    val intent = Intent(this@MessageActivity, LoginActivity::class.java)
+                    intent.action = Intent.ACTION_MAIN
+                    intent.addCategory(Intent.CATEGORY_LAUNCHER)
+                    startActivity(intent)
+                    finish()
+                    overridePendingTransition(R.anim.none, R.anim.none)
+                } else {
+                    finish()
+                    overridePendingTransition(R.anim.none, R.anim.none)
+                }
                 return true
             }
             R.id.action_exit -> {
-                if (uid == postMaster){// 방장이 나가면
+                if (uid == postMaster) {// 방장이 나가면
                     MaterialAlertDialogBuilder(this@MessageActivity).setMessage("채팅방을 나가시겠습니까? 방장의 권한은 다른 사람에게 넘어갑니다.")
-                        .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
-                            exitMasterPost()
-                        })
-                        .setNegativeButton("취소") { _, _ -> }.show()
-                }
-                else{ // 방장이 아닌사람이 나가면
+                            .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
+                                exitMasterPost()
+                            })
+                            .setNegativeButton("취소") { _, _ -> }.show()
+                } else { // 방장이 아닌사람이 나가면
                     MaterialAlertDialogBuilder(this@MessageActivity).setMessage("채팅방을 나가시겠습니까?")
-                        .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
-                            exitPost()
-                        })
-                        .setNegativeButton("취소") { _, _ -> }.show()
+                            .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
+                                exitPost()
+                            })
+                            .setNegativeButton("취소") { _, _ -> }.show()
                 }
             }
             R.id.action_finish -> {
                 MaterialAlertDialogBuilder(this@MessageActivity).setMessage("모집을 마감하시겠습니까?")
-                    .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
-                        finishPost()
-                    })
-                    .setNegativeButton("취소") { _, _ -> }.show()
+                        .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
+                            finishPost()
+                        })
+                        .setNegativeButton("취소") { _, _ -> }.show()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -361,25 +382,24 @@ class MessageActivity : AppCompatActivity() {
         finish()
 
 
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener{
+        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 currentUsers.clear()
-                for (data in snapshot.children){
+                for (data in snapshot.children) {
                     val key = data.key
                     val item = data.value
 
                     currentUsers.put(key.toString(), item.toString())
                 }
-                if (currentUsers.isEmpty()){
+                if (currentUsers.isEmpty()) {
                     //post 제거
                     mDatabaseReference.child("Post").child(postId.toString()).removeValue()
                     //chatroom 제거
                     mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
-                }
-                else{
+                } else {
                     nextMaster = currentUsers.keys.toTypedArray()[0]
                     mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
 
@@ -442,7 +462,7 @@ class MessageActivity : AppCompatActivity() {
         private var post : Post? = null
         init{
             // 포스트 정보 받아오기
-            mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener{
+            mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(error: DatabaseError) {
                 }
 
@@ -458,13 +478,13 @@ class MessageActivity : AppCompatActivity() {
             })
         }
         fun getMessageList(){
-            mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").addValueEventListener(object : ValueEventListener{
+            mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(error: DatabaseError) {
                 }
 
                 override fun onDataChange(snapshot: DataSnapshot) {
                     comments.clear()
-                    for (data in snapshot.children){
+                    for (data in snapshot.children) {
                         val item = data.getValue<ChatModel.Comment>()
                         val key = data.key
                         comments.add(item!!)
@@ -488,8 +508,8 @@ class MessageActivity : AppCompatActivity() {
 
         @SuppressLint("RtlHardcoded")
         override fun onBindViewHolder(
-            holder: MessageViewHolder,
-            position: Int
+                holder: MessageViewHolder,
+                position: Int
         ) {
             // 사진이면 사진 받아오기
             var isPhoto = comments[position].isPhoto

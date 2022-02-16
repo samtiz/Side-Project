@@ -9,4 +9,6 @@ class UserAccount{
     var dorm: String? = null
     var nickname: String? = null
     var postId: String? = null
+    var firebaseToken: String? = null
+    var nowChatting: Boolean = false
 }
