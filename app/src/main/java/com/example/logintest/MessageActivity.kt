@@ -209,10 +209,6 @@ class MessageActivity : AppCompatActivity() {
                 messageActivity_editText.text = null
                 Log.d("chatUidNotNull dest", "$postId")
             }
-//            if(editText.text.isEmpty()){
-//                imageView.visibility = View.INVISIBLE
-//                imageView_photo.visibility = View.VISIBLE
-//            }
             imageView.visibility = View.INVISIBLE
             imageView_photo.visibility = View.VISIBLE
         }
@@ -232,15 +228,6 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun showContextPopupPermission() {
-//        AlertDialog.Builder(this).setTitle("권한 요청")
-//            .setMessage("사진을 불러오기 위해 권한이 필요합니다.")
-//            .setPositiveButton("동의") {_,_ ->
-//                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)
-//            }
-//            .setNegativeButton("취소"){_,_ ->
-//            }
-//            .create()
-//            .show()
         Toast.makeText(applicationContext, "사진을 불러오기 위해 권한이 필요합니다", Toast.LENGTH_SHORT).show()
     }
 
