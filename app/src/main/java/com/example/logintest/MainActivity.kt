@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,10 +19,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -64,12 +68,34 @@ class MainActivity : BasicActivity() {
         setSupportActionBar(toolbar_main)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        val GAA = GoogleApiAvailability.getInstance()
+        GAA.makeGooglePlayServicesAvailable(this@MainActivity).addOnCompleteListener {
+            if (!it.isSuccessful) {
+                Toast.makeText(this, "makeGooglePlayServicesAvailable failed", Toast.LENGTH_SHORT).show()
+                Log.d("error", "makeGooglePlayServicesAvailable failed")
+            }
+        }
+
         uid = mFirebaseAuth.currentUser?.uid!!
-        // UserAccount 에서 속해있는 postId 받아오기
-//        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener {
-//            postId = it.value.toString()
-//        }.addOnFailureListener {
-//        }
+
+        mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(false)
+
+        mDatabaseReference.child("UserAccount").child(uid!!).child("firebaseToken").get().addOnSuccessListener {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("error", "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new FCM registration token
+                val realToken = task.result.toString()
+                val savedToken = it.value.toString()
+
+                if (realToken != savedToken) {
+                    mDatabaseReference.child("UserAccount").child(uid!!).child("firebaseToken").setValue(realToken)
+                }
+            })
+        }
 
         adapter = ListAdapter(this@MainActivity)
 
@@ -138,7 +164,7 @@ class MainActivity : BasicActivity() {
                         postId = it.value.toString()
                         if (postId == "null"){
                             Toast.makeText(applicationContext, "참여하신 채팅방이 없습니다.", Toast.LENGTH_SHORT).show()
-
+                            bottomNavigationView.selectedItemId = R.id.navigation_home
 
                         }
                         else{
@@ -190,6 +216,7 @@ class MainActivity : BasicActivity() {
                         }
                         else{
                             Toast.makeText(applicationContext, "이미 참여한 모집방이 존재합니다.", Toast.LENGTH_SHORT).show()
+                            bottomNavigationView.selectedItemId = R.id.navigation_home
                         }
                     }.addOnFailureListener {
                     }
@@ -221,7 +248,9 @@ class MainActivity : BasicActivity() {
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.navigation_home
         observerData()
+
     }
+
 
 
 

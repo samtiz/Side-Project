@@ -1,8 +1,9 @@
 package com.example.logintest
 
 import android.app.Application
+import androidx.multidex.MultiDexApplication
 
-class GlobalVariable : Application() {
+class GlobalVariable : MultiDexApplication() {
     private var userLocation: String? = null
     private var currentCommentId: String? = null
 

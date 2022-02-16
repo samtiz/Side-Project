@@ -2,23 +2,21 @@ package com.example.logintest
 
 import android.content.Intent
 import android.graphics.Color
-import android.nfc.Tag
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class RegisterActivity : BasicActivity() {
     private lateinit var mFirebaseAuth: FirebaseAuth            // Firebase certification
@@ -81,19 +79,25 @@ class RegisterActivity : BasicActivity() {
                         account.password = strPwd
                         account.nickname = strName
                         account.dorm = strDorm
+                        account.nowChatting = false
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                Log.w("FCM token error", "Fetching FCM registration token failed", task.exception)
+                                return@OnCompleteListener
+                            }
 
-                        mFirebaseUser?.uid?.let { it1 -> mDatabaseReference.child("UserAccount").child(it1).setValue(account) }
+                            // Get new FCM registration token
+                            val token = task.result.toString()
+                            account.firebaseToken = token
 
-//                        UserStatus add
+                            mFirebaseUser?.uid?.let { it1 -> mDatabaseReference.child("UserAccount").child(it1).setValue(account) }
 
-//                        val status = UserStatus()
-//                        status.post_num = 0
-//                        mFirebaseUser?.uid?.let { it1 -> mDatabaseReference.child("UserStatus").child(it1).setValue(status) }
+                            Toast.makeText(this@RegisterActivity, "회원가입에 성공하셨습니다", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        })
 
-                        Toast.makeText(this@RegisterActivity, "회원가입에 성공하셨습니다", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
-                        startActivity(intent)
-                        finish()
                     }
                     else {
                         Toast.makeText(this@RegisterActivity, "회원가입에 실패하셨습니다", Toast.LENGTH_SHORT).show()
