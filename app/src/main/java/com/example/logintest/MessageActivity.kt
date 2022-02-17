@@ -538,6 +538,8 @@ class MessageActivity : BasicActivity() {
             // 프사 정해주기
             var index = 0
             if (!speakingUserId.equals("Admin")){
+                println("씨발")
+                println(users)
                 index = users?.get(speakingUserId!!)?.split("/")?.last()!!.toInt()
                 println("인덱스")
                 println(speakingUserId)

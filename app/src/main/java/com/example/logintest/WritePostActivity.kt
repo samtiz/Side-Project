@@ -258,7 +258,7 @@ class WritePostActivity: BasicActivity() {
                 realTimeLimit = "${hour}:${minute}"
                 mEtTime.setText("${strHour}:${strMin}")
             }
-            TimePickerDialog(this, timeSetListener, (cal.get(Calendar.HOUR_OF_DAY)+9)%24, cal.get(Calendar.MINUTE),true).show()
+            TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),true).show()
         }
 
 
