@@ -13,12 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Logintest">
         <activity
+            android:name=".photoDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".imagePickerActivity"
             android:exported="false" />
         <activity
             android:name=".MessageActivity"
-            android:parentActivityName=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,9 +35,9 @@
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.Bridge" />
         <activity android:name=".ManageAccountActivity" />
         <activity android:name=".BasicActivity" />
-        <activity android:name=".WritePostActivity" />
-<!--        <activity android:name=".ManagePostActivity"/>-->
-        <activity android:name=".PostDetailActivity"/>
+        <activity android:name=".WritePostActivity" /> <!-- <activity android:name=".ManagePostActivity"/> -->
+        <activity android:name=".PostDetailActivity" />
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">
@@ -49,22 +52,19 @@
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="false" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/selector_bottom_navi_chat_icon_selected" />
-        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <!--
+ Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/black" />
-
     </application>
-
-
 
 </manifest>

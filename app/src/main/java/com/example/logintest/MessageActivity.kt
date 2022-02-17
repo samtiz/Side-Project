@@ -1,7 +1,6 @@
 package com.example.logintest
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,7 +14,6 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +33,6 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlinx.coroutines.*
 import java.io.File
-import java.util.jar.Manifest
 
 class MessageActivity : AppCompatActivity() {
 
@@ -52,6 +49,7 @@ class MessageActivity : AppCompatActivity() {
     private var post : Post? = null
     private var postMaster : String? = null
     private val users : HashMap<String, String> = HashMap()
+    private var index = 0
 
 
     private var recyclerView : RecyclerView? = null
@@ -60,7 +58,7 @@ class MessageActivity : AppCompatActivity() {
     private var uriPhoto : Uri? = null
 
     // 메세지를 보낸 시간
-    val time = System.currentTimeMillis() + 32400000
+    val time = System.currentTimeMillis()
     private val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
     private val curTime = dateFormat.format(Date(time)).toString()
 
@@ -143,12 +141,14 @@ class MessageActivity : AppCompatActivity() {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 users.clear()
+                var i = 0
                 for (data in snapshot.children) {
                     val key = data.key
                     val item = data.value
                     users.put(key.toString(), item.toString())
+                    i += 1
                 }
-
+                index = i
             }
         })
 
@@ -156,7 +156,9 @@ class MessageActivity : AppCompatActivity() {
         Handler().postDelayed({
             if (users!!.containsKey(uid)) {
             } else {
-                users.put(uid!!, userName!!)
+                val userinfo = "$userName/$index"
+                //users.put(uid!!, userName!!)
+                users.put(uid!!, userinfo)
                 mDatabaseReference.child("Post").child(postId.toString()).child("users").setValue(users)
 
                 //입장 알람
@@ -203,6 +205,10 @@ class MessageActivity : AppCompatActivity() {
 
         // 글 전송 버튼 누르면
         imageView.setOnClickListener {
+            val time = System.currentTimeMillis()
+            val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
+            val curTime = dateFormat.format(Date(time)).toString()
+
             if(!editText.text.isEmpty()){
                 val comment = ChatModel.Comment(uid, editText.text.toString(), curTime, false)
                 mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(comment)
@@ -239,6 +245,11 @@ class MessageActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        val time = System.currentTimeMillis()
+        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
+        val curTime = dateFormat.format(Date(time)).toString()
+
         if (requestCode == 2000) {
             var path = data?.getStringExtra("image")
             if (data != null){
@@ -325,6 +336,9 @@ class MessageActivity : AppCompatActivity() {
 
 
     private fun finishPost() {
+        val time = System.currentTimeMillis()
+        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
+        val curTime = dateFormat.format(Date(time)).toString()
         mDatabaseReference.child("Post").child(postId.toString()).child("visibility").setValue(false)
         // 모집마감 알림
         val finishAlarm = ChatModel.Comment("Admin", "모집이 마감되었습니다.", curTime, false)
@@ -332,31 +346,25 @@ class MessageActivity : AppCompatActivity() {
     }
 
     private fun exitPost() {
+        val time = System.currentTimeMillis()
+        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
+        val curTime = dateFormat.format(Date(time)).toString()
         // Post에 접근하여 uid 제거하기
         mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
         // UserAccount에 접근하여 postId 제거하기
         mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
         // 메인 화면으로 돌아가기
-//        val intent = Intent(this@MessageActivity, MainActivity::class.java)
-//        startActivity(intent)
         finish()
         // 퇴장 알림
         val exitAlarm = ChatModel.Comment("Admin", "${userName}님이 퇴장하셨습니다.", curTime, false)
         mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm)
 
-//        // 마지막 남은 사람인지 확인하고 맞다면 채팅방 폭파
-//        mDatabaseReference.child("Post").child(postId.toString()).child("users").get().addOnSuccessListener {
-//            if (it.value == null){
-//                //post 제거
-//                mDatabaseReference.child("Post").child(postId.toString()).removeValue()
-//                //chatroom 제거
-//                mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
-//            }
-//        }.addOnFailureListener {
-//        }
     }
 
     private fun exitMasterPost() {
+        val time = System.currentTimeMillis()
+        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
+        val curTime = dateFormat.format(Date(time)).toString()
         var nextMaster : String? = null
         var currentUsers : HashMap<String, String> = HashMap()
         // Post에 접근하여 uid 제거하기
@@ -364,10 +372,7 @@ class MessageActivity : AppCompatActivity() {
         // UserAccount에 접근하여 postId 제거하기
         mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
         // 메인 화면으로 돌아가기
-//        val intent = Intent(this@MessageActivity, MainActivity::class.java)
-//        startActivity(intent)
         finish()
-
 
         mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
@@ -386,13 +391,25 @@ class MessageActivity : AppCompatActivity() {
                     mDatabaseReference.child("Post").child(postId.toString()).removeValue()
                     //chatroom 제거
                     mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
+                    // 사진 파일 제거
+                    FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).delete()
                 } else {
-                    nextMaster = currentUsers.keys.toTypedArray()[0]
+                    var minIndex = 100
+                    for (key in currentUsers.keys){
+                        val i = currentUsers.get(key)?.split("/")?.last()!!.toInt()
+                        if(i < minIndex){
+                            minIndex = i
+                            nextMaster = key
+                        }
+                    }
+                    //nextMaster = currentUsers.keys.toTypedArray()[0]
                     mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
 
                     // 퇴장 알림
                     val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
-                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${currentUsers.get(nextMaster)}님으로 변경되었습니다.", curTime, false)
+                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${
+                        currentUsers.get(nextMaster)?.split("/")?.first()
+                    }님으로 변경되었습니다.", curTime, false)
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
                 }
@@ -478,6 +495,7 @@ class MessageActivity : AppCompatActivity() {
                         keys.add(key!!)
                     }
                     notifyDataSetChanged()
+
                     recyclerView?.scrollToPosition(comments.size - 1)
                 }
             })
@@ -513,9 +531,39 @@ class MessageActivity : AppCompatActivity() {
             holder.textView_message.textSize = 20F
 
             val speakingUserId = comments[position].uid
-            var speakingUserName = users?.get(speakingUserId!!)
+            var speakingUserName = users?.get(speakingUserId!!)?.split("/")?.first()
             holder.textView_time.text = comments[position].time
-            holder.imageView_message.visibility = View.INVISIBLE
+            holder.imageView_message.visibility = View.GONE
+
+
+            // 프사 정해주기
+            var index = 0
+            if (!speakingUserId.equals("Admin")){
+                index = users?.get(speakingUserId!!)?.split("/")?.last()!!.toInt()
+                println("인덱스")
+                println(speakingUserId)
+                println(index)
+            }
+
+            when{
+                index % 5 == 0 -> {
+                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background1)
+                    println("여기1")
+                }
+                index % 5 == 1 -> {
+                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background2)
+                    println("여기2")
+                }
+                index % 5 == 2 -> {
+                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background3)
+                }
+                index % 5 == 3 -> {
+                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background4)
+                }
+                index % 5 == 4 -> {
+                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background5)
+                }
+            }
 
             if (speakingUserId.equals(uid)){// 본인 채팅
 //                if (isPhoto!!){
@@ -571,7 +619,7 @@ class MessageActivity : AppCompatActivity() {
             val textView_message: TextView = view.findViewById(R.id.messageItem_textView_message)
             val textView_name: TextView = view.findViewById(R.id.messageItem_textview_name)
             val imageView_message: ImageView = view.findViewById(R.id.messageItem_imageview_message)
-            //val imageView_profile: ImageView = view.findViewById(R.id.messageItem_imageview_profile)
+            val imageView_profile: ImageView = view.findViewById(R.id.messageItem_imageview_profile)
             val layout_destination: LinearLayout = view.findViewById(R.id.messageItem_layout_destination)
             val layout_main: LinearLayout = view.findViewById(R.id.messageItem_linearlayout_main)
             val textView_time : TextView = view.findViewById(R.id.messageItem_textView_time)

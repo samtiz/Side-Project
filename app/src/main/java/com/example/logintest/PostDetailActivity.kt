@@ -18,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_post_detail.*
 import org.w3c.dom.Text
 import java.text.SimpleDateFormat
@@ -200,12 +201,20 @@ class PostDetailActivity : BasicActivity(){
         }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
 
 
+        // swipe로 refresh하기
+        swipeRefreshLayout_postDetail.setOnRefreshListener {
+            observeComments()
+            println("왜 안돌아가")
+            swipeRefreshLayout_postDetail.isRefreshing = false
+        }
+
 
         //TODO view랑 post 데이터 연동 및 댓글 데이터 연동
         adapter = ListAdapterPostComment(this@PostDetailActivity)
         recyclerViewInquire.layoutManager = WrapContentLinearLayoutManager(this@PostDetailActivity)
         recyclerViewInquire.adapter = adapter
         observeComments()
+
 
         btnPostInquire.setOnClickListener {
             val comment: PostComment = PostComment()
@@ -272,7 +281,7 @@ class PostDetailActivity : BasicActivity(){
         super.onResume()
         mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
             post = it.getValue(Post::class.java) as Post
-            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
+            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)?.split("/")?.first()}의 모집글"
             txtResName.text = post?.restaurantName
             txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
             txtResCategory2.text = post?.foodCategories?.get(1) ?: ""

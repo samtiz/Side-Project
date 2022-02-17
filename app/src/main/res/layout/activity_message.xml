@@ -130,7 +130,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearlayout">
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_message">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messageActivity_recyclerview"
@@ -167,8 +167,8 @@
 
         <ImageView
             android:id="@+id/messageActivity_ImageView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
 
             android:src="@drawable/baseline_send_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
