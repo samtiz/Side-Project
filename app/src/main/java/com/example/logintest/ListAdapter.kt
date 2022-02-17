@@ -33,42 +33,55 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
     override fun onBindViewHolder(holder: ListAdapter.ViewHolder, position: Int) {
         val post: Post = postListFiltered[position]
 
-        mFirebaseAuth = FirebaseAuth.getInstance()
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
-        val uid = mFirebaseAuth.currentUser?.uid!!
+        if (post.dorm == "warning") {
+            holder.restaurantName.text = ""
+            holder.restaurantCategory1.text = ""
+            holder.restaurantCategory2.text = ""
+            holder.restaurantCategory3.text = ""
+            holder.restaurantCategory4.text = ""
+            holder.mainText.text = ""
+            holder.dorm.text = if (post.mainText == null) {"모집글이 없습니다.\n하단의 '모집하기'를 눌러 새 모집글을 작성해보세요."} else {post.mainText}
+            holder.timeLimit.text = ""
+            holder.deliveryFee.text = ""
+        }
+        else {
+            mFirebaseAuth = FirebaseAuth.getInstance()
+            mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
+            val uid = mFirebaseAuth.currentUser?.uid!!
 
-        holder.restaurantName.text = post.restaurantName
-        holder.restaurantCategory1.text = post.foodCategories?.get(0).toString()
-        holder.restaurantCategory2.text = post.foodCategories?.get(1).toString()
-        holder.restaurantCategory3.text = post.foodCategories?.get(2).toString()
-        holder.restaurantCategory4.text = post.foodCategories?.get(3).toString()
-        holder.mainText.text = post.mainText
-        holder.dorm.text = post.dorm
-        val time = post.timeLimit?.split(":")
-        var strTime: String = ""
-        strTime += if (time?.get(0)?.toInt()!! < 10) { "0${time[0]}" } else { time[0] }
-        strTime += ":"
-        strTime += if (time[1].toInt() < 10) { "0${time[1]}" } else { time[1] }
-        holder.timeLimit.text = strTime + " 까지"
-        holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
+            holder.restaurantName.text = post.restaurantName
+            holder.restaurantCategory1.text = post.foodCategories?.get(0).toString()
+            holder.restaurantCategory2.text = post.foodCategories?.get(1).toString()
+            holder.restaurantCategory3.text = post.foodCategories?.get(2).toString()
+            holder.restaurantCategory4.text = post.foodCategories?.get(3).toString()
+            holder.mainText.text = post.mainText
+            holder.dorm.text = post.dorm
+            val time = post.timeLimit?.split(":")
+            var strTime: String = ""
+            strTime += if (time?.get(0)?.toInt()!! < 10) { "0${time[0]}" } else { time[0] }
+            strTime += ":"
+            strTime += if (time[1].toInt() < 10) { "0${time[1]}" } else { time[1] }
+            holder.timeLimit.text = strTime + " 까지"
+            holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
 
-        // 현태가 수정한 부분 ///
-        // 게시물을 클릭하면 채팅 activity로 넘어가게 함
-        holder.itemView.setOnClickListener {
+            // 현태가 수정한 부분 ///
+            // 게시물을 클릭하면 채팅 activity로 넘어가게 함
+            holder.itemView.setOnClickListener {
 
-            mDatabaseReference.child("Post").child(post.postId.toString()).get().addOnSuccessListener {
-                if (it.value != null){
-                    val intent = Intent(context, PostDetailActivity::class.java)
-                    intent.putExtra("postId", post.postId)
-                    intent.putExtra("uid", uid)
-                    context.startActivity(intent)
+                mDatabaseReference.child("Post").child(post.postId.toString()).get().addOnSuccessListener {
+                    if (it.value != null){
+                        val intent = Intent(context, PostDetailActivity::class.java)
+                        intent.putExtra("postId", post.postId)
+                        intent.putExtra("uid", uid)
+                        context.startActivity(intent)
+                    }
+                    else{
+                        Toast.makeText(context, "이미 삭제된 게시물입니다.", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                else{
-                    Toast.makeText(context, "이미 삭제된 게시물입니다.", Toast.LENGTH_SHORT).show()
-                }
+
+
             }
-
-
         }
         ////////////////////
     }
@@ -122,6 +135,12 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
                     ArrayList()
                 else
                     results.values as ArrayList<Post>
+                if (postListFiltered.isEmpty()) {
+                    val temp = Post()
+                    temp.dorm = "warning"
+                    temp.mainText = "검색 결과가 없습니다."
+                    postListFiltered.add(temp)
+                }
                 notifyDataSetChanged()
             }
 

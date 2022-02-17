@@ -12,22 +12,7 @@ import com.google.firebase.database.ValueEventListener
 class Repo {
     fun getData(category: String?, selectedDormCategory: String?, userLocation: String?): LiveData<MutableList<Post>> {
         val mutableData = MutableLiveData<MutableList<Post>>()
-        //var ismutableData = true
         val myRef = FirebaseDatabase.getInstance().getReference("logintest")
-
-//        myRef.child("Post").get().addOnSuccessListener {
-//            println("이게 뭘까요요")
-//            println(it.value)
-//            println(mutableData.value)
-//            if (it.value == null) {
-//                ismutableData = false
-//            }
-//        }.addOnFailureListener{
-//        }
-//
-//        if (!ismutableData) return mutableData
-
-        //myRef.addValueEventListener(object : ValueEventListener {
         myRef.child("Post").addListenerForSingleValueEvent(object  : ValueEventListener {
             val listData: MutableList<Post> = mutableListOf<Post>()
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -58,6 +43,13 @@ class Repo {
                             }
                         }
                         mutableData.value = listData
+                    }
+                    if (listData.size == 0) {
+                        val temp: MutableList<Post> = mutableListOf<Post>()
+                        val noPostWarning: Post = Post()
+                        noPostWarning.dorm = "warning"
+                        temp.add(noPostWarning)
+                        mutableData.value = temp
                     }
                 }
             }

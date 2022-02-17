@@ -15,7 +15,6 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -34,7 +33,7 @@ import kotlin.collections.HashMap
 import kotlinx.coroutines.*
 import java.io.File
 
-class MessageActivity : AppCompatActivity() {
+class MessageActivity : BasicActivity() {
 
     private lateinit var mFirebaseAuth : FirebaseAuth
     private lateinit var mDatabaseReference : DatabaseReference

@@ -26,15 +26,58 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onMessageReceived(p0: RemoteMessage) {
         super.onMessageReceived(p0)
-        sendNotification(p0.data["title"], p0.data["body"]);
+        if (p0.data["flag"] == "chat") {
+            sendChatNotification(p0.data["title"], p0.data["body"])
+        }
+        else {
+            sendCommentNotification(p0.data["title"], p0.data["body"], p0.data["postId"])
+        }
     }
 
     override fun onNewToken(token: String) {
-        Log.d("token", "created new token: $token")
+        Log.d(TAG, "created new token: $token")
     }
 
-    private fun sendNotification(title: String?, body: String?) {
-        Log.d("noti", "reached")
+    private fun sendCommentNotification(title: String?, body: String?, postId: String?) {
+        val intent = Intent(this, PostDetailActivity::class.java)
+        intent.putExtra("postId", postId)
+        intent.putExtra("uid", mFirebaseAuth.currentUser?.uid!!)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
+        val pendingIntent = TaskStackBuilder.create(this).run {
+            // Add the intent, which inflates the back stack
+            addNextIntentWithParentStack(intent)
+            // Get the PendingIntent containing the entire back stack
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        val channelId = "comment_notification_channel"
+        val defaultSoundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(com.example.logintest.R.drawable.selector_bottom_navi_chat_icon_selected)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent)
+
+        val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                    channelId,
+                    "comment notification channel",
+                    NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
+    }
+
+    private fun sendChatNotification(title: String?, body: String?) {
         val intent = Intent(this, MessageActivity::class.java)
         mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("postId").get().addOnSuccessListener {
             intent.putExtra("postId", it.value.toString())
@@ -63,8 +106,6 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            // Since android Oreo notification channel is needed.
 
             // Since android Oreo notification channel is needed.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
