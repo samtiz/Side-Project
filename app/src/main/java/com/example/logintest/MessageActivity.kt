@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -22,28 +21,29 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_message.*
+import kotlinx.android.synthetic.main.activity_post_detail.*
 import kotlinx.android.synthetic.main.activity_write_post.*
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlinx.coroutines.*
 import java.io.File
 
 class MessageActivity : BasicActivity() {
 
     private lateinit var mFirebaseAuth : FirebaseAuth
     private lateinit var mDatabaseReference : DatabaseReference
+    private lateinit var mfirestore : FirebaseFirestore
 
 
     //private var usersId : ArrayList<String>? = null
     private var uid : String? = null
     private var userName : String? = null
 
-    private var chatRoomUid : String? = null
     private var postId : String? = null
     private var post : Post? = null
     private var postMaster : String? = null
@@ -53,7 +53,6 @@ class MessageActivity : BasicActivity() {
 
     private var recyclerView : RecyclerView? = null
 
-    private var pickImageFromElbum = 0
     private var uriPhoto : Uri? = null
 
     // 메세지를 보낸 시간
@@ -70,6 +69,7 @@ class MessageActivity : BasicActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        mfirestore = FirebaseFirestore.getInstance()
         mFirebaseAuth = FirebaseAuth.getInstance()
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
 
@@ -151,6 +151,7 @@ class MessageActivity : BasicActivity() {
             }
         })
 
+
         // 유저 id 추가(처음 들어오는 유저만)
         Handler().postDelayed({
             if (users!!.containsKey(uid)) {
@@ -179,6 +180,9 @@ class MessageActivity : BasicActivity() {
                 }
                 dlg.show()
             }
+            println("자 이제 시작이야")
+            recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
+            recyclerView?.adapter = RecyclerViewAdapter()
         }, 1000L)
 
         imageView_photo.setOnClickListener {
@@ -218,8 +222,8 @@ class MessageActivity : BasicActivity() {
             imageView_photo.visibility = View.VISIBLE
         }
 
-        recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
-        recyclerView?.adapter = RecyclerViewAdapter()
+
+
     }
 
     override fun onRestart() {
@@ -242,6 +246,7 @@ class MessageActivity : BasicActivity() {
 
     }
 
+    // 그림 전송
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -254,15 +259,18 @@ class MessageActivity : BasicActivity() {
             if (data != null){
                 // 데이터 가져옴
                 uriPhoto = Uri.fromFile(File(path))
-                val photoComments = ChatModel.Comment(uid, uriPhoto.toString(), curTime, true)
                 val messageId = mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push()
-                FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).child(messageId.getKey().toString()).putFile(uriPhoto!!).addOnSuccessListener {
-                    Toast.makeText(applicationContext, "업로드 완료!", Toast.LENGTH_SHORT).show()
-                    Handler().postDelayed({
+                FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).child(messageId.getKey().toString()).putFile(uriPhoto!!).addOnSuccessListener {taskSnapshot ->
+                    taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener {
+                        it ->
+                            var imageUrl=it.toString()
+                        val photoComments = ChatModel.Comment(uid, imageUrl, curTime, true)
                         messageId.setValue(photoComments)
-                    },10000L)
-
+                    }
+                    Toast.makeText(applicationContext, "전송 완료", Toast.LENGTH_SHORT).show()
+                    //messageId.setValue(photoComments)
                 }
+
 
             }
         }
@@ -412,50 +420,9 @@ class MessageActivity : BasicActivity() {
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
                     mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
                 }
-
-//                if (snapshot.children == null){ // 채팅방에서 모두 나갔는지 확인
-//                    //post 제거
-//                    mDatabaseReference.child("Post").child(postId.toString()).removeValue()
-//                    //chatroom 제거
-//                    mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
-//                }
-//                else{ // 방장 넘기기
-//                    for (data in snapshot.children){
-//                        val key = data.key
-//                        val item = data.value
-//
-//                        currentUsers.put(key.toString(), item.toString())
-//                    }
-//                    nextMaster = currentUsers.keys.toTypedArray()[0]
-//                    mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
-//
-//                    // 퇴장 알림
-//                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", "exit")
-//                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${currentUsers.get(nextMaster)}님으로 변경되었습니다.", "exit")
-//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
-//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
-//                }
             }
         })
 
-//        val nextMaster = users.keys.toTypedArray()[0]
-//        mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
-
-
-
-
-        // 마지막 남은 사람인지 확인하고 맞다면 채팅방 폭파
-//        mDatabaseReference.child("Post").child(postId.toString()).child("users").get().addOnSuccessListener {
-//            println("남은사람")
-//            println(it.value)
-//            if (it.value == null){
-//                //post 제거
-//                mDatabaseReference.child("Post").child(postId.toString()).removeValue()
-//                //chatroom 제거
-//                mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
-//            }
-//        }.addOnFailureListener {
-//        }
     }
 
     inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.MessageViewHolder>() {
@@ -463,22 +430,17 @@ class MessageActivity : BasicActivity() {
         private val comments = ArrayList<ChatModel.Comment>()
         private val keys = ArrayList<String>()
         private var post : Post? = null
+        private var index = 0
+
         init{
             // 포스트 정보 받아오기
-            mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-//                    post = snapshot.getValue<Post>()
-//                    if (post?.restaurantName == "미정"){
-//                        message_lists_top_name.text = post?.foodCategories!![0]
-//                    }else{
-//                        message_lists_top_name.text = post?.restaurantName
-//                    }
-                    getMessageList()
-                }
-            })
+//            println("그림들")
+//            for (item in photoList){
+//                var i = 1
+//                println(item.imageUrl + "$i")
+//                i += 1
+//            }
+            getMessageList()
         }
         fun getMessageList(){
             mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").addValueEventListener(object : ValueEventListener {
@@ -489,9 +451,7 @@ class MessageActivity : BasicActivity() {
                     comments.clear()
                     for (data in snapshot.children) {
                         val item = data.getValue<ChatModel.Comment>()
-                        val key = data.key
                         comments.add(item!!)
-                        keys.add(key!!)
                     }
                     notifyDataSetChanged()
 
@@ -517,18 +477,7 @@ class MessageActivity : BasicActivity() {
         ) {
             // 사진이면 사진 받아오기
             var isPhoto = comments[position].isPhoto
-            if (isPhoto!!){
-                FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).child(keys[position]).downloadUrl
-                    .addOnSuccessListener {
-                        Glide.with(holder.itemView.context)
-                            .load(it).into(holder.imageView_message)
-                    }.addOnFailureListener{
-                        Toast.makeText(applicationContext, "실패!", Toast.LENGTH_SHORT).show()
-                    }
-            }
-
             holder.textView_message.textSize = 20F
-
             val speakingUserId = comments[position].uid
             var speakingUserName = users?.get(speakingUserId!!)?.split("/")?.first()
             holder.textView_time.text = comments[position].time
@@ -566,54 +515,81 @@ class MessageActivity : BasicActivity() {
                 }
             }
 
-            if (speakingUserId.equals(uid)){// 본인 채팅
-//                if (isPhoto!!){
-//                    holder.imageView_message.visibility = View.VISIBLE
-//
-//                }
-//                else{
-//                    holder.textView_message.text = comments[position].message
-//                    holder.textView_message.setBackgroundResource(R.drawable.rightbubble)
-//                    holder.textView_name.visibility = View.INVISIBLE
-//                    holder.layout_destination.visibility = View.INVISIBLE
-//                    holder.layout_main.gravity = Gravity.RIGHT
-//
-//                    holder.layout_admin.visibility = View.GONE
-//                    holder.textView_admin_message.visibility = View.GONE
-//                }
+            if (isPhoto!!){
                 holder.imageView_message.visibility = View.VISIBLE
-                holder.textView_message.text = comments[position].message
-                holder.textView_message.setBackgroundResource(R.drawable.rightbubble)
-                holder.textView_name.visibility = View.INVISIBLE
-                holder.layout_destination.visibility = View.INVISIBLE
-                holder.layout_main.gravity = Gravity.RIGHT
-
-                holder.layout_admin.visibility = View.GONE
-                holder.textView_admin_message.visibility = View.GONE
-
-
-            }
-            else if(speakingUserId.equals("Admin")){
-
-                holder.layout_admin.visibility = View.VISIBLE
-                holder.textView_admin_message.visibility = View.VISIBLE
-                holder.textView_admin_message.text = comments[position].message
-                holder.textView_name.visibility = View.GONE
-                holder.layout_destination.visibility = View.GONE
                 holder.textView_message.visibility = View.GONE
-                holder.textView_time.visibility = View.GONE
-            }
-            else{// 남의 채팅
-                holder.textView_message.text = comments[position].message
-                holder.textView_name.text = speakingUserName
-                holder.layout_destination.visibility = View.VISIBLE
-                holder.textView_name.visibility = View.VISIBLE
-                holder.textView_message.setBackgroundResource(R.drawable.leftbubble)
-                holder.layout_main.gravity = Gravity.LEFT
+                var photo = Uri.parse(comments[position].message)
 
-                holder.layout_admin.visibility = View.GONE
-                holder.textView_admin_message.visibility = View.GONE
+                // 사진 클릭하면 자세히 보여주기
+                holder.imageView_message.setOnClickListener{
+                    val intent = Intent(this@MessageActivity, photoDetailActivity::class.java)
+                    intent.putExtra("imageUrl", comments[position].message)
+                    startActivity(intent)
+                }
+
+                Glide.with(holder.itemView.context).load(photo).into(holder.imageView_message)
+                when {
+                    speakingUserId.equals(uid) -> {// 본인 채팅
+                        holder.textView_name.visibility = View.INVISIBLE
+                        holder.layout_destination.visibility = View.INVISIBLE
+                        holder.layout_main.gravity = Gravity.RIGHT
+
+                        holder.layout_admin.visibility = View.GONE
+                        holder.textView_admin_message.visibility = View.GONE
+
+                    }
+                    else -> {// 남의 채팅
+                        holder.textView_name.text = speakingUserName
+                        holder.layout_destination.visibility = View.VISIBLE
+                        when{
+
+                        }
+                        //holder.imageView_profile.background
+                        holder.textView_name.visibility = View.VISIBLE
+                        holder.layout_main.gravity = Gravity.LEFT
+
+                        holder.layout_admin.visibility = View.GONE
+                        holder.textView_admin_message.visibility = View.GONE
+                    }
+                }
+            }else{
+                when {
+                    speakingUserId.equals(uid) -> {// 본인 채팅
+                        holder.textView_message.text = comments[position].message
+                        holder.textView_message.setBackgroundResource(R.drawable.rightbubble)
+                        holder.textView_name.visibility = View.INVISIBLE
+                        holder.layout_destination.visibility = View.INVISIBLE
+                        holder.layout_main.gravity = Gravity.RIGHT
+
+                        holder.layout_admin.visibility = View.GONE
+                        holder.textView_admin_message.visibility = View.GONE
+
+
+                    }
+                    speakingUserId.equals("Admin") -> {
+
+                        holder.layout_admin.visibility = View.VISIBLE
+                        holder.textView_admin_message.visibility = View.VISIBLE
+                        holder.textView_admin_message.text = comments[position].message
+                        holder.textView_name.visibility = View.GONE
+                        holder.layout_destination.visibility = View.GONE
+                        holder.textView_message.visibility = View.GONE
+                        holder.textView_time.visibility = View.GONE
+                    }
+                    else -> {// 남의 채팅
+                        holder.textView_message.text = comments[position].message
+                        holder.textView_name.text = speakingUserName
+                        holder.layout_destination.visibility = View.VISIBLE
+                        holder.textView_name.visibility = View.VISIBLE
+                        holder.textView_message.setBackgroundResource(R.drawable.leftbubble)
+                        holder.layout_main.gravity = Gravity.LEFT
+
+                        holder.layout_admin.visibility = View.GONE
+                        holder.textView_admin_message.visibility = View.GONE
+                    }
+                }
             }
+
         }
 
         inner class MessageViewHolder(view: View) : RecyclerView.ViewHolder(view){

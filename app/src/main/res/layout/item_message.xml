@@ -64,17 +64,25 @@
                 android:layout_marginTop="3dp"
                 android:text="메세지"
                 android:textColor="#000000" />
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:adjustViewBounds="true"
+                android:id="@+id/messageItem_imageview_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxHeight="300dp"
+                android:maxWidth="200dp"
+                app:riv_corner_radius="10dp"
+                android:layout_marginEnd="7dp"
+                />
+
             <TextView
                 android:id="@+id/messageItem_textView_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="시간"
                 android:textSize="12sp" />
-            <ImageView
-                android:id="@+id/messageItem_imageview_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
