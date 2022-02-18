@@ -1,14 +1,19 @@
 package com.example.logintest
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -23,6 +28,14 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
     fun setListData(data: MutableList<Post>) {
         postList = data
         postListFiltered = data
+//        mFirebaseAuth = FirebaseAuth.getInstance()
+//        mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
+//        val uid = mFirebaseAuth.currentUser?.uid!!
+//        mDatabaseReference.child("UserAccount").child(uid).child("postId").get().addOnSuccessListener {
+//            if (it.value.toString() != "null") {
+//
+//            }
+//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListAdapter.ViewHolder {
@@ -48,7 +61,14 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
             mFirebaseAuth = FirebaseAuth.getInstance()
             mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
             val uid = mFirebaseAuth.currentUser?.uid!!
-
+            if (position == 0) {
+                if (post.users.contains(uid)) {
+                    holder.isParticipating.visibility = VISIBLE
+                }
+                else if (holder.isParticipating.visibility == VISIBLE) {
+                    holder.isParticipating.visibility = GONE
+                }
+            }
             holder.restaurantName.text = post.restaurantName
             holder.restaurantCategory1.text = post.foodCategories?.get(0).toString()
             holder.restaurantCategory2.text = post.foodCategories?.get(1).toString()
@@ -64,8 +84,7 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
             holder.timeLimit.text = strTime + " 까지"
             holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
 
-            // 현태가 수정한 부분 ///
-            // 게시물을 클릭하면 채팅 activity로 넘어가게 함
+            // 게시물을 클릭하면 postDetail 로 넘어가게 함
             holder.itemView.setOnClickListener {
 
                 mDatabaseReference.child("Post").child(post.postId.toString()).get().addOnSuccessListener {
@@ -79,8 +98,17 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
                         Toast.makeText(context, "이미 삭제된 게시물입니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
-
-
+            }
+            if (!post.visibility) {
+                holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.restaurantCategory1.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.restaurantCategory2.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.restaurantCategory3.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.restaurantCategory4.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.timeLimit.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                holder.deliveryFee.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
             }
         }
         ////////////////////
@@ -100,6 +128,7 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         val dorm: TextView = itemView.findViewById(R.id.txt_dorm)
         val timeLimit: TextView = itemView.findViewById(R.id.txt_timeLimit)
         val deliveryFee: TextView = itemView.findViewById(R.id.txt_deliveryFee)
+        val isParticipating: TextView = itemView.findViewById(R.id.txt_participating)
     }
 
     override fun getFilter(): Filter {

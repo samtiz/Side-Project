@@ -262,12 +262,41 @@ class MainActivity : BasicActivity() {
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     fun observerData(){
-        viewModel.fetchData(selectedFoodCategory, selectedDormCategory, userLocation).observe(this, Observer {
-            adapter.setListData(it)
-            adapter.filter.filter(searchText)
-            adapter.notifyDataSetChanged()
-        })
+        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").get().addOnSuccessListener { snapshot ->
+            val userPostId = snapshot.value.toString()
+            if (userPostId != "null") {
+                viewModel.fetchData(selectedFoodCategory, selectedDormCategory, userLocation).observe(this, Observer {
+                    for (i: Int in 0 until it.size) {
+                        if (it[i].users.contains(uid)) {
+                            val p = it[i]
+                            it.removeAt(i)
+                            it.add(0, p)
+                        }
+                    }
+                    adapter.setListData(it)
+                    adapter.filter.filter(searchText)
+                    adapter.notifyDataSetChanged()
+                })
+            }
+            else {
+                viewModel.fetchData(selectedFoodCategory, selectedDormCategory, userLocation).observe(this, Observer {
+                    adapter.setListData(it)
+                    adapter.filter.filter(searchText)
+                    adapter.notifyDataSetChanged()
+                })
+            }
+        }.addOnFailureListener{ e ->
+            viewModel.fetchData(selectedFoodCategory, selectedDormCategory, userLocation).observe(this, Observer {
+                adapter.setListData(it)
+                adapter.filter.filter(searchText)
+                adapter.notifyDataSetChanged()
+            })
+            Toast.makeText(this@MainActivity, "get() postId of User failed", Toast.LENGTH_SHORT).show()
+            Log.d("MainActivity", e.message.toString())
+        }
+
     }
 
     fun selectArea(view: View) {

@@ -21,12 +21,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_message.*
-import kotlinx.android.synthetic.main.activity_post_detail.*
-import kotlinx.android.synthetic.main.activity_write_post.*
-import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -37,7 +33,6 @@ class MessageActivity : BasicActivity() {
 
     private lateinit var mFirebaseAuth : FirebaseAuth
     private lateinit var mDatabaseReference : DatabaseReference
-    private lateinit var mfirestore : FirebaseFirestore
 
 
     //private var usersId : ArrayList<String>? = null
@@ -69,7 +64,6 @@ class MessageActivity : BasicActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        mfirestore = FirebaseFirestore.getInstance()
         mFirebaseAuth = FirebaseAuth.getInstance()
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
 

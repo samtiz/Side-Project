@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ListAdapterPostReply(private val context: Context): RecyclerView.Adapter<ListAdapterPostReply.ViewHolder>() {
-    private var replyList = mutableListOf<PostComment.Reply>()
+    private val replyList = mutableListOf<PostComment.Reply>()
 
     fun setReplyData(data: HashMap<String, PostComment.Reply>) {
         replyList.clear()

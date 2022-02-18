@@ -148,9 +148,7 @@ class PostDetailActivity : BasicActivity(){
                     MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("정말로 이 게시물을 삭제하시겠습니까?\n게시물을 삭제하면 이 게시물의 모집 채팅방도 같이 삭제됩니다.")
                             .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
                                 deletePost()
-                                finishAffinity()
-                                val intent = Intent(applicationContext, MainActivity::class.java)
-                                startActivity(intent)
+                                finish()
                                 overridePendingTransition(R.anim.none, R.anim.none)
                             })
                             .setNegativeButton("취소") { _, _ -> }.show()
@@ -169,7 +167,7 @@ class PostDetailActivity : BasicActivity(){
             else {
                 btnJoinChat?.setOnClickListener {
                     mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("postId").get().addOnSuccessListener {
-                        var userpostId = it.value.toString()
+                        val userpostId = it.value.toString()
                         if (userpostId == postId){
                             val intent = Intent(this@PostDetailActivity, MessageActivity::class.java)
                             intent.putExtra("postId", postId)
@@ -204,12 +202,25 @@ class PostDetailActivity : BasicActivity(){
         // swipe로 refresh하기
         swipeRefreshLayout_postDetail.setOnRefreshListener {
             observeComments()
+            mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
+                post = it.getValue(Post::class.java) as Post
+                txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
+                txtResName.text = post?.restaurantName
+                txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
+                txtResCategory2.text = post?.foodCategories?.get(1) ?: ""
+                txtResCategory3.text = post?.foodCategories?.get(2) ?: ""
+                txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
+                txtLocation.text = "배달 수령 위치: ${post?.dorm}"
+                txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
+                txtTime.text = "모집 만료 시간: ${post?.timeLimit}" // TODO 시간 포맷 바꿔서 적용
+                txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
+                txtMain.text = post?.mainText
+            }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
             println("왜 안돌아가")
             swipeRefreshLayout_postDetail.isRefreshing = false
         }
 
 
-        //TODO view랑 post 데이터 연동 및 댓글 데이터 연동
         adapter = ListAdapterPostComment(this@PostDetailActivity)
         recyclerViewInquire.layoutManager = WrapContentLinearLayoutManager(this@PostDetailActivity)
         recyclerViewInquire.adapter = adapter
@@ -281,7 +292,7 @@ class PostDetailActivity : BasicActivity(){
         super.onResume()
         mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
             post = it.getValue(Post::class.java) as Post
-            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)?.split("/")?.first()}의 모집글"
+            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
             txtResName.text = post?.restaurantName
             txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
             txtResCategory2.text = post?.foodCategories?.get(1) ?: ""
