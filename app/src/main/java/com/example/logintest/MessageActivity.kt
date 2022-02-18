@@ -26,25 +26,20 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_message.*
 import kotlinx.android.synthetic.main.activity_post_detail.*
 import kotlinx.android.synthetic.main.activity_write_post.*
-import kotlinx.coroutines.*
 import okhttp3.Dispatcher
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import java.io.File
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 
-class MessageActivity : BasicActivity() , CoroutineScope{
+class MessageActivity : BasicActivity(){
 
     private lateinit var mFirebaseAuth : FirebaseAuth
     private lateinit var mDatabaseReference : DatabaseReference
     private lateinit var mfirestore : FirebaseFirestore
-    private lateinit var mJob : Job
 
-    override val coroutineContext: CoroutineContext
-        get() = mJob + Dispatchers.Main
 
 
     //private var usersId : ArrayList<String>? = null
@@ -71,7 +66,6 @@ class MessageActivity : BasicActivity() , CoroutineScope{
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
-        mJob = Job()
 
         setSupportActionBar(toolbar_message)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -210,20 +204,6 @@ class MessageActivity : BasicActivity() , CoroutineScope{
         })
 
 
-
-
-//            job1.await()
-//            print("users")
-//            print(users)
-//            job2.await()
-
-
-
-//        Handler().postDelayed({
-//
-//
-//        }, 1000L)
-
         imageView_photo.setOnClickListener {
             when{
                 ContextCompat.checkSelfPermission(
@@ -275,10 +255,6 @@ class MessageActivity : BasicActivity() , CoroutineScope{
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(false)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mJob.cancel()
-    }
 
     private fun showContextPopupPermission() {
         Toast.makeText(applicationContext, "사진을 불러오기 위해 권한이 필요합니다", Toast.LENGTH_SHORT).show()
