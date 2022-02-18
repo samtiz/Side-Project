@@ -177,26 +177,25 @@ class MessageActivity : BasicActivity(){
                         maxIndex = item.index!!
                     }
                 }
-
             }
         })
 
-
-            // 해당 포스트에 참여중인 유저 가져오기
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").addChildEventListener(object : ChildEventListener {
+        mDatabaseReference.child("chatrooms").child(postId.toString()).addChildEventListener(object : ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                users.clear()
-                for (data in snapshot.children) {
-                    val key = data.key
-                    val item = data.value
-                    users.put(key.toString(), item.toString())
-                }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
+
+                //Toast.makeText(applicationContext, "존재하지 않는 채팅방입니다.", Toast.LENGTH_SHORT).show()
+                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                dlg.setMessage("존재하지 않는 채팅방입니다. 나가시겠습니까?") // 메시지
+                dlg.setPositiveButton("확인") { _, _ ->
+                    finish()
+                }
+                dlg.show()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
@@ -207,37 +206,54 @@ class MessageActivity : BasicActivity(){
         })
 
 
+            // 해당 포스트에 참여중인 유저 가져오기
+        mDatabaseReference.child("Post").child(postId.toString()).child("users").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                users.clear()
+                for (data in snapshot.children) {
+                    val key = data.key
+                    val item = data.value
+                    users.put(key.toString(), item.toString())
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+
+
         Handler().postDelayed({
             // 처음 들어오는 유저 더해주기
             if (!users.containsKey(uid)){
 
-                users.put(uid!!, userName!!)
-                mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).setValue(userName.toString())
+                if((users.isEmpty() && uid == postMaster) || !users.isEmpty()){
+                    users.put(uid!!, userName!!)
+                    mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).setValue(userName.toString())
 
-                // 채팅방 users 업데이트
-                val userStatus = ChatModel.userStat(userName, maxIndex + 1)
-                chatusers.put(uid!!, userStatus)
-                mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").child(uid.toString()).setValue(userStatus)
+                    // 채팅방 users 업데이트
+                    val userStatus = ChatModel.userStat(userName, maxIndex + 1)
+                    chatusers.put(uid!!, userStatus)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").child(uid.toString()).setValue(userStatus)
 
 
-                //입장 알람
-                if (uid == postMaster){
-                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime, false)
-                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
-                }else{
-                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime, false)
-                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
+                    //입장 알람
+                    if (uid == postMaster){
+                        val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime, false)
+                        mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
+                    }else{
+                        val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime, false)
+                        mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
+                    }
+
+                    // 입장할 때 공지사항
+                    val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                    dlg.setTitle("공지") //제목
+                    dlg.setMessage("1. 각자 원하시는 메뉴를 말씀해주세요.\n" +
+                            "2. 음식을 받을 위치를 결정해주세요.\n" +
+                            "3. 시키시는 분(방장)은 계좌번호를 알려주세요.") // 메시지
+                    dlg.setPositiveButton("확인") { _, _ ->
+                    }
+                    dlg.show()
                 }
-
-                // 입장할 때 공지사항
-                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
-                dlg.setTitle("공지") //제목
-                dlg.setMessage("1. 각자 원하시는 메뉴를 말씀해주세요.\n" +
-                        "2. 음식을 받을 위치를 결정해주세요.\n" +
-                        "3. 시키시는 분(방장)은 계좌번호를 알려주세요.") // 메시지
-                dlg.setPositiveButton("확인") { _, _ ->
-                }
-                dlg.show()
             }
             println("자 이제 시작이야")
             recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)

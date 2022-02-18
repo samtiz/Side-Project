@@ -291,7 +291,10 @@ class WritePostActivity: BasicActivity() {
                         selectedFoodCategory += foods[i]
                         selectedFoodCategory += ", "
                     }
-                    mEtFoodCategory.setText(selectedFoodCategory.trim().substring(0, selectedFoodCategory.trim().length-1))
+            // TODO 아무것도 안선택하고 확인 누르면 에러ㅁㄴㅇ
+                    if (selectedFoodCategory.isNotEmpty()) {
+                        mEtFoodCategory.setText(selectedFoodCategory.trim().substring(0, selectedFoodCategory.trim().length-1))
+                    }
                 }.setNeutralButton("취소") { _, _ ->  }.show()
 
     }

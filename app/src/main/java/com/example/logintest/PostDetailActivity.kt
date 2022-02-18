@@ -146,13 +146,19 @@ class PostDetailActivity : BasicActivity(){
                 btnJoinChat?.visibility = GONE
                 btnInquire.visibility = GONE
                 btnDelete?.setOnClickListener{
-                    MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("정말로 이 게시물을 삭제하시겠습니까?\n게시물을 삭제하면 이 게시물의 모집 채팅방도 같이 삭제됩니다.")
+                    if (post?.users?.size!! > 1){
+                        Toast.makeText(applicationContext, "참여한 사람이 존재하여 게시물을 삭제할 수 없습니다. 채팅방을 나가고 싶다면 채팅방에서 나가기를 눌러주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("정말로 이 게시물을 삭제하시겠습니까?\n게시물을 삭제하면 이 게시물의 모집 채팅방도 같이 삭제됩니다.")
                             .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
                                 deletePost()
                                 finish()
                                 overridePendingTransition(R.anim.none, R.anim.none)
                             })
                             .setNegativeButton("취소") { _, _ -> }.show()
+                    }
+
                 }
                 btnModify?.setOnClickListener{
                     MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("게시물을 수정하시겠습니까?")
@@ -217,7 +223,6 @@ class PostDetailActivity : BasicActivity(){
                 txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
                 txtMain.text = post?.mainText
             }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
-            println("왜 안돌아가")
             swipeRefreshLayout_postDetail.isRefreshing = false
         }
 
