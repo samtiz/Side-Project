@@ -25,19 +25,24 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_message.*
 import kotlinx.android.synthetic.main.activity_post_detail.*
 import kotlinx.android.synthetic.main.activity_write_post.*
+import kotlinx.coroutines.*
 import okhttp3.Dispatcher
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import java.io.File
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 
 class MessageActivity : BasicActivity(){
 
+    //private lateinit var mJob : Job
     private lateinit var mFirebaseAuth : FirebaseAuth
     private lateinit var mDatabaseReference : DatabaseReference
 
+//    override val coroutineContext: CoroutineContext
+//        get() = mJob + Dispatchers.Main
 
     //private var usersId : ArrayList<String>? = null
     private var uid : String? = null
@@ -63,6 +68,7 @@ class MessageActivity : BasicActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
+//        mJob = Job()
 
         setSupportActionBar(toolbar_message)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -106,6 +112,7 @@ class MessageActivity : BasicActivity(){
             }
         })
 
+
         // 채팅방 이름 설정
         // 포스트 정보 받아오기
         mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
@@ -123,16 +130,38 @@ class MessageActivity : BasicActivity(){
             }
         })
 
-        // UserAccount 에서 현재 사용자 이름 받아오기
-        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
-            userName = it.value.toString()
-        }.addOnFailureListener {
-            Toast.makeText(this@MessageActivity, "get() username failed", Toast.LENGTH_SHORT).show()
-        }
-
-        // 채팅방에 참여중인 유저 가져오기
-        // 최대 인덱스 확인용
         var maxIndex = 0
+
+        // 채팅방 이름 설정
+        // 포스트 정보 받아오기
+        mDatabaseReference.child("Post").child(postId.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                post = snapshot.getValue<Post>()
+                if (post?.restaurantName == "미정") {
+                    message_lists_top_name.text = post?.foodCategories!![0]
+                } else {
+                    message_lists_top_name.text = post?.restaurantName
+                }
+                postMaster = post?.uid
+            }
+        })
+
+
+        // UserAccount 에서 현재 사용자 이름 받아오기
+        mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                userName = snapshot.getValue<String>()
+            }
+        })
+
+            // 채팅방에 참여중인 유저 가져오기
+            // 최대 인덱스 확인용
         mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").addValueEventListener(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
@@ -148,56 +177,73 @@ class MessageActivity : BasicActivity(){
                         maxIndex = item.index!!
                     }
                 }
-                // 해당 포스트에 참여중인 유저 가져오기
-                mDatabaseReference.child("Post").child(postId.toString()).child("users").addValueEventListener(object : ValueEventListener {
-                    override fun onCancelled(error: DatabaseError) {
-                    }
 
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        users.clear()
-                        for (data in snapshot.children) {
-                            val key = data.key
-                            val item = data.value
-                            users.put(key.toString(), item.toString())
-                        }
-
-                        // 처음 들어오는 유저 더해주기
-                        if (!users.containsKey(uid)){
-                            users.put(uid!!, userName!!)
-                            mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).setValue(userName.toString())
-
-                            // 채팅방 users 업데이트
-                            val userStatus = ChatModel.userStat(userName, maxIndex + 1)
-                            chatusers.put(uid!!, userStatus)
-                            mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").child(uid.toString()).setValue(userStatus)
-
-
-                            //입장 알람
-                            if (uid == postMaster){
-                                val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime, false)
-                                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
-                            }else{
-                                val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime, false)
-                                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
-                            }
-
-                            // 입장할 때 공지사항
-                            val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
-                            dlg.setTitle("공지") //제목
-                            dlg.setMessage("1. 각자 원하시는 메뉴를 말씀해주세요.\n" +
-                                    "2. 음식을 받을 위치를 결정해주세요.\n" +
-                                    "3. 시키시는 분(방장)은 계좌번호를 알려주세요.") // 메시지
-                            dlg.setPositiveButton("확인") { _, _ ->
-                            }
-                            dlg.show()
-                        }
-                        println("자 이제 시작이야")
-                        recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
-                        recyclerView?.adapter = RecyclerViewAdapter()
-                    }
-                })
             }
         })
+
+
+            // 해당 포스트에 참여중인 유저 가져오기
+        mDatabaseReference.child("Post").child(postId.toString()).child("users").addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                users.clear()
+                for (data in snapshot.children) {
+                    val key = data.key
+                    val item = data.value
+                    users.put(key.toString(), item.toString())
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+
+
+        Handler().postDelayed({
+            // 처음 들어오는 유저 더해주기
+            if (!users.containsKey(uid)){
+
+                users.put(uid!!, userName!!)
+                mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).setValue(userName.toString())
+
+                // 채팅방 users 업데이트
+                val userStatus = ChatModel.userStat(userName, maxIndex + 1)
+                chatusers.put(uid!!, userStatus)
+                mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").child(uid.toString()).setValue(userStatus)
+
+
+                //입장 알람
+                if (uid == postMaster){
+                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime, false)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
+                }else{
+                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime, false)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
+                }
+
+                // 입장할 때 공지사항
+                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                dlg.setTitle("공지") //제목
+                dlg.setMessage("1. 각자 원하시는 메뉴를 말씀해주세요.\n" +
+                        "2. 음식을 받을 위치를 결정해주세요.\n" +
+                        "3. 시키시는 분(방장)은 계좌번호를 알려주세요.") // 메시지
+                dlg.setPositiveButton("확인") { _, _ ->
+                }
+                dlg.show()
+            }
+            println("자 이제 시작이야")
+            recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
+            recyclerView?.adapter = RecyclerViewAdapter()
+        },1000L)
+
 
 
         imageView_photo.setOnClickListener {
@@ -251,6 +297,11 @@ class MessageActivity : BasicActivity(){
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(false)
     }
 
+//    override fun onDestroy() {
+//        super.onDestroy()
+//
+//        mJob.cancel()
+//    }
 
     private fun showContextPopupPermission() {
         Toast.makeText(applicationContext, "사진을 불러오기 위해 권한이 필요합니다", Toast.LENGTH_SHORT).show()
@@ -490,7 +541,6 @@ class MessageActivity : BasicActivity(){
         private val comments = ArrayList<ChatModel.Comment>()
         private val keys = ArrayList<String>()
         private var post : Post? = null
-        private var index = 0
 
         init{
             // 포스트 정보 받아오기

@@ -18,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_post_detail.*
 import org.w3c.dom.Text
@@ -319,6 +320,8 @@ class PostDetailActivity : BasicActivity(){
         postId?.let { mDatabaseReference.child("chatrooms").child(it).removeValue() }
         // 현태 수정 ///
         mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("postId").removeValue()
+        // 사진 파일 제거
+        FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).delete()
         //////////////
         // or
         // postId?.let { mDatabaseReference.child("Post").child(it).child("visibility").setValue(false) }
