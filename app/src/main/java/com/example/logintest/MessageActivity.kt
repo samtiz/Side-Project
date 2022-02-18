@@ -149,7 +149,7 @@ class MessageActivity : BasicActivity(){
                     }
                 }
                 // 해당 포스트에 참여중인 유저 가져오기
-                mDatabaseReference.child("Post").child(postId.toString()).child("users").addValueEventListener(object : ValueEventListener {
+                mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onCancelled(error: DatabaseError) {
                     }
 
@@ -162,6 +162,9 @@ class MessageActivity : BasicActivity(){
                         }
 
                         // 처음 들어오는 유저 더해주기
+                        println(users)
+                        println(uid)
+                        println(userName)
                         if (!users.containsKey(uid)){
                             users.put(uid!!, userName!!)
                             mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).setValue(userName.toString())
@@ -236,13 +239,16 @@ class MessageActivity : BasicActivity(){
             imageView.visibility = View.INVISIBLE
             imageView_photo.visibility = View.VISIBLE
         }
-
-
-
     }
 
     override fun onRestart() {
         super.onRestart()
+        mDatabaseReference.child("chatrooms").child(postId!!).get().addOnSuccessListener {
+            if (it.value == null) {
+                Toast.makeText(this@MessageActivity, "존재하지 않는 채팅방입니다.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(true)
     }
 

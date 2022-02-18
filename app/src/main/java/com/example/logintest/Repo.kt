@@ -10,8 +10,11 @@ import com.google.firebase.database.ValueEventListener
 
 
 class Repo {
+    private lateinit var mFirebaseAuth: FirebaseAuth
+
     fun getData(category: String?, selectedDormCategory: String?, userLocation: String?): LiveData<MutableList<Post>> {
         val mutableData = MutableLiveData<MutableList<Post>>()
+        mFirebaseAuth = FirebaseAuth.getInstance()
         val myRef = FirebaseDatabase.getInstance().getReference("logintest")
         myRef.child("Post").addListenerForSingleValueEvent(object  : ValueEventListener {
             val listData: MutableList<Post> = mutableListOf<Post>()
@@ -41,6 +44,9 @@ class Repo {
                             else if (selectedDormCategory == "화암캠" && isHwaam(getData?.dorm)) {
                                 listData.add(getData!!)
                             }
+                        }
+                        else if (!getData.visibility!! && getData.users?.contains(mFirebaseAuth.currentUser?.uid!!) == true) {
+                            listData.add(getData!!)
                         }
                         mutableData.value = listData
                     }
