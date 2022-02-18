@@ -3,9 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_toPost"
+        android:title="게시물로 이동"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/action_exit"
         android:title="채팅방 나가기"
         android:icon="@drawable/ic_exit_to_app"
-        app:showAsAction="always"/>
+        app:showAsAction="never"/>
 
 </menu>

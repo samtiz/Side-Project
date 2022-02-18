@@ -148,10 +148,7 @@ class PostDetailActivity : BasicActivity(){
                     MaterialAlertDialogBuilder(this@PostDetailActivity).setMessage("정말로 이 게시물을 삭제하시겠습니까?\n게시물을 삭제하면 이 게시물의 모집 채팅방도 같이 삭제됩니다.")
                             .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, id ->
                                 deletePost()
-                                finishAffinity()
-                                val intent = Intent(applicationContext, MainActivity::class.java)
-                                startActivity(intent)
-                                overridePendingTransition(R.anim.none, R.anim.none)
+                                finish()
                             })
                             .setNegativeButton("취소") { _, _ -> }.show()
                 }
@@ -281,7 +278,7 @@ class PostDetailActivity : BasicActivity(){
         super.onResume()
         mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
             post = it.getValue(Post::class.java) as Post
-            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)?.split("/")?.first()}의 모집글"
+            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
             txtResName.text = post?.restaurantName
             txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
             txtResCategory2.text = post?.foodCategories?.get(1) ?: ""

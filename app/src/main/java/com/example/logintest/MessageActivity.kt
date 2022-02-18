@@ -27,17 +27,24 @@ import kotlinx.android.synthetic.main.activity_message.*
 import kotlinx.android.synthetic.main.activity_post_detail.*
 import kotlinx.android.synthetic.main.activity_write_post.*
 import kotlinx.coroutines.*
+import okhttp3.Dispatcher
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import java.io.File
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
 
-class MessageActivity : BasicActivity() {
+class MessageActivity : BasicActivity() , CoroutineScope{
 
     private lateinit var mFirebaseAuth : FirebaseAuth
     private lateinit var mDatabaseReference : DatabaseReference
     private lateinit var mfirestore : FirebaseFirestore
+    private lateinit var mJob : Job
+
+    override val coroutineContext: CoroutineContext
+        get() = mJob + Dispatchers.Main
 
 
     //private var usersId : ArrayList<String>? = null
@@ -47,8 +54,8 @@ class MessageActivity : BasicActivity() {
     private var postId : String? = null
     private var post : Post? = null
     private var postMaster : String? = null
-    private val users : HashMap<String, String> = HashMap()
-    private var index = 0
+    private var users : HashMap<String, String> = HashMap()
+    private var chatusers : HashMap<String, ChatModel.userStat> = HashMap()
 
 
     private var recyclerView : RecyclerView? = null
@@ -64,6 +71,7 @@ class MessageActivity : BasicActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
+        mJob = Job()
 
         setSupportActionBar(toolbar_message)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -72,6 +80,7 @@ class MessageActivity : BasicActivity() {
         mfirestore = FirebaseFirestore.getInstance()
         mFirebaseAuth = FirebaseAuth.getInstance()
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
+
 
         val imageView_photo = findViewById<ImageView>(R.id.messageActivity_ImageView_photo)
         val imageView = findViewById<ImageView>(R.id.messageActivity_ImageView)
@@ -124,8 +133,6 @@ class MessageActivity : BasicActivity() {
             }
         })
 
-
-
         // UserAccount 에서 현재 사용자 이름 받아오기
         mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
             userName = it.value.toString()
@@ -133,57 +140,89 @@ class MessageActivity : BasicActivity() {
             Toast.makeText(this@MessageActivity, "get() username failed", Toast.LENGTH_SHORT).show()
         }
 
-        // 해당 포스트의 채팅방에 참여중인 유저 가져오기
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
+        // 채팅방에 참여중인 유저 가져오기
+        // 최대 인덱스 확인용
+        var maxIndex = 0
+        mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").addValueEventListener(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                users.clear()
-                var i = 0
-                for (data in snapshot.children) {
+                chatusers.clear()
+                maxIndex = 0
+                for (data in snapshot.children){
                     val key = data.key
-                    val item = data.value
-                    users.put(key.toString(), item.toString())
-                    i += 1
+                    val item = data.getValue<ChatModel.userStat>()
+                    chatusers.put(key.toString(), item!!)
+                    if (maxIndex < item.index!!){
+                        maxIndex = item.index!!
+                    }
                 }
-                index = i
+                // 해당 포스트에 참여중인 유저 가져오기
+                mDatabaseReference.child("Post").child(postId.toString()).child("users").addValueEventListener(object : ValueEventListener {
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        users.clear()
+                        for (data in snapshot.children) {
+                            val key = data.key
+                            val item = data.value
+                            users.put(key.toString(), item.toString())
+                        }
+
+                        // 처음 들어오는 유저 더해주기
+                        if (!users.containsKey(uid)){
+                            users.put(uid!!, userName!!)
+                            mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).setValue(userName.toString())
+
+                            // 채팅방 users 업데이트
+                            val userStatus = ChatModel.userStat(userName, maxIndex + 1)
+                            chatusers.put(uid!!, userStatus)
+                            mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").child(uid.toString()).setValue(userStatus)
+
+
+                            //입장 알람
+                            if (uid == postMaster){
+                                val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime, false)
+                                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
+                            }else{
+                                val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime, false)
+                                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
+                            }
+
+                            // 입장할 때 공지사항
+                            val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                            dlg.setTitle("공지") //제목
+                            dlg.setMessage("1. 각자 원하시는 메뉴를 말씀해주세요.\n" +
+                                    "2. 음식을 받을 위치를 결정해주세요.\n" +
+                                    "3. 시키시는 분(방장)은 계좌번호를 알려주세요.") // 메시지
+                            dlg.setPositiveButton("확인") { _, _ ->
+                            }
+                            dlg.show()
+                        }
+                        println("자 이제 시작이야")
+                        recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
+                        recyclerView?.adapter = RecyclerViewAdapter()
+                    }
+                })
             }
         })
 
 
-        // 유저 id 추가(처음 들어오는 유저만)
-        Handler().postDelayed({
-            if (users!!.containsKey(uid)) {
-            } else {
-                val userinfo = "$userName/$index"
-                //users.put(uid!!, userName!!)
-                users.put(uid!!, userinfo)
-                mDatabaseReference.child("Post").child(postId.toString()).child("users").setValue(users)
 
-                //입장 알람
-                if (uid == postMaster){
-                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님(방장)이 입장하셨습니다.", curTime, false)
-                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
-                }else{
-                    val entranceAlarm = ChatModel.Comment("Admin", "${userName}님이 입장하셨습니다.", curTime, false)
-                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(entranceAlarm)
-                }
 
-                // 입장할 때 공지사항
-                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
-                dlg.setTitle("공지") //제목
-                dlg.setMessage("1. 각자 원하시는 메뉴를 말씀해주세요.\n" +
-                        "2. 음식을 받을 위치를 결정해주세요.\n" +
-                        "3. 시키시는 분(방장)은 계좌번호를 알려주세요.") // 메시지
-                dlg.setPositiveButton("확인") { _, _ ->
-                }
-                dlg.show()
-            }
-            println("자 이제 시작이야")
-            recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
-            recyclerView?.adapter = RecyclerViewAdapter()
-        }, 1000L)
+//            job1.await()
+//            print("users")
+//            print(users)
+//            job2.await()
+
+
+
+//        Handler().postDelayed({
+//
+//
+//        }, 1000L)
 
         imageView_photo.setOnClickListener {
             when{
@@ -234,6 +273,11 @@ class MessageActivity : BasicActivity() {
     override fun onStop() {
         super.onStop()
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mJob.cancel()
     }
 
     private fun showContextPopupPermission() {
@@ -314,6 +358,12 @@ class MessageActivity : BasicActivity() {
                 }
                 return true
             }
+            R.id.action_toPost -> {
+                val intent = Intent(this@MessageActivity, PostDetailActivity::class.java)
+                intent.putExtra("postId", postId)
+                intent.putExtra("uid", uid)
+                startActivity(intent)
+            }
             R.id.action_exit -> {
                 if (uid == postMaster) {// 방장이 나가면
                     MaterialAlertDialogBuilder(this@MessageActivity).setMessage("채팅방을 나가시겠습니까? 방장의 권한은 다른 사람에게 넘어갑니다.")
@@ -373,7 +423,7 @@ class MessageActivity : BasicActivity() {
         val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
         val curTime = dateFormat.format(Date(time)).toString()
         var nextMaster : String? = null
-        var currentUsers : HashMap<String, String> = HashMap()
+        val currentUsersId = ArrayList<String>()
         // Post에 접근하여 uid 제거하기
         mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
         // UserAccount에 접근하여 postId 제거하기
@@ -381,47 +431,85 @@ class MessageActivity : BasicActivity() {
         // 메인 화면으로 돌아가기
         finish()
 
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
+
+        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(error: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                currentUsers.clear()
-                for (data in snapshot.children) {
+                for (data in snapshot.children){
                     val key = data.key
-                    val item = data.value
-
-                    currentUsers.put(key.toString(), item.toString())
+                    currentUsersId.add(key!!)
                 }
-                if (currentUsers.isEmpty()) {
+                if (currentUsersId.isEmpty()){//  다 나갔으면 채팅방 폭파
+                    println("유저가 아무도 안남음!!!")
                     //post 제거
                     mDatabaseReference.child("Post").child(postId.toString()).removeValue()
                     //chatroom 제거
                     mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
                     // 사진 파일 제거
                     FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).delete()
-                } else {
-                    var minIndex = 100
-                    for (key in currentUsers.keys){
-                        val i = currentUsers.get(key)?.split("/")?.last()!!.toInt()
-                        if(i < minIndex){
-                            minIndex = i
-                            nextMaster = key
-                        }
-                    }
-                    //nextMaster = currentUsers.keys.toTypedArray()[0]
-                    mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
-
-                    // 퇴장 알림
-                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
-                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${
-                        currentUsers.get(nextMaster)?.split("/")?.first()
-                    }님으로 변경되었습니다.", curTime, false)
-                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
-                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
+                    return
                 }
+                var maxIndex = 100
+                for (cuid in currentUsersId){
+                    if(chatusers.get(cuid)?.index!! < maxIndex){
+                        maxIndex = chatusers.get(cuid)?.index!!
+                        nextMaster = cuid
+                    }
+                }
+                mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
+                // 퇴장 알림
+                val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
+                val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${chatusers.get(nextMaster)?.nickname}님으로 변경되었습니다.", curTime, false)
+                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
+                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
             }
         })
+
+//        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onCancelled(error: DatabaseError) {
+//            }
+//
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                currentUsers.clear()
+//                for (data in snapshot.children) {
+//                    val key = data.key
+//                    val item = data.value
+//
+//                    //현재 유저들 정보 받아오기
+//                    currentUsers.put(key.toString(), item.toString())
+//                }
+//
+//                if (isChatRoomEmpty) {
+//                    //post 제거
+//                    mDatabaseReference.child("Post").child(postId.toString()).removeValue()
+//                    //chatroom 제거
+//                    mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
+//                    // 사진 파일 제거
+//                    FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).delete()
+//                } else {
+//                    var minIndex = 100
+//                    for (key in currentUsers.keys){
+//                        val i = currentUsers.get(key)?.index!!
+//                        if(i < minIndex){
+//                            minIndex = i
+//                            nextMaster = key
+//                        }
+//                    }
+//                    //nextMaster = currentUsers.keys.toTypedArray()[0]
+//                    mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
+//
+//                    // 퇴장 알림
+//                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
+//                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${
+//                        currentUsers.get(nextMaster)?.nickname
+//                    }님으로 변경되었습니다.", curTime, false)
+//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
+//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
+//                }
+//            }
+//        })
 
     }
 
@@ -434,12 +522,6 @@ class MessageActivity : BasicActivity() {
 
         init{
             // 포스트 정보 받아오기
-//            println("그림들")
-//            for (item in photoList){
-//                var i = 1
-//                println(item.imageUrl + "$i")
-//                i += 1
-//            }
             getMessageList()
         }
         fun getMessageList(){
@@ -479,7 +561,7 @@ class MessageActivity : BasicActivity() {
             var isPhoto = comments[position].isPhoto
             holder.textView_message.textSize = 20F
             val speakingUserId = comments[position].uid
-            var speakingUserName = users?.get(speakingUserId!!)?.split("/")?.first()
+            var speakingUserName = chatusers.get(speakingUserId!!)?.nickname
             holder.textView_time.text = comments[position].time
             holder.imageView_message.visibility = View.GONE
 
@@ -487,22 +569,15 @@ class MessageActivity : BasicActivity() {
             // 프사 정해주기
             var index = 0
             if (!speakingUserId.equals("Admin")){
-                println("씨발")
-                println(users)
-                index = users?.get(speakingUserId!!)?.split("/")?.last()!!.toInt()
-                println("인덱스")
-                println(speakingUserId)
-                println(index)
+                index = chatusers.get(speakingUserId)?.index!!
             }
 
             when{
                 index % 5 == 0 -> {
                     holder.imageView_profile.setBackgroundResource(R.drawable.profile_background1)
-                    println("여기1")
                 }
                 index % 5 == 1 -> {
                     holder.imageView_profile.setBackgroundResource(R.drawable.profile_background2)
-                    println("여기2")
                 }
                 index % 5 == 2 -> {
                     holder.imageView_profile.setBackgroundResource(R.drawable.profile_background3)

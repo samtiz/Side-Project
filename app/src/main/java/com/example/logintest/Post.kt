@@ -16,6 +16,7 @@ class Post {
     // 현태가 수정한 부분 /////
     var postId: String? = null
     var users : HashMap<String, String> = HashMap()
+    //class userStat(val nickname : String? = null, var index : Int? = null, var stat : Boolean? = null)
     //var usersId : ArrayList<String>? = null
     //val userName : MutableSet<String>? = null
     var visibility: Boolean = true
