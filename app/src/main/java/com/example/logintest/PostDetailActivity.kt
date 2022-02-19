@@ -3,6 +3,7 @@ package com.example.logintest
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -318,6 +319,11 @@ class PostDetailActivity : BasicActivity(){
             adapter.setCommentData(it)
             adapter.notifyDataSetChanged()
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_post_detail, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     private fun deletePost() {

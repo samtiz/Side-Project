@@ -218,6 +218,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:enabled="false"
                 android:text="기본기숙사"
                 android:textSize="14dp"
                 app:layout_constraintEnd_toStartOf="@+id/btn_time"

@@ -5,6 +5,7 @@ import android.app.SearchManager
 import android.content.Intent
 import android.database.Cursor
 import android.database.MatrixCursor
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.provider.BaseColumns
 import android.util.Log
@@ -13,8 +14,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import android.widget.*
 import android.widget.Spinner
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -51,6 +54,29 @@ class MainActivity : BasicActivity() {
     private var uid : String? = null
     private var userName : String? = null
 
+    private var btnCat1: Button? = null
+    private var btnCat2: Button? = null
+    private var btnCat3: Button? = null
+    private var btnCat4: Button? = null
+    private var btnCat5: Button? = null
+    private var btnCat6: Button? = null
+    private var btnCat7: Button? = null
+    private var btnCat8: Button? = null
+    private var btnCat9: Button? = null
+    private var btnCat10: Button? = null
+    private var btnCat11: Button? = null
+    private var btnCat12: Button? = null
+    private var btnCat13: Button? = null
+    private var btnCat14: Button? = null
+    private var btnCat15: Button? = null
+    private var btnCat16: Button? = null
+    private var btnCat17: Button? = null
+    private var btnCat18: Button? = null
+    private var btnCat19: Button? = null
+    private var btnCat20: Button? = null
+    private var btnCat21: Button? = null
+    private var btnCat22: Button? = null
+    private var btnCatList: ArrayList<Button?>? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -241,6 +267,32 @@ class MainActivity : BasicActivity() {
             }
         }
 
+        btnCat1 = findViewById(R.id.btn_allCategory)
+        btnCat2 = findViewById(R.id.btn_korean)
+        btnCat3 = findViewById(R.id.btn_chicken)
+        btnCat4 = findViewById(R.id.btn_boonsik)
+        btnCat5 = findViewById(R.id.btn_donkkas)
+        btnCat6 = findViewById(R.id.btn_jokbal)
+        btnCat7 = findViewById(R.id.btn_zzim)
+        btnCat8 = findViewById(R.id.btn_roast)
+        btnCat9 = findViewById(R.id.btn_pizza)
+        btnCat10 = findViewById(R.id.btn_chinese)
+        btnCat11 = findViewById(R.id.btn_japanese)
+        btnCat12 = findViewById(R.id.btn_rawFish)
+        btnCat13 = findViewById(R.id.btn_western)
+        btnCat14 = findViewById(R.id.btn_coffee)
+        btnCat15 = findViewById(R.id.btn_dessert)
+        btnCat16 = findViewById(R.id.btn_asian)
+        btnCat17 = findViewById(R.id.btn_sandwich)
+        btnCat18 = findViewById(R.id.btn_salad)
+        btnCat19 = findViewById(R.id.btn_burger)
+        btnCat20 = findViewById(R.id.btn_mexican)
+        btnCat21 = findViewById(R.id.btn_mealBox)
+        btnCat22 = findViewById(R.id.btn_jook)
+        btnCatList = arrayListOf(btnCat1, btnCat2, btnCat3, btnCat4, btnCat5, btnCat6, btnCat7, btnCat8, btnCat9, btnCat10,
+            btnCat11, btnCat12, btnCat13, btnCat14, btnCat15, btnCat16, btnCat17, btnCat18, btnCat19, btnCat20, btnCat21, btnCat22, )
+        btnCat1?.isSelected = true
+
     }
 
     override fun onResume() {
@@ -259,6 +311,12 @@ class MainActivity : BasicActivity() {
         selectedFoodCategory = foodCategory
         observerData()
         txtSubject.text = foodCategory
+        btnCatList?.forEach {
+            if (it?.isSelected == true && it != v) {
+                it.isSelected = false
+            }
+        }
+        v.isSelected = true
     }
 
 
