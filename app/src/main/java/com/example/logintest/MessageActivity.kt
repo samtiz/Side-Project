@@ -32,6 +32,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import java.io.File
+import java.security.AccessController.getContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 
@@ -59,6 +60,8 @@ class MessageActivity : BasicActivity(){
 
     private var uriPhoto : Uri? = null
 
+    private var isViewing: Boolean? = null
+
     // 메세지를 보낸 시간
     val time = System.currentTimeMillis()
     private val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
@@ -82,7 +85,7 @@ class MessageActivity : BasicActivity(){
         val imageView = findViewById<ImageView>(R.id.messageActivity_ImageView)
         val editText = findViewById<TextView>(R.id.messageActivity_editText)
 
-
+        isViewing = true
 
         // 클릭으로 넘어온 post Id, chatRoomName
         postId = intent.getStringExtra("postId")
@@ -190,12 +193,14 @@ class MessageActivity : BasicActivity(){
             override fun onChildRemoved(snapshot: DataSnapshot) {
 
                 //Toast.makeText(applicationContext, "존재하지 않는 채팅방입니다.", Toast.LENGTH_SHORT).show()
-                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
-                dlg.setMessage("존재하지 않는 채팅방입니다. 나가시겠습니까?") // 메시지
-                dlg.setPositiveButton("확인") { _, _ ->
-                    finish()
+                if (isViewing!!) {
+                    val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                    dlg.setMessage("존재하지 않는 채팅방입니다. 채팅을 종료합니다.") // 메시지
+                    dlg.setPositiveButton("확인") { _, _ ->
+                        finish()
+                    }
+                    dlg.show()
                 }
-                dlg.show()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
@@ -224,6 +229,8 @@ class MessageActivity : BasicActivity(){
         Handler().postDelayed({
             // 처음 들어오는 유저 더해주기
             if (!users.containsKey(uid)){
+
+                Log.d("firstUser", users.toString())
 
                 if((users.isEmpty() && uid == postMaster) || !users.isEmpty()){
                     users.put(uid!!, userName!!)
@@ -305,11 +312,23 @@ class MessageActivity : BasicActivity(){
 
     override fun onRestart() {
         super.onRestart()
+        isViewing = true
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(true)
+        mDatabaseReference.child("chatrooms").child(postId.toString()).get().addOnSuccessListener {
+            if (it.value.toString() == "null") {
+                val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+                dlg.setMessage("존재하지 않는 채팅방입니다. 채팅을 종료합니다.") // 메시지
+                dlg.setPositiveButton("확인") { _, _ ->
+                    finish()
+                }
+                dlg.show()
+            }
+        }
     }
 
     override fun onStop() {
         super.onStop()
+        isViewing = false
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(false)
     }
 

@@ -46,7 +46,7 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
     override fun onBindViewHolder(holder: ListAdapter.ViewHolder, position: Int) {
         val post: Post = postListFiltered[position]
 
-        if (post.dorm == "warning") {
+        if (post.dorm == "warning" && position == 0) {
             holder.restaurantName.text = ""
             holder.restaurantCategory1.text = ""
             holder.restaurantCategory2.text = ""
@@ -54,8 +54,12 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
             holder.restaurantCategory4.text = ""
             holder.mainText.text = ""
             holder.dorm.text = if (post.mainText == null) {"모집글이 없습니다.\n하단의 '모집하기'를 눌러 새 모집글을 작성해보세요."} else {post.mainText}
+            holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.black))
             holder.timeLimit.text = ""
             holder.deliveryFee.text = ""
+            if (holder.isParticipating.visibility == VISIBLE) {
+                holder.isParticipating.visibility = GONE
+            }
         }
         else {
             mFirebaseAuth = FirebaseAuth.getInstance()
@@ -67,6 +71,29 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
                 }
                 else if (holder.isParticipating.visibility == VISIBLE) {
                     holder.isParticipating.visibility = GONE
+                }
+
+                if (!post.visibility) {
+                    holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.restaurantCategory1.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.restaurantCategory2.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.restaurantCategory3.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.restaurantCategory4.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.timeLimit.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.deliveryFee.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                }
+                else {
+                    holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.restaurantCategory1.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.restaurantCategory2.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.restaurantCategory3.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.restaurantCategory4.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.timeLimit.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.deliveryFee.setTextColor(ContextCompat.getColor(context, R.color.black))
                 }
             }
             holder.restaurantName.text = post.restaurantName
@@ -86,7 +113,6 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
 
             // 게시물을 클릭하면 postDetail 로 넘어가게 함
             holder.itemView.setOnClickListener {
-
                 mDatabaseReference.child("Post").child(post.postId.toString()).get().addOnSuccessListener {
                     if (it.value != null){
                         val intent = Intent(context, PostDetailActivity::class.java)
@@ -98,17 +124,6 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
                         Toast.makeText(context, "이미 삭제된 게시물입니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
-            }
-            if (!post.visibility) {
-                holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.restaurantCategory1.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.restaurantCategory2.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.restaurantCategory3.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.restaurantCategory4.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.timeLimit.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                holder.deliveryFee.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
             }
         }
         ////////////////////
@@ -138,17 +153,16 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
                 if (charString.isEmpty()) {
                     postListFiltered = postList
                 }
+                else if (postList.isNotEmpty() && postList[0].dorm == "warning") {
+                    postListFiltered = ArrayList<Post>()
+                }
                 else {
+                    println(postList)
                     val filteredList = ArrayList<Post>()
                     val temp = ArrayList<Post>()
                     temp.addAll(postList)
                     temp
                             .filter {
-//                                        (it.dorm?.contains(constraint!!, ignoreCase = true))!! or
-//                                        (it.foodCategories?.get(0)?.contains(constraint!!))!! or
-//                                        (it.foodCategories?.get(1)?.contains(constraint!!))!! or
-//                                        (it.foodCategories?.get(2)?.contains(constraint!!))!! or
-//                                        (it.foodCategories?.get(3)?.contains(constraint!!))!! or
                                           (it.restaurantName?.contains(constraint!!, ignoreCase = true))!!
 
                             }
