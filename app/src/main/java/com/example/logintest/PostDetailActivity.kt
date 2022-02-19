@@ -3,6 +3,7 @@ package com.example.logintest
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -122,7 +123,7 @@ class PostDetailActivity : BasicActivity(){
             txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
             txtLocation.text = "배달 수령 위치: ${post?.dorm}"
             txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-            txtTime.text = "모집 만료 시간: ${post?.timeLimit}" // TODO 시간 포맷 바꿔서 적용
+            txtTime.text = "모집 만료 시간: ${post?.timeLimit?.let { it1 -> leftPad(it1) }}" // TODO 시간 포맷 바꿔서 적용
             txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
             txtMain.text = post?.mainText
             if (post?.comments?.isEmpty()!!) {
@@ -219,7 +220,7 @@ class PostDetailActivity : BasicActivity(){
                 txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
                 txtLocation.text = "배달 수령 위치: ${post?.dorm}"
                 txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-                txtTime.text = "모집 만료 시간: ${post?.timeLimit}" // TODO 시간 포맷 바꿔서 적용
+                txtTime.text = "모집 만료 시간: ${post?.timeLimit?.let { it1 -> leftPad(it1) }}" // TODO 시간 포맷 바꿔서 적용
                 txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
                 txtMain.text = post?.mainText
             }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
@@ -306,7 +307,7 @@ class PostDetailActivity : BasicActivity(){
             txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
             txtLocation.text = "배달 수령 위치: ${post?.dorm}"
             txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-            txtTime.text = "모집 만료 시간: ${post?.timeLimit}" // TODO 시간 포맷 바꿔서 적용
+            txtTime.text = "모집 만료 시간: ${post?.timeLimit?.let { it1 -> leftPad(it1) }}" // TODO 시간 포맷 바꿔서 적용
             txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
             txtMain.text = post?.mainText
         }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
@@ -318,6 +319,11 @@ class PostDetailActivity : BasicActivity(){
             adapter.setCommentData(it)
             adapter.notifyDataSetChanged()
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_post_detail, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     private fun deletePost() {

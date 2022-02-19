@@ -176,6 +176,9 @@ class WritePostActivity: BasicActivity() {
             else if (mEtFoodCategory.text.split(", ").size > 4) {
                 Toast.makeText(this@WritePostActivity, "음식 카테고리는 최대 4개까지만 설정 가능합니다.", Toast.LENGTH_SHORT).show()
             }
+            else if (mEtFoodCategory.text.split(", ").size != 1 && mSwitch.isChecked) {
+                Toast.makeText(this@WritePostActivity, "음식점 미정인 경우 카테고리는 한 가지만 설정해주세요.", Toast.LENGTH_SHORT).show()
+            }
             else {
 
                 val post = Post()

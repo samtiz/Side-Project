@@ -1,6 +1,5 @@
 package com.example.logintest
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -13,10 +12,11 @@ import android.widget.Filterable
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
 
 class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapter.ViewHolder>(), Filterable {
@@ -47,24 +47,22 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
         val post: Post = postListFiltered[position]
 
         if (post.dorm == "warning" && position == 0) {
-            holder.restaurantName.text = ""
-            holder.restaurantCategory1.text = ""
-            holder.restaurantCategory2.text = ""
-            holder.restaurantCategory3.text = ""
-            holder.restaurantCategory4.text = ""
-            holder.mainText.text = ""
-            holder.dorm.text = if (post.mainText == null) {"모집글이 없습니다.\n하단의 '모집하기'를 눌러 새 모집글을 작성해보세요."} else {post.mainText}
-            holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.black))
-            holder.timeLimit.text = ""
-            holder.deliveryFee.text = ""
+            holder.restaurantName.text = if (post.mainText == null) {"모집글이 없습니다."} else {post.mainText}
+            holder.mainText.text = if (post.mainText == null) {"하단의 '모집하기'를 눌러 새 모집글을 작성해보세요."} else {""}
+            holder.dormNtimeNfee.text = ""
+            holder.dormNtimeNfee.setTextColor(ContextCompat.getColor(context, R.color.black))
             if (holder.isParticipating.visibility == VISIBLE) {
                 holder.isParticipating.visibility = GONE
+            }
+            if (holder.numUsers.visibility == VISIBLE) {
+                holder.numUsers.visibility = GONE
             }
         }
         else {
             mFirebaseAuth = FirebaseAuth.getInstance()
             mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
             val uid = mFirebaseAuth.currentUser?.uid!!
+            val time = post.timeLimit?.split(":")
             if (position == 0) {
                 if (post.users.contains(uid)) {
                     holder.isParticipating.visibility = VISIBLE
@@ -73,43 +71,38 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
                     holder.isParticipating.visibility = GONE
                 }
 
+                if (holder.numUsers.visibility == GONE) {
+                    holder.numUsers.visibility = VISIBLE
+                }
+
                 if (!post.visibility) {
                     holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                    holder.restaurantCategory1.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                    holder.restaurantCategory2.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                    holder.restaurantCategory3.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                    holder.restaurantCategory4.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
                     holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                    holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                    holder.timeLimit.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-                    holder.deliveryFee.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+                    holder.dormNtimeNfee.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
                 }
                 else {
                     holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    holder.restaurantCategory1.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    holder.restaurantCategory2.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    holder.restaurantCategory3.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    holder.restaurantCategory4.setTextColor(ContextCompat.getColor(context, R.color.black))
                     holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    holder.dorm.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    holder.timeLimit.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    holder.deliveryFee.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    holder.dormNtimeNfee.setTextColor(ContextCompat.getColor(context, R.color.black))
                 }
             }
             holder.restaurantName.text = post.restaurantName
-            holder.restaurantCategory1.text = post.foodCategories?.get(0).toString()
-            holder.restaurantCategory2.text = post.foodCategories?.get(1).toString()
-            holder.restaurantCategory3.text = post.foodCategories?.get(2).toString()
-            holder.restaurantCategory4.text = post.foodCategories?.get(3).toString()
             holder.mainText.text = post.mainText
-            holder.dorm.text = post.dorm
-            val time = post.timeLimit?.split(":")
+
+            var temp = ""
+            temp += "배달위치 ${post.dorm}"
+            temp += " · "
+
             var strTime: String = ""
             strTime += if (time?.get(0)?.toInt()!! < 10) { "0${time[0]}" } else { time[0] }
             strTime += ":"
             strTime += if (time[1].toInt() < 10) { "0${time[1]}" } else { time[1] }
-            holder.timeLimit.text = strTime + " 까지"
-            holder.deliveryFee.text = "${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
+            temp += "모집마감 $strTime"
+            temp += "\n"
+            temp += "배달비 ${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"
+
+            holder.dormNtimeNfee.text = temp
+            holder.numUsers.text = post.users.size.toString()
 
             // 게시물을 클릭하면 postDetail 로 넘어가게 함
             holder.itemView.setOnClickListener {
@@ -135,15 +128,10 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val restaurantName: TextView = itemView.findViewById(R.id.txt_restaurantName)
-        val restaurantCategory1: TextView = itemView.findViewById(R.id.txt_restaurantCategory1)
-        val restaurantCategory2: TextView = itemView.findViewById(R.id.txt_restaurantCategory2)
-        val restaurantCategory3: TextView = itemView.findViewById(R.id.txt_restaurantCategory3)
-        val restaurantCategory4: TextView = itemView.findViewById(R.id.txt_restaurantCategory4)
         val mainText: TextView = itemView.findViewById(R.id.txt_mainText)
-        val dorm: TextView = itemView.findViewById(R.id.txt_dorm)
-        val timeLimit: TextView = itemView.findViewById(R.id.txt_timeLimit)
-        val deliveryFee: TextView = itemView.findViewById(R.id.txt_deliveryFee)
+        val dormNtimeNfee: TextView = itemView.findViewById(R.id.txt_dormNtimeNfee)
         val isParticipating: TextView = itemView.findViewById(R.id.txt_participating)
+        val numUsers: TextView = itemView.findViewById(R.id.txt_numUsers)
     }
 
     override fun getFilter(): Filter {

@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/selector_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -12,107 +13,71 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
         android:text="TextView"
-        android:textSize="24dp"
+        android:textSize="19dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/txt_restaurantCategory1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
-        android:text="TextView"
-        android:textSize="10dp"
-        app:layout_constraintEnd_toStartOf="@+id/txt_restaurantCategory2"
-        app:layout_constraintTop_toTopOf="@+id/txt_restaurantName" />
-
-    <TextView
-        android:id="@+id/txt_restaurantCategory2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:text="TextView"
-        android:textSize="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/txt_restaurantCategory1" />
-
-    <TextView
-        android:id="@+id/txt_restaurantCategory3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="TextView"
-        android:textSize="10dp"
-        app:layout_constraintStart_toStartOf="@+id/txt_restaurantCategory1"
-        app:layout_constraintTop_toBottomOf="@+id/txt_restaurantCategory1" />
-
-    <TextView
-        android:id="@+id/txt_restaurantCategory4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textSize="10dp"
-        app:layout_constraintStart_toStartOf="@+id/txt_restaurantCategory2"
-        app:layout_constraintTop_toTopOf="@+id/txt_restaurantCategory3" />
 
     <TextView
         android:id="@+id/txt_mainText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="20dp"
         android:ellipsize="end"
+        android:layout_marginTop="6dp"
         android:maxLines="1"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/txt_restaurantCategory4"
-        app:layout_constraintStart_toStartOf="@+id/txt_restaurantName"
-        app:layout_constraintTop_toBottomOf="@+id/txt_dorm" />
-
-    <TextView
-        android:id="@+id/txt_dorm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="TextView"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/txt_restaurantName"
         app:layout_constraintTop_toBottomOf="@+id/txt_restaurantName" />
 
     <TextView
-        android:id="@+id/txt_timeLimit"
+        android:id="@+id/txt_dormNtimeNfee"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/txt_dorm"
-        app:layout_constraintStart_toEndOf="@+id/txt_dorm" />
+        android:textSize="13dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/txt_restaurantName"
+        app:layout_constraintTop_toBottomOf="@id/txt_mainText" />
 
     <TextView
-        android:id="@+id/txt_deliveryFee"
+        android:id="@+id/txt_numUsers"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/txt_timeLimit"
-        app:layout_constraintStart_toEndOf="@+id/txt_timeLimit" />
+        android:layout_height="23dp"
+        android:paddingStart="1dp"
+        android:paddingEnd="5dp"
+        android:gravity="center_vertical"
+        android:text="1"
+        android:drawableLeft="@drawable/postlist_person_icon"
+        android:background="@drawable/round_black_tag"
+        android:textColor="@color/white"
+        android:textSize="12dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/txt_participating"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="참여 중"
-        android:textSize="15dp"
+        android:layout_height="23dp"
+        android:paddingHorizontal="6dp"
+        android:gravity="center"
+        android:text="참여중"
+        android:background="@drawable/round_pink_tag"
+        android:textColor="@color/white"
+        android:textSize="12dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:visibility="gone"
-        android:textColor="@android:color/holo_red_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/txt_restaurantName"
-        app:layout_constraintEnd_toStartOf="@+id/txt_restaurantCategory3"
-        app:layout_constraintStart_toEndOf="@+id/txt_restaurantName"
-        app:layout_constraintTop_toTopOf="@+id/txt_restaurantName" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/txt_numUsers"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
