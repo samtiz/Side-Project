@@ -9,11 +9,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -64,8 +66,9 @@ class MessageActivity : BasicActivity(){
 
     // 메세지를 보낸 시간
     val time = System.currentTimeMillis()
-    private val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
-    private val curTime = dateFormat.format(Date(time)).toString()
+    private val dateFormat = SimpleDateFormat("hh:mm")
+    private val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+    private val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,24 +99,24 @@ class MessageActivity : BasicActivity(){
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(true)
         //글창에 글 없으면 이미지 추가 버튼, 글 있으면 전송 버튼
         //imageView.visibility = View.INVISIBLE
-        imageView.visibility = View.INVISIBLE
-        imageView_photo.visibility = View.VISIBLE
-        editText.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if(editText.text.isEmpty()){
-                    imageView.visibility = View.INVISIBLE
-                    imageView_photo.visibility = View.VISIBLE
-                }
-                imageView.visibility = View.VISIBLE
-                imageView_photo.visibility = View.INVISIBLE
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-            }
-        })
+//        imageView.visibility = View.INVISIBLE
+//        imageView_photo.visibility = View.VISIBLE
+//        editText.addTextChangedListener(object : TextWatcher{
+//            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+//            }
+//
+//            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+//                if(editText.text.isEmpty()){
+//                    imageView.visibility = View.INVISIBLE
+//                    imageView_photo.visibility = View.VISIBLE
+//                }
+//                imageView.visibility = View.VISIBLE
+//                imageView_photo.visibility = View.INVISIBLE
+//            }
+//
+//            override fun afterTextChanged(p0: Editable?) {
+//            }
+//        })
 
 
         // 채팅방 이름 설정
@@ -225,6 +228,25 @@ class MessageActivity : BasicActivity(){
             }
         })
 
+        // 키보드 올라가면 같이 올라가게
+        recyclerView?.addOnLayoutChangeListener(object : View.OnLayoutChangeListener{
+            override fun onLayoutChange(
+                v: View?,
+                left: Int,
+                top: Int,
+                right: Int,
+                bottom: Int,
+                oldLeft: Int,
+                oldTop: Int,
+                oldRight: Int,
+                oldBottom: Int
+            ) {
+                if (bottom < oldBottom){
+                    recyclerView?.scrollToPosition(recyclerView?.adapter?.itemCount!! - 1)
+                }
+            }
+        })
+
 
         Handler().postDelayed({
             // 처음 들어오는 유저 더해주기
@@ -263,7 +285,9 @@ class MessageActivity : BasicActivity(){
                 }
             }
             println("자 이제 시작이야")
-            recyclerView?.layoutManager = LinearLayoutManager(this@MessageActivity)
+            val manager = LinearLayoutManager(this@MessageActivity)
+//            manager.stackFromEnd = true
+            recyclerView?.layoutManager = manager
             recyclerView?.adapter = RecyclerViewAdapter()
         },1000L)
 
@@ -293,8 +317,9 @@ class MessageActivity : BasicActivity(){
         // 글 전송 버튼 누르면
         imageView.setOnClickListener {
             val time = System.currentTimeMillis()
-            val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
-            val curTime = dateFormat.format(Date(time)).toString()
+            val dateFormat = SimpleDateFormat("hh:mm")
+            val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+            val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
 
             if(!editText.text.isEmpty()){
                 val comment = ChatModel.Comment(uid, editText.text.toString(), curTime, false)
@@ -302,8 +327,6 @@ class MessageActivity : BasicActivity(){
                 messageActivity_editText.text = null
                 Log.d("chatUidNotNull dest", "$postId")
             }
-            imageView.visibility = View.INVISIBLE
-            imageView_photo.visibility = View.VISIBLE
         }
 
 
@@ -353,8 +376,9 @@ class MessageActivity : BasicActivity(){
         super.onActivityResult(requestCode, resultCode, data)
 
         val time = System.currentTimeMillis()
-        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
-        val curTime = dateFormat.format(Date(time)).toString()
+        val dateFormat = SimpleDateFormat("hh:mm")
+        val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+        val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
 
         if (requestCode == 2000) {
             var path = data?.getStringExtra("image")
@@ -452,8 +476,9 @@ class MessageActivity : BasicActivity(){
 
     private fun finishPost() {
         val time = System.currentTimeMillis()
-        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
-        val curTime = dateFormat.format(Date(time)).toString()
+        val dateFormat = SimpleDateFormat("hh:mm")
+        val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+        val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
         mDatabaseReference.child("Post").child(postId.toString()).child("visibility").setValue(false)
         // 모집마감 알림
         val finishAlarm = ChatModel.Comment("Admin", "모집이 마감되었습니다.", curTime, false)
@@ -462,8 +487,9 @@ class MessageActivity : BasicActivity(){
 
     private fun exitPost() {
         val time = System.currentTimeMillis()
-        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
-        val curTime = dateFormat.format(Date(time)).toString()
+        val dateFormat = SimpleDateFormat("hh:mm")
+        val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+        val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
         // Post에 접근하여 uid 제거하기
         mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
         // UserAccount에 접근하여 postId 제거하기
@@ -478,8 +504,9 @@ class MessageActivity : BasicActivity(){
 
     private fun exitMasterPost() {
         val time = System.currentTimeMillis()
-        val dateFormat = SimpleDateFormat("MM월dd일 hh:mm")
-        val curTime = dateFormat.format(Date(time)).toString()
+        val dateFormat = SimpleDateFormat("hh:mm")
+        val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+        val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
         var nextMaster : String? = null
         val currentUsersId = ArrayList<String>()
         // Post에 접근하여 uid 제거하기
@@ -574,8 +601,6 @@ class MessageActivity : BasicActivity(){
     inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.MessageViewHolder>() {
 
         private val comments = ArrayList<ChatModel.Comment>()
-        private val keys = ArrayList<String>()
-        private var post : Post? = null
 
         init{
             // 포스트 정보 받아오기
@@ -614,14 +639,32 @@ class MessageActivity : BasicActivity(){
                 holder: MessageViewHolder,
                 position: Int
         ) {
+
+
             // 사진이면 사진 받아오기
             var isPhoto = comments[position].isPhoto
-            holder.textView_message.textSize = 20F
+            holder.textView_message.textSize = 16F
+            holder.textView_message_my.textSize = 16F
             val speakingUserId = comments[position].uid
+            val messageTime = comments[position].time
             var speakingUserName = chatusers.get(speakingUserId!!)?.nickname
             holder.textView_time.text = comments[position].time
             holder.imageView_message.visibility = View.GONE
 
+            // 마지막 메세지에만 시간
+            if (position < comments.size - 1){
+                if (comments[position + 1].uid == speakingUserId && comments[position + 1].time == messageTime){
+                    holder.textView_time.visibility = View.GONE
+                }
+            }
+
+            // 첫번째 메세지에만 프사,이름 달아주기
+            if (position > 0){
+                if (comments[position - 1].uid == speakingUserId && comments[position - 1].time == messageTime){
+                    holder.layout_destination.visibility = View.INVISIBLE
+                    holder.textView_name.visibility = View.GONE
+                }
+            }
 
             // 프사 정해주기
             var index = 0
@@ -658,12 +701,29 @@ class MessageActivity : BasicActivity(){
                     intent.putExtra("imageUrl", comments[position].message)
                     startActivity(intent)
                 }
-
-                Glide.with(holder.itemView.context).load(photo).into(holder.imageView_message)
+                holder.imageView_message_my.setOnClickListener{
+                    val intent = Intent(this@MessageActivity, photoDetailActivity::class.java)
+                    intent.putExtra("imageUrl", comments[position].message)
+                    startActivity(intent)
+                }
                 when {
                     speakingUserId.equals(uid) -> {// 본인 채팅
-                        holder.textView_name.visibility = View.INVISIBLE
-                        holder.layout_destination.visibility = View.INVISIBLE
+                        Glide.with(holder.itemView.context).load(photo).into(holder.imageView_message_my)
+                        holder.textView_name.visibility = View.GONE
+                        holder.textView_message_my.visibility = View.GONE
+                        holder.layout_destination.visibility = View.GONE
+
+                        holder.layout_otherChat.visibility = View.GONE
+                        holder.layout_myChat.visibility = View.VISIBLE
+                        holder.textView_time_my.text = comments[position].time
+
+                        // 마지막 메세지에만 시간 달아주기
+                        if (position < comments.size - 1){
+                            if (comments[position + 1].uid == speakingUserId && comments[position + 1].time == messageTime){
+                                holder.textView_time_my.visibility = View.GONE
+                            }
+                        }
+
                         holder.layout_main.gravity = Gravity.RIGHT
 
                         holder.layout_admin.visibility = View.GONE
@@ -671,13 +731,10 @@ class MessageActivity : BasicActivity(){
 
                     }
                     else -> {// 남의 채팅
+                        Glide.with(holder.itemView.context).load(photo).into(holder.imageView_message)
                         holder.textView_name.text = speakingUserName
-                        holder.layout_destination.visibility = View.VISIBLE
-                        when{
-
-                        }
-                        //holder.imageView_profile.background
-                        holder.textView_name.visibility = View.VISIBLE
+//                        holder.layout_destination.visibility = View.VISIBLE
+//                        holder.textView_name.visibility = View.VISIBLE
                         holder.layout_main.gravity = Gravity.LEFT
 
                         holder.layout_admin.visibility = View.GONE
@@ -687,15 +744,27 @@ class MessageActivity : BasicActivity(){
             }else{
                 when {
                     speakingUserId.equals(uid) -> {// 본인 채팅
-                        holder.textView_message.text = comments[position].message
-                        holder.textView_message.setBackgroundResource(R.drawable.rightbubble)
-                        holder.textView_name.visibility = View.INVISIBLE
-                        holder.layout_destination.visibility = View.INVISIBLE
+                        holder.textView_message_my.text = comments[position].message
+//                        holder.textView_message_my.setBackgroundResource(R.drawable.rightbubble)
+                        holder.textView_name.visibility = View.GONE
+                        holder.layout_destination.visibility = View.GONE
                         holder.layout_main.gravity = Gravity.RIGHT
 
                         holder.layout_admin.visibility = View.GONE
                         holder.textView_admin_message.visibility = View.GONE
 
+                        holder.textView_time_my.text = comments[position].time
+
+                        holder.layout_otherChat.visibility = View.GONE
+                        holder.layout_myChat.visibility = View.VISIBLE
+
+                        // 마지막 메세지에만 시간 달아주기
+                        if (position < comments.size - 1){
+                            if (comments[position + 1].uid == speakingUserId && comments[position + 1].time == messageTime){
+                                holder.textView_time_my.visibility = View.GONE
+                            }
+                        }
+//                        holder.textView_time_my.text = comments[position].time
 
                     }
                     speakingUserId.equals("Admin") -> {
@@ -703,17 +772,15 @@ class MessageActivity : BasicActivity(){
                         holder.layout_admin.visibility = View.VISIBLE
                         holder.textView_admin_message.visibility = View.VISIBLE
                         holder.textView_admin_message.text = comments[position].message
-                        holder.textView_name.visibility = View.GONE
-                        holder.layout_destination.visibility = View.GONE
-                        holder.textView_message.visibility = View.GONE
-                        holder.textView_time.visibility = View.GONE
+
+                        holder.text_item.visibility = View.GONE
                     }
                     else -> {// 남의 채팅
                         holder.textView_message.text = comments[position].message
                         holder.textView_name.text = speakingUserName
-                        holder.layout_destination.visibility = View.VISIBLE
-                        holder.textView_name.visibility = View.VISIBLE
-                        holder.textView_message.setBackgroundResource(R.drawable.leftbubble)
+//                        holder.layout_destination.visibility = View.VISIBLE
+//                        holder.textView_name.visibility = View.VISIBLE
+//                        holder.textView_message.setBackgroundResource(R.drawable.leftbubble)
                         holder.layout_main.gravity = Gravity.LEFT
 
                         holder.layout_admin.visibility = View.GONE
@@ -733,9 +800,18 @@ class MessageActivity : BasicActivity(){
             val layout_main: LinearLayout = view.findViewById(R.id.messageItem_linearlayout_main)
             val textView_time : TextView = view.findViewById(R.id.messageItem_textView_time)
 
+            // 내채팅
+            val layout_myChat : LinearLayout = view.findViewById(R.id.myChat)
+            val imageView_message_my : ImageView = view.findViewById(R.id.messageItem_imageview_message_my)
+            val textView_time_my : TextView = view.findViewById(R.id.messageItem_textView_time_my)
+            val textView_message_my: TextView = view.findViewById(R.id.messageItem_textView_message_my)
+            //남의 채팅
+            val layout_otherChat : LinearLayout = view.findViewById(R.id.otherChat)
+
             // 관리자 메세지
             val textView_admin_message: TextView = view.findViewById(R.id.messageItem_textView_admin_message)
             val layout_admin: LinearLayout = view.findViewById(R.id.messageItem_linearlayout_admin)
+            val text_item : LinearLayout = view.findViewById(R.id.text_item)
         }
 
         override fun getItemCount(): Int {
