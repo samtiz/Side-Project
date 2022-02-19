@@ -31,8 +31,7 @@
         </activity>
         <activity android:name=".RegisterActivity" />
         <activity
-            android:name=".MainActivity"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.Bridge" />
+            android:name=".MainActivity" />
         <activity android:name=".ManageAccountActivity" />
         <activity android:name=".BasicActivity" />
         <activity android:name=".WritePostActivity" />
