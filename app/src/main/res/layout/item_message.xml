@@ -4,85 +4,141 @@
     android:id="@+id/messageItem_linearlayout_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <LinearLayout
         android:id="@+id/messageItem_linearlayout_admin"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#D2D4E1"
-        android:gravity="center"
+        android:background="@drawable/adminbackground"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         >
 
         <TextView
             android:id="@+id/messageItem_textView_admin_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
             android:text="관리자 메세지"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
+            android:textSize="12sp"
             />
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/text_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="10dp">
+        android:orientation="horizontal">
         <LinearLayout
             android:id="@+id/messageItem_layout_destination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_marginLeft="3dp">
             <ImageView
                 android:id="@+id/messageItem_imageview_profile"
                 android:src = "@drawable/baseline_person_black_24dp"
                 android:background="@drawable/profile_background5"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:scaleType="fitCenter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="3dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginLeft="3dp"
                 app:tint="#E6E8EF" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginEnd="7dp"
+            android:layout_marginTop="6dp"
+            >
             <TextView
                 android:id="@+id/messageItem_textview_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="이름"
-                android:textColor="#000000"
-                android:textStyle="bold" />
-            <TextView
-                android:id="@+id/messageItem_textView_message"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+
+            <LinearLayout
+                android:id="@+id/otherChat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="메세지"
-                android:textColor="#000000" />
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/messageItem_textView_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="200dp"
+                    android:text="메세지"
+                    android:background="@drawable/othermessagebubble"
+                    android:textColor="@color/black" />
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:adjustViewBounds="true"
+                    android:id="@+id/messageItem_imageview_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="300dp"
+                    android:maxWidth="200dp"
+                    app:riv_corner_radius="10dp"
+                    />
+                <TextView
+                    android:id="@+id/messageItem_textView_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="시간"
+                    android:textSize="10sp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="4dp"/>
+            </LinearLayout>
 
+        </LinearLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/myChat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7dp"
+            android:layout_marginRight="7dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/messageItem_textView_time_my"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="시간"
+                android:textSize="10sp"
+                android:layout_gravity="bottom"
+                android:layout_marginRight="4dp"/>
+            <TextView
+                android:id="@+id/messageItem_textView_message_my"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="200dp"
+                android:background="@drawable/mymessagebubble"
+                android:text="메세지"
+                android:textColor="@color/black" />
             <com.makeramen.roundedimageview.RoundedImageView
                 android:adjustViewBounds="true"
-                android:id="@+id/messageItem_imageview_message"
+                android:id="@+id/messageItem_imageview_message_my"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxHeight="300dp"
                 android:maxWidth="200dp"
                 app:riv_corner_radius="10dp"
-                android:layout_marginEnd="7dp"
                 />
-
-            <TextView
-                android:id="@+id/messageItem_textView_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="시간"
-                android:textSize="12sp" />
-
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
