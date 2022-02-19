@@ -82,7 +82,7 @@
                     android:id="@+id/messageItem_textView_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxWidth="200dp"
+                    android:maxWidth="250dp"
                     android:text="메세지"
                     android:background="@drawable/othermessagebubble"
                     android:textColor="@color/black" />

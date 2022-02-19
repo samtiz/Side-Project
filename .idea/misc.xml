@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/adminbackground.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/borderline.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/chatrecyclerviewbackground.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/drawable_view_focused.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/image_check_image.xml" value="0.259375" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/image_check_image2.xml" value="0.38229166666666664" />
