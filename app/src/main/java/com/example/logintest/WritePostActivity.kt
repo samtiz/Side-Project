@@ -123,7 +123,7 @@ class WritePostActivity: BasicActivity() {
                 minCost = pastPost.minDeliveryFee
                 maxCost = pastPost.maxDeliveryFee
                 mEtMainText.setText(pastPost.mainText)
-                mEtTime.setText(pastPost.timeLimit)
+                mEtTime.setText(pastPost.timeLimit?.let { it1 -> leftPad(it1) })
                 mEtLocation.setText(pastPost.dorm)
                 users = pastPost.users
                 comments = pastPost.comments
@@ -197,6 +197,21 @@ class WritePostActivity: BasicActivity() {
                 post.visibility = true
 
                 if (isModify) {
+                    val timeText = mEtTime.text
+                    val strTime = if (timeText[0] == '0') {
+                        if (timeText[3] == '0') {
+                            timeText.substring(1 until 3) + timeText[4].toString()
+                        } else {
+                            timeText.substring(1)
+                        }
+                    } else {
+                        if (timeText[3] == '0') {
+                            timeText.substring(0 until 3) + timeText[4].toString()
+                        } else {
+                            timeText
+                        }
+                    }
+                    post.timeLimit = strTime.toString()
                     post.postId = postId
                     post.users = users!!
                     post.comments = comments!!
@@ -253,10 +268,8 @@ class WritePostActivity: BasicActivity() {
         mBtnTime.setOnClickListener {
             val cal = Calendar.getInstance()
             val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hour, minute ->
-                val strHour = if (hour < 10) { "0${hour}" } else { "$hour" }
-                val strMin = if (minute < 10) { "0${minute}" } else { "$minute" }
                 realTimeLimit = "${hour}:${minute}"
-                mEtTime.setText("${strHour}:${strMin}")
+                mEtTime.setText(leftPad(realTimeLimit!!))
             }
             TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),true).show()
         }

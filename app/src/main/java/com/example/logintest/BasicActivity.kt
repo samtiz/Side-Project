@@ -41,6 +41,24 @@ open class BasicActivity : AppCompatActivity() {
         }
     }
 
+    fun leftPad(strTime: String): String {
+        val hourMinList = strTime.split(":")
+        var hour: String? = null
+        var minute: String? = null
+        hour = if (hourMinList[0].length == 1) {
+            "0${hourMinList[0]}"
+        } else {
+            hourMinList[0]
+        }
+        minute = if (hourMinList[1].length == 1) {
+            "0${hourMinList[1]}"
+        } else {
+            hourMinList[1]
+        }
+        return "${hour}:${minute}"
+    }
+
+
 
 
 
