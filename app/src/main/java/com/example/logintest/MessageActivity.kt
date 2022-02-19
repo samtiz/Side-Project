@@ -673,20 +673,14 @@ class MessageActivity : BasicActivity(){
             }
 
             when{
-                index % 5 == 0 -> {
-                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background1)
+                index % 3 == 0 -> {
+                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background5)
                 }
-                index % 5 == 1 -> {
-                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background2)
-                }
-                index % 5 == 2 -> {
-                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background3)
-                }
-                index % 5 == 3 -> {
+                index % 3 == 1 -> {
                     holder.imageView_profile.setBackgroundResource(R.drawable.profile_background4)
                 }
-                index % 5 == 4 -> {
-                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background5)
+                index % 3 == 2 -> {
+                    holder.imageView_profile.setBackgroundResource(R.drawable.profile_background3)
                 }
             }
 
