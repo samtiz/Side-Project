@@ -5,9 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
-class ListAdapterPostReply(private val context: Context): RecyclerView.Adapter<ListAdapterPostReply.ViewHolder>() {
+class ListAdapterPostReply(private val context: Context, private val postUid: String?): RecyclerView.Adapter<ListAdapterPostReply.ViewHolder>() {
     private val replyList = mutableListOf<PostComment.Reply>()
 
     fun setReplyData(data: HashMap<String, PostComment.Reply>) {
@@ -27,7 +28,13 @@ class ListAdapterPostReply(private val context: Context): RecyclerView.Adapter<L
 
     override fun onBindViewHolder(holder: ListAdapterPostReply.ViewHolder, position: Int) {
         val reply: PostComment.Reply = replyList[position]
-        holder.userName.text = reply.userName
+        if (reply.uid == postUid) {
+            holder.userName.text = reply.userName + "(글쓴이)"
+            holder.userName.setTextColor(ContextCompat.getColor(context, R.color.themeColor))
+        } else {
+            holder.userName.text = reply.userName
+            holder.userName.setTextColor(ContextCompat.getColor(context, R.color.black))
+        }
         holder.mainText.text = reply.mainText
     }
 

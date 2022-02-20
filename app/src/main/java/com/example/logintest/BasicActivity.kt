@@ -35,6 +35,10 @@ open class BasicActivity : AppCompatActivity() {
         }
     }
 
+    fun hideKeyboardByView(context: Context, view: View) {
+        context.hideKeyboard1(view)
+    }
+
     fun Fragment.showKeyboard() {
         view?.let {
             activity?.showKeyboard1(it)

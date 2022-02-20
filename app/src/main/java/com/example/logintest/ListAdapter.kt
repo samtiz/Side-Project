@@ -57,9 +57,9 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
             if (holder.numUsers.visibility == VISIBLE) {
                 holder.numUsers.visibility = GONE
             }
-            holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-            holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
-            holder.dormNtimeNfee.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+            holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.darkGray))
+            holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.darkGray))
+            holder.dormNtimeNfee.setTextColor(ContextCompat.getColor(context, R.color.darkGray))
         }
         else {
             mFirebaseAuth = FirebaseAuth.getInstance()
