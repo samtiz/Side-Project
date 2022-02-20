@@ -269,10 +269,43 @@ class WritePostActivity: BasicActivity() {
         }
 
         mBtnTime.setOnClickListener {
+            val curTime = Date()
+            val dateFormat = SimpleDateFormat("yyyyMMddkk:mm")
+            val dateFormat2 = SimpleDateFormat("yyyyMMdd")
             val cal = Calendar.getInstance()
+            var isToday = true
+            var isAM = true
             val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hour, minute ->
                 realTimeLimit = "${hour}:${minute}"
-                mEtTime.setText(leftPad(realTimeLimit!!))
+
+                val setTime = dateFormat.parse(dateFormat2.format(curTime)+leftPad(realTimeLimit!!))
+
+                println("시간")
+                println(curTime)
+                println(setTime)
+                println(curTime.time)
+                println(setTime.time)
+                if (curTime.time > setTime.time){
+                    isToday = false
+                }
+                var realTimeLimit2 = realTimeLimit
+                if(hour > 12){
+                    isAM = false
+                    realTimeLimit2 = "${hour-12}:${minute}"
+                }else if(hour == 12){
+                    isAM = false
+                    realTimeLimit2 = "${12}:${minute}"
+                }else if (hour == 0){
+                    realTimeLimit2 = "${12}:${minute}"
+                }
+                mEtTime.setText(
+                    when {
+                        isToday && isAM -> "오늘 오전 " + leftPad(realTimeLimit2!!)
+                        isToday && !isAM -> "오늘 오후 " + leftPad(realTimeLimit2!!)
+                        !isToday && isAM -> "내일 오전 " + leftPad(realTimeLimit2!!)
+                        else -> {"내일 오후 " + leftPad(realTimeLimit2!!)}
+                    }
+                )
             }
             TimePickerDialog(this, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),true).show()
         }
