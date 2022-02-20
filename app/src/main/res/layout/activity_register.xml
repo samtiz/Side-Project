@@ -6,73 +6,82 @@
     android:layout_height="match_parent"
     tools:context=".RegisterActivity">
 
-    <EditText
-        android:id="@+id/edit_email"
+    <TextView
+        android:id="@+id/txt_register_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:ems="10"
-        android:hint="이메일을 입력하세요"
-        android:inputType="textEmailAddress"
+        android:text="슬기로운 배달 생활,\n공동배달구역"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:layout_marginTop="40dp"
+        android:textSize="24dp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/edit_pwd"
+    <TextView
+        android:id="@+id/register_textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:text="KAIST"
+        android:textColor="@color/themeColor"
+        android:translationY="-2dp"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_register_title" />
+
+    <EditText
+        android:id="@+id/edit_email"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:ems="10"
+        android:hint="이메일을 입력하세요"
+        android:textColorHint="@color/hintColor"
+        android:backgroundTint="@color/black"
+        android:textSize="16sp"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_textView2" />
+
+    <EditText
+        android:id="@+id/edit_pwd"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
         android:ems="10"
         android:hint="비밀번호를 입력하세요"
+        android:textColorHint="@color/hintColor"
+        android:backgroundTint="@color/black"
+        android:textSize="16sp"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_email" />
 
-    <Button
-        android:id="@+id/btn_register"
+    <TextView
+        android:id="@+id/txt_pwdcheck"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="100dp"
-        android:text="가입 완료"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_dorm" />
-
-    <Button
-        android:id="@+id/btn_dorm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:onClick="showCofirmationDialog"
-        android:text="선택"
-        app:layout_constraintEnd_toEndOf="@+id/edit_name"
-        app:layout_constraintTop_toBottomOf="@+id/edit_name" />
-
-    <EditText
-        android:id="@+id/edit_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:ems="10"
-        android:hint="닉네임을 입력하세요"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_pwdconfirm" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_pwd" />
 
     <EditText
         android:id="@+id/edit_pwdconfirm"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="35dp"
         android:ems="10"
         android:hint="비밀번호 확인"
+        android:textColorHint="@color/hintColor"
+        android:backgroundTint="@color/black"
+        android:textSize="16sp"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,14 +96,80 @@
         app:layout_constraintTop_toBottomOf="@+id/edit_pwdconfirm" />
 
     <EditText
-        android:id="@+id/txt_dorm"
-        android:layout_width="0dp"
+        android:id="@+id/edit_name"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:hint="기숙사 선택"
-        android:enabled="false"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toStartOf="@+id/btn_dorm"
-        app:layout_constraintStart_toStartOf="@+id/edit_name"
-        app:layout_constraintTop_toTopOf="@+id/btn_dorm" />
+        android:layout_marginTop="35dp"
+        android:ems="10"
+        android:hint="닉네임을 입력하세요"
+        android:textColorHint="@color/hintColor"
+        android:backgroundTint="@color/black"
+        android:textSize="16sp"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_pwdconfirm" />
+
+    <LinearLayout
+        android:id="@+id/register_linearLayout"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edit_name">
+
+
+        <EditText
+            android:id="@+id/txt_dorm"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:hint="기숙사 선택"
+            android:textColorHint="@color/hintColor"
+            android:backgroundTint="@color/black"
+            android:textSize="16sp"
+            android:enabled="false"
+            android:textColor="@color/black"
+            android:layout_marginTop="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <Button
+            android:id="@+id/btn_dorm"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:onClick="showCofirmationDialog"
+            android:text="선택"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:background="@drawable/round_big_button_superlightgray"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/txt_dorm"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
+
+
+
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:text="가입 완료"
+        android:background="@drawable/round_big_button_skyblue"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_linearLayout" />
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

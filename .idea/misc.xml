@@ -6,10 +6,13 @@
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/adminbackground.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/borderline.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/chatrecyclerviewbackground.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/chattextinputbackground.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/drawable_view_focused.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/image_check_image.xml" value="0.259375" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/image_check_image2.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/image_not_check_image.xml" value="0.259375" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/imagepickerbackground.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/imagepickerbackground_check.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/mymessagebubble.xml" value="0.24739583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/othermessagebubble.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/profile_background.xml" value="0.22083333333333333" />
@@ -19,25 +22,31 @@
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/profile_background4.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/profile_background5.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/round.xml" value="0.22083333333333333" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/round_big_button_skyblue.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/round_big_button_superlightgray.xml" value="0.38229166666666664" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/round_big_button_themecolor.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/selector.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/selector_view.xml" value="0.38229166666666664" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout-v21/activity_main.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout-v21/activity_post_detail.xml" value="0.33" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout-v21/comment_item.xml" value="0.2046875" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_image_picker.xml" value="0.24322916666666666" />
-        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_login.xml" value="0.2046875" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_manage_account.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_manage_post.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_message.xml" value="0.33" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_photo_detail.xml" value="0.3515625" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_post_detail.xml" value="0.2046875" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_register.xml" value="0.33" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/activity_write_post.xml" value="0.36614583333333334" />
-        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/image_picker_item.xml" value="0.22864583333333333" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/image_picker_item.xml" value="0.33" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/item_admin_message.xml" value="0.3515625" />
-        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/item_message.xml" value="0.33" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/item_message.xml" value="0.75" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/list_item.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/layout/reply_item.xml" value="0.23125" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/menu/menu.xml" value="0.36614583333333334" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/menu/menu_image_picker.xml" value="0.36614583333333334" />
+        <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/menu/menu_image_picker_before_select.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/menu/menu_manage_post.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/menu/menu_message.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/menu/menu_message_master.xml" value="0.36614583333333334" />

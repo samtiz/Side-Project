@@ -260,7 +260,7 @@ class MainActivity : BasicActivity() {
                     val intent = Intent(applicationContext, ManageAccountActivity::class.java)
                     intent.flags = (Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                     startActivityIfNeeded(intent, 0)
-                    //overridePendingTransition(R.anim.none, R.anim.none)
+                    overridePendingTransition(R.anim.none, R.anim.none)
                     true
                 }
                 else -> false

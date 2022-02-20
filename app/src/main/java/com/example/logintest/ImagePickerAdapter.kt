@@ -27,9 +27,11 @@ class ImagePickerAdapter(var context: Context , var list : ArrayList<String>) : 
         Glide.with(context).load(picture).into((holder as ImagePickerViewHolder).image)
 
         if(checkBox==position){
-            (holder as ImagePickerViewHolder).check.setImageResource(R.drawable.image_check_image)
+//            (holder as ImagePickerViewHolder).check.setImageResource(R.drawable.image_check_image)
+            holder.after_check.visibility = View.VISIBLE
         }else{
-            (holder as ImagePickerViewHolder).check.setImageResource(R.drawable.image_not_check_image)
+//            (holder as ImagePickerViewHolder).check.setImageResource(R.drawable.image_not_check_image)
+            holder.after_check.visibility = View.INVISIBLE
         }
 
     }
@@ -37,14 +39,12 @@ class ImagePickerAdapter(var context: Context , var list : ArrayList<String>) : 
         notifyDataSetChanged()
     }
     class ImagePickerViewHolder(view : View,var adapter: ImagePickerAdapter) : RecyclerView.ViewHolder(view){
-        lateinit var image : ImageView
-        lateinit var check : ImageView
-        lateinit var layout : RelativeLayout
+        var image : ImageView = view.findViewById(R.id.image_picker_item)
+        var check : ImageView = view.findViewById(R.id.image_check_box_button)
+        var after_check : ImageView = view.findViewById(R.id.image_check_box_button_check)
+        var layout : RelativeLayout = view.findViewById(R.id.image_picker_layout)
 
         init{
-            image = view.findViewById(R.id.image_picker_item)
-            check = view.findViewById(R.id.image_check_box_button)
-            layout  = view.findViewById(R.id.image_picker_layout)
             layout.setOnClickListener(ButtonClick())
 //            check.setOnClickListener(ButtonClick())
         }
