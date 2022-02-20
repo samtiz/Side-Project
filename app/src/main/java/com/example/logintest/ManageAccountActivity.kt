@@ -29,8 +29,8 @@ class ManageAccountActivity : BasicActivity() {
             txtName = findViewById(R.id.txt_manage_username)
             txtEmail = findViewById(R.id.txt_manage_email)
             mDatabaseReference.child("UserAccount").child(uid!!).get().addOnSuccessListener {
-                val username = it.child("nickname").value as String
-                val postId = it.child("postId").value as String
+                val username = it.child("nickname").value.toString()
+                val postId = it.child("postId").value.toString()
                 txtName.text = username
                 adapter = ManageAccountListAdapter(this@ManageAccountActivity, username, postId)
 

@@ -90,6 +90,8 @@ class MessageActivity : BasicActivity(){
 
         isViewing = true
 
+        //
+
         // 클릭으로 넘어온 post Id, chatRoomName
         postId = intent.getStringExtra("postId")
         //chatRoomName = intent.getStringExtra("chatRoomName")
@@ -175,7 +177,6 @@ class MessageActivity : BasicActivity(){
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-
                 //Toast.makeText(applicationContext, "존재하지 않는 채팅방입니다.", Toast.LENGTH_SHORT).show()
                 if (isViewing!!) {
                     val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)

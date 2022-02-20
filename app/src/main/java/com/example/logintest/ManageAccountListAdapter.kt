@@ -174,10 +174,10 @@ class ManageAccountListAdapter(private val context: Context, private val usernam
                             Toast.makeText(context, "UserAccount nickname setValue failed", Toast.LENGTH_SHORT).show()
                             isSuccess = false
                         }
-                        mDatabaseReference.child("UserAccount").child(uid).get().addOnSuccessListener {
-                            if (it.hasChild("postId")) {
-                                val userAccount = it.value as UserAccount
-                                val postId = userAccount.postId as String
+                        mDatabaseReference.child("UserAccount").child(uid).child("postId").get().addOnSuccessListener {
+                            if (it.value!=null) {
+                                val postId = it.value.toString()
+                                mDatabaseReference.child("chatrooms").child(postId).child("users").child(uid).child("nickname").setValue(et.text.toString())
                                 mDatabaseReference.child("Post").child(postId).child("users").child(uid).setValue(et.text.toString()).addOnFailureListener {
                                     Toast.makeText(context, "Post nickname setValue failed", Toast.LENGTH_SHORT).show()
                                     isSuccess = false
