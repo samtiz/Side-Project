@@ -97,26 +97,7 @@ class MessageActivity : BasicActivity(){
         recyclerView = findViewById(R.id.messageActivity_recyclerview)
 
         mDatabaseReference.child("UserAccount").child(uid!!).child("nowChatting").setValue(true)
-        //글창에 글 없으면 이미지 추가 버튼, 글 있으면 전송 버튼
-        //imageView.visibility = View.INVISIBLE
-//        imageView.visibility = View.INVISIBLE
-//        imageView_photo.visibility = View.VISIBLE
-//        editText.addTextChangedListener(object : TextWatcher{
-//            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-//            }
-//
-//            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-//                if(editText.text.isEmpty()){
-//                    imageView.visibility = View.INVISIBLE
-//                    imageView_photo.visibility = View.VISIBLE
-//                }
-//                imageView.visibility = View.VISIBLE
-//                imageView_photo.visibility = View.INVISIBLE
-//            }
-//
-//            override fun afterTextChanged(p0: Editable?) {
-//            }
-//        })
+
 
 
         // 채팅방 이름 설정
@@ -509,91 +490,47 @@ class MessageActivity : BasicActivity(){
         var nextMaster : String? = null
         val currentUsersId = ArrayList<String>()
         // Post에 접근하여 uid 제거하기
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
-        // UserAccount에 접근하여 postId 제거하기
-        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
-        // 메인 화면으로 돌아가기
-        finish()
+        mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue().addOnSuccessListener {
+            // UserAccount에 접근하여 postId 제거하기
+            mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
+            // 메인 화면으로 돌아가기
+            finish()
 
-
-        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onCancelled(error: DatabaseError) {
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (data in snapshot.children){
-                    val key = data.key
-                    currentUsersId.add(key!!)
+            mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onCancelled(error: DatabaseError) {
                 }
-                if (currentUsersId.isEmpty()){//  다 나갔으면 채팅방 폭파
-                    println("유저가 아무도 안남음!!!")
-                    //post 제거
-                    mDatabaseReference.child("Post").child(postId.toString()).removeValue()
-                    //chatroom 제거
-                    mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
-                    // 사진 파일 제거
-                    FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).delete()
-                    return
-                }
-                var maxIndex = 100
-                for (cuid in currentUsersId){
-                    if(chatusers.get(cuid)?.index!! < maxIndex){
-                        maxIndex = chatusers.get(cuid)?.index!!
-                        nextMaster = cuid
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (data in snapshot.children){
+                        val key = data.key
+                        currentUsersId.add(key!!)
                     }
+                    if (currentUsersId.isEmpty()){//  다 나갔으면 채팅방 폭파
+                        println("유저가 아무도 안남음!!!")
+                        //post 제거
+                        mDatabaseReference.child("Post").child(postId.toString()).removeValue()
+                        //chatroom 제거
+                        mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
+                        // 사진 파일 제거
+                        FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).delete()
+                        return
+                    }
+                    var maxIndex = 100
+                    for (cuid in currentUsersId){
+                        if(chatusers.get(cuid)?.index!! < maxIndex){
+                            maxIndex = chatusers.get(cuid)?.index!!
+                            nextMaster = cuid
+                        }
+                    }
+                    mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
+                    // 퇴장 알림
+                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
+                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${chatusers.get(nextMaster!!)?.nickname}님으로 변경되었습니다.", curTime, false)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
                 }
-                mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
-                // 퇴장 알림
-                val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
-                val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${chatusers.get(nextMaster!!)?.nickname}님으로 변경되었습니다.", curTime, false)
-                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
-                mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
-            }
-        })
-
-//        mDatabaseReference.child("Post").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onCancelled(error: DatabaseError) {
-//            }
-//
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                currentUsers.clear()
-//                for (data in snapshot.children) {
-//                    val key = data.key
-//                    val item = data.value
-//
-//                    //현재 유저들 정보 받아오기
-//                    currentUsers.put(key.toString(), item.toString())
-//                }
-//
-//                if (isChatRoomEmpty) {
-//                    //post 제거
-//                    mDatabaseReference.child("Post").child(postId.toString()).removeValue()
-//                    //chatroom 제거
-//                    mDatabaseReference.child("chatrooms").child(postId.toString()).removeValue()
-//                    // 사진 파일 제거
-//                    FirebaseStorage.getInstance().reference.child("ChatImages").child(postId.toString()).delete()
-//                } else {
-//                    var minIndex = 100
-//                    for (key in currentUsers.keys){
-//                        val i = currentUsers.get(key)?.index!!
-//                        if(i < minIndex){
-//                            minIndex = i
-//                            nextMaster = key
-//                        }
-//                    }
-//                    //nextMaster = currentUsers.keys.toTypedArray()[0]
-//                    mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
-//
-//                    // 퇴장 알림
-//                    val exitAlarm1 = ChatModel.Comment("Admin", "${userName}님(방장)이 퇴장하셨습니다.", curTime, false)
-//                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${
-//                        currentUsers.get(nextMaster)?.nickname
-//                    }님으로 변경되었습니다.", curTime, false)
-//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
-//                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
-//                }
-//            }
-//        })
+            })
+        }
 
     }
 

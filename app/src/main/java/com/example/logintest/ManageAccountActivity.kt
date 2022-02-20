@@ -13,7 +13,7 @@ class ManageAccountActivity : BasicActivity() {
 
         private lateinit var mFirebaseAuth: FirebaseAuth
         private lateinit var mDatabaseReference: DatabaseReference
-        private lateinit var adapter: ManageAccountListAdapter
+        private var adapter :  ManageAccountListAdapter? = null
         private lateinit var txtName: TextView
         private lateinit var txtEmail: TextView
 
@@ -28,18 +28,20 @@ class ManageAccountActivity : BasicActivity() {
 
             txtName = findViewById(R.id.txt_manage_username)
             txtEmail = findViewById(R.id.txt_manage_email)
-            mDatabaseReference.child("UserAccount").child(uid!!).child("nickname").get().addOnSuccessListener {
-                val username = it.value as String
+            mDatabaseReference.child("UserAccount").child(uid!!).get().addOnSuccessListener {
+                val username = it.child("nickname").value as String
+                val postId = it.child("postId").value as String
                 txtName.text = username
+                adapter = ManageAccountListAdapter(this@ManageAccountActivity, username, postId)
+
+                val recyclerView: RecyclerView = findViewById(R.id.recyclerView_manage_account)
+                recyclerView.layoutManager = WrapContentLinearLayoutManager(this@ManageAccountActivity)
+                recyclerView.adapter = adapter
+                adapter?.notifyDataSetChanged()
             }.addOnFailureListener { Toast.makeText(this, "nickname get Failed", Toast.LENGTH_SHORT).show() }
             txtEmail.text = mFirebaseAuth.currentUser?.email.toString()
 
-            adapter = ManageAccountListAdapter(this@ManageAccountActivity)
 
-            val recyclerView: RecyclerView = findViewById(R.id.recyclerView_manage_account)
-            recyclerView.layoutManager = WrapContentLinearLayoutManager(this@ManageAccountActivity)
-            recyclerView.adapter = adapter
-            adapter.notifyDataSetChanged()
 
             val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
             bottomNavigationView.selectedItemId = R.id.navigation_myAccount
@@ -99,8 +101,8 @@ class ManageAccountActivity : BasicActivity() {
         super.onResume()
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.navigation_myAccount
-        adapter.notifyDataSetChanged()
+        if (adapter != null){
+            adapter?.notifyDataSetChanged()
+        }
     }
-
-
 }

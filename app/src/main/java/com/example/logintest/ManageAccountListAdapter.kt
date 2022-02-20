@@ -23,14 +23,84 @@ import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.database.collection.LLRBNode
+import com.google.firebase.database.ktx.getValue
+import com.google.firebase.storage.FirebaseStorage
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.regex.Pattern
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
-class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapter<ManageAccountListAdapter.ViewHolder>() {
+class ManageAccountListAdapter(private val context: Context, private val username : String, private val postId: String): RecyclerView.Adapter<ManageAccountListAdapter.ViewHolder>() {
 
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mDatabaseReference: DatabaseReference
+
+    private fun exitMasterPost(postId : String, uid : String, chatusers : HashMap<String, ChatModel.userStat>) {
+        val time = System.currentTimeMillis()
+        val dateFormat = SimpleDateFormat("hh:mm")
+        val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+        val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
+        var nextMaster : String? = null
+        val currentUsersId = ArrayList<String>()
+        // Post에 접근하여 uid 제거하기
+        mDatabaseReference.child("Post").child(postId).child("users").child(uid).removeValue().addOnSuccessListener {
+            mDatabaseReference.child("Post").child(postId).child("users").addListenerForSingleValueEvent(object :
+                ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (data in snapshot.children){
+                        val key = data.key
+                        currentUsersId.add(key!!)
+                    }
+                    if (currentUsersId.isEmpty()){//  다 나갔으면 채팅방 폭파
+                        println("유저가 아무도 안남음!!!")
+                        //post 제거
+                        mDatabaseReference.child("Post").child(postId).removeValue()
+                        //chatroom 제거
+                        mDatabaseReference.child("chatrooms").child(postId).removeValue()
+                        // 사진 파일 제거
+                        FirebaseStorage.getInstance().reference.child("ChatImages").child(postId).delete()
+                        return
+                    }
+                    var maxIndex = 1000
+                    for (cuid in currentUsersId){
+                        if(chatusers.get(cuid)?.index!! < maxIndex){
+                            maxIndex = chatusers.get(cuid)?.index!!
+                            nextMaster = cuid
+                        }
+                    }
+                    mDatabaseReference.child("Post").child(postId.toString()).child("uid").setValue(nextMaster)
+                    // 퇴장 알림
+                    val exitAlarm1 = ChatModel.Comment("Admin", "${username}님(방장)이 퇴장하셨습니다.", curTime, false)
+                    val exitAlarm2 = ChatModel.Comment("Admin", "방장이 ${chatusers.get(nextMaster!!)?.nickname}님으로 변경되었습니다.", curTime, false)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm1)
+                    mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm2)
+                }
+            })
+        }
+
+    }
+
+    private fun exitPost(uid: String) {
+        val time = System.currentTimeMillis()
+        val dateFormat = SimpleDateFormat("hh:mm")
+        val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
+        val curTime = AMPM + " " +dateFormat.format(Date(time)).toString()
+        // Post에 접근하여 uid 제거하기
+        mDatabaseReference.child("Post").child(postId.toString()).child("users").child(uid.toString()).removeValue()
+        // UserAccount에 접근하여 postId 제거하기
+        mDatabaseReference.child("UserAccount").child(uid!!).child("postId").removeValue()
+
+        // 퇴장 알림
+        val exitAlarm = ChatModel.Comment("Admin", "${username}님이 퇴장하셨습니다.", curTime, false)
+        mDatabaseReference.child("chatrooms").child(postId.toString()).child("comments").push().setValue(exitAlarm)
+
+    }
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val text: TextView = itemView.findViewById(R.id.txt_item_manage_account)
@@ -147,27 +217,31 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                     builder.setTitle("비밀번호 변경")
                     builder.setView(container)
                     builder.setPositiveButton("확인") { _, _ ->
-                        mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("password").get().addOnSuccessListener {
-                            val pw = it.value as String
-                            val credential: AuthCredential = EmailAuthProvider.getCredential(mFirebaseAuth.currentUser?.email.toString(), pw)
-                            mFirebaseAuth.currentUser?.reauthenticate(credential)?.addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    mFirebaseAuth.currentUser!!.updatePassword(et.text.toString()).addOnCompleteListener { task2 ->
-                                        if (task2.isSuccessful) {
-                                            Toast.makeText(context, "비밀번호가 ${et.text}으로 변경되었습니다.", Toast.LENGTH_LONG).show()
-                                            mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("password").setValue(et.text.toString())
-                                        }
-                                        else {
-                                            Toast.makeText(context, task2.exception.toString(), Toast.LENGTH_LONG).show()
+                        if (!Pattern.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{8,16}.\$", et.text)){
+                            Toast.makeText(context, "비밀번호는 8~16자 숫자, 문자를 사용하세요", Toast.LENGTH_SHORT).show()
+                        }
+                        else{
+                            mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("password").get().addOnSuccessListener {
+                                val pw = it.value as String
+                                val credential: AuthCredential = EmailAuthProvider.getCredential(mFirebaseAuth.currentUser?.email.toString(), pw)
+                                mFirebaseAuth.currentUser?.reauthenticate(credential)?.addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        mFirebaseAuth.currentUser!!.updatePassword(et.text.toString()).addOnCompleteListener { task2 ->
+                                            if (task2.isSuccessful) {
+                                                Toast.makeText(context, "비밀번호가 ${et.text}으로 변경되었습니다.", Toast.LENGTH_LONG).show()
+                                                mDatabaseReference.child("UserAccount").child(mFirebaseAuth.currentUser?.uid!!).child("password").setValue(et.text.toString())
+                                            }
+                                            else {
+                                                Toast.makeText(context, task2.exception.toString(), Toast.LENGTH_LONG).show()
+                                            }
                                         }
                                     }
-                                }
-                                else {
-                                    Toast.makeText(context, task.exception.toString(), Toast.LENGTH_LONG).show()
+                                    else {
+                                        Toast.makeText(context, task.exception.toString(), Toast.LENGTH_LONG).show()
+                                    }
                                 }
                             }
                         }
-
 
                     }
                     builder.setNegativeButton("취소") { _, _ -> }
@@ -254,12 +328,31 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                                                 if (task0.isSuccessful) {
                                                     mFirebaseUser?.delete()?.addOnCompleteListener { task1 ->
                                                         if (task1.isSuccessful) {
-                                                            mDatabaseReference.child("UserAccount").child(it1).child("postId").get().addOnSuccessListener { it2 ->
-                                                                if (it2.value != null) {
-                                                                    val postId = it2.value.toString()
-                                                                    mDatabaseReference.child("Post").child(postId).child("users").child(uid!!).removeValue()
+                                                            if (postId != "null") { // 참가하는 post 존재한다면
+                                                                mDatabaseReference.child("Post").child(postId).child("uid").get().addOnSuccessListener { // 방장 체크
+                                                                    if (it.value == uid){ // 방장이면
+                                                                        // chatusers 가져오기
+                                                                        val chatusers = HashMap<String, ChatModel.userStat>()
+                                                                        mDatabaseReference.child("chatrooms").child(postId.toString()).child("users").addListenerForSingleValueEvent(object : ValueEventListener{
+                                                                            override fun onCancelled(error: DatabaseError) {
+                                                                            }
+
+                                                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                                                                chatusers.clear()
+                                                                                for (data in snapshot.children){
+                                                                                    val key = data.key
+                                                                                    val item = data.getValue<ChatModel.userStat>()
+                                                                                    chatusers.put(key.toString(), item!!)
+                                                                                }
+                                                                                uid?.let { it2 -> exitMasterPost(postId, it2, chatusers) } // 방장 나가기
+                                                                            }
+                                                                        })
+                                                                    }else{ // 방장이 아니면
+                                                                        uid?.let { it2 -> exitPost(it2) } // 방장 아닌 사람 나가기
+                                                                    }
                                                                 }
                                                             }
+
                                                             mDatabaseReference.child("UserAccount").child(it1).removeValue().addOnCompleteListener { task2 ->
                                                                 if (task2.isSuccessful) {
                                                                     MySharedPreferences.clearUser(context)
