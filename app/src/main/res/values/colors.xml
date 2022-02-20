@@ -8,8 +8,11 @@
     <color name="black">#212B35</color>
     <color name="white">#FFFFFFFF</color>
     <color name="lightGray">#BEBEBE</color>
+    <color name="darkGray">#666666</color>
     <color name="doubleLightGray">#DEE3E8</color>
+    <color name="superLightGray">#F0F1F2</color>
     <color name="themeColor">#00AFFE</color>
     <color name="tagPink">#FE585C</color>
     <color name= "colorPrimaryDark">#FFFFFF</color>
+    <color name="hintColor">#98999B</color>
 </resources>

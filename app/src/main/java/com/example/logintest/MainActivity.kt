@@ -334,21 +334,27 @@ class MainActivity : BasicActivity() {
                         }
                     }
                     adapter.setListData(it)
-                    adapter.filter.filter(searchText)
+                    if (!searchText.isNullOrEmpty()) {
+                        adapter.filter.filter(searchText)
+                    }
                     adapter.notifyDataSetChanged()
                 })
             }
             else {
                 viewModel.fetchData(selectedFoodCategory, selectedDormCategory, userLocation).observe(this, Observer {
                     adapter.setListData(it)
-                    adapter.filter.filter(searchText)
+                    if (!searchText.isNullOrEmpty()) {
+                        adapter.filter.filter(searchText)
+                    }
                     adapter.notifyDataSetChanged()
                 })
             }
         }.addOnFailureListener{ e ->
             viewModel.fetchData(selectedFoodCategory, selectedDormCategory, userLocation).observe(this, Observer {
                 adapter.setListData(it)
-                adapter.filter.filter(searchText)
+                if (!searchText.isNullOrEmpty()) {
+                    adapter.filter.filter(searchText)
+                }
                 adapter.notifyDataSetChanged()
             })
             Toast.makeText(this@MainActivity, "get() postId of User failed", Toast.LENGTH_SHORT).show()

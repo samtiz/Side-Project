@@ -123,7 +123,41 @@ class PostDetailActivity : BasicActivity(){
             txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
             txtLocation.text = "배달 수령 위치: ${post?.dorm}"
             txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-            txtTime.text = "모집 만료 시간: ${post?.timeLimit?.let { it1 -> leftPad(it1) }}" // TODO 시간 포맷 바꿔서 적용
+            var strTime = ""
+            val limitList = post?.timeLimit?.split(":")
+            val time = System.currentTimeMillis()
+            val dateFormat = SimpleDateFormat("hh:mm")
+            val currentHM = dateFormat.format(Date(time)).toString()
+            println(currentHM)
+            strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
+                "내일 "
+            } else {
+                "오늘 "
+            }
+            if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
+                strTime += "오후 "
+                if (limitList.get(0).let{ it1 -> it1 == "12"}) {
+                    strTime += "12시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+                else {
+                    strTime += "${limitList.get(0).toInt()-12}시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+            } else if (limitList != null){
+                strTime += "오전 "
+                if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
+                    strTime += "12시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+                else {
+                    strTime += "${limitList.get(0)}시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+            }
+
+
+            txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
             txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
             txtMain.text = post?.mainText
             if (post?.comments?.isEmpty()!!) {
@@ -139,7 +173,7 @@ class PostDetailActivity : BasicActivity(){
                         }
                     }
                 }
-                txtNumInquire.text = " 문의 ${numInquire}"
+                txtNumInquire.text = "  ${numInquire}"
             }
             if (isMyPost!!) {
                 btnDelete?.visibility = VISIBLE
@@ -220,7 +254,41 @@ class PostDetailActivity : BasicActivity(){
                 txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
                 txtLocation.text = "배달 수령 위치: ${post?.dorm}"
                 txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-                txtTime.text = "모집 만료 시간: ${post?.timeLimit?.let { it1 -> leftPad(it1) }}" // TODO 시간 포맷 바꿔서 적용
+                var strTime = ""
+                val limitList = post?.timeLimit?.split(":")
+                val time = System.currentTimeMillis()
+                val dateFormat = SimpleDateFormat("hh:mm")
+                val currentHM = dateFormat.format(Date(time)).toString()
+                println(currentHM)
+                strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
+                    "내일 "
+                } else {
+                    "오늘 "
+                }
+                if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
+                    strTime += "오후 "
+                    if (limitList.get(0).let{ it1 -> it1 == "12"}) {
+                        strTime += "12시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                    else {
+                        strTime += "${limitList.get(0).toInt()-12}시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                } else if (limitList != null){
+                    strTime += "오전 "
+                    if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
+                        strTime += "12시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                    else {
+                        strTime += "${limitList.get(0)}시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                }
+
+
+                txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
                 txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
                 txtMain.text = post?.mainText
             }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
@@ -307,7 +375,41 @@ class PostDetailActivity : BasicActivity(){
             txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
             txtLocation.text = "배달 수령 위치: ${post?.dorm}"
             txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-            txtTime.text = "모집 만료 시간: ${post?.timeLimit?.let { it1 -> leftPad(it1) }}" // TODO 시간 포맷 바꿔서 적용
+            var strTime = ""
+            val limitList = post?.timeLimit?.split(":")
+            val time = System.currentTimeMillis()
+            val dateFormat = SimpleDateFormat("hh:mm")
+            val currentHM = dateFormat.format(Date(time)).toString()
+            println(currentHM)
+            strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
+                "내일 "
+            } else {
+                "오늘 "
+            }
+            if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
+                strTime += "오후 "
+                if (limitList.get(0).let{ it1 -> it1 == "12"}) {
+                    strTime += "12시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+                else {
+                    strTime += "${limitList.get(0).toInt()-12}시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+            } else if (limitList != null){
+                strTime += "오전 "
+                if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
+                    strTime += "12시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+                else {
+                    strTime += "${limitList.get(0)}시 "
+                    strTime += "${limitList.get(1)}분"
+                }
+            }
+
+
+            txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
             txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
             txtMain.text = post?.mainText
         }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }

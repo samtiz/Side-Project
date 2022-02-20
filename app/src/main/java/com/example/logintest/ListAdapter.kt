@@ -57,6 +57,9 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
             if (holder.numUsers.visibility == VISIBLE) {
                 holder.numUsers.visibility = GONE
             }
+            holder.restaurantName.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+            holder.mainText.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
+            holder.dormNtimeNfee.setTextColor(ContextCompat.getColor(context, R.color.lightGray))
         }
         else {
             mFirebaseAuth = FirebaseAuth.getInstance()
@@ -86,7 +89,12 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
                     holder.dormNtimeNfee.setTextColor(ContextCompat.getColor(context, R.color.black))
                 }
             }
-            holder.restaurantName.text = post.restaurantName
+            if (post.restaurantName == "미정") {
+                val strTemp = post.restaurantName.toString() +" (" + post.foodCategories?.get(0).toString() + ")"
+                holder.restaurantName.text = strTemp
+            } else {
+                holder.restaurantName.text = post.restaurantName
+            }
             holder.mainText.text = post.mainText
 
             var temp = ""
@@ -94,9 +102,13 @@ class ListAdapter(private val context: Context): RecyclerView.Adapter<ListAdapte
             temp += " · "
 
             var strTime: String = ""
-            strTime += if (time?.get(0)?.toInt()!! < 10) { "0${time[0]}" } else { time[0] }
+            strTime += if (time?.get(0)?.let{ it1 -> it1.toInt() < 10} == true) { "0${time[0]}" } else {
+                time?.get(0)
+            }
             strTime += ":"
-            strTime += if (time[1].toInt() < 10) { "0${time[1]}" } else { time[1] }
+            strTime += if (time?.get(1)?.let{ it1 -> it1.toInt() < 10} == true) { "0${time[1]}" } else {
+                time?.get(1)
+            }
             temp += "모집마감 $strTime"
             temp += "\n"
             temp += "배달비 ${post.minDeliveryFee}원 ~ ${post.maxDeliveryFee}원"

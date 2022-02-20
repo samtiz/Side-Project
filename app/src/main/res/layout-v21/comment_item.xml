@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -14,6 +15,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="15dp"
         android:text="닉네임"
+        android:textColor="@color/black"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,6 +28,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:text="댓글 본문입니다. 만ㅇ롸ㅣㅐㅁ노ㅜㅇㅎ리포ㅜ닝ㄹ"
+        android:textColor="@color/black"
         android:layout_marginBottom="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/txt_reply_username"
@@ -43,12 +47,20 @@
 
     <Button
         android:id="@+id/btn_reply"
-        android:layout_width="55dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="20dp"
         android:text="답글"
-        android:textSize="9dp"
+        android:textColor="@color/black"
+        android:textSize="10dp"
+        android:background="@drawable/round_empty_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/doubleLightGray"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
