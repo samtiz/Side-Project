@@ -9,7 +9,15 @@
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/drawable_view_focused.xml" value="0.329" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/dropdown_icon.xml" value="0.129" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/post_list_background.xml" value="0.182" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/postdetail_chatroom_icon.xml" value="0.158" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/postdetail_delete_icon.xml" value="0.162" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/postdetail_inquire_icon.xml" value="0.2135" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/postdetail_modify_icon.xml" value="0.162" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/postlist_person_icon.xml" value="0.221" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/round_big_button_doublelightgray.xml" value="0.2135" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/round_big_button_pink.xml" value="0.2045" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/round_big_button_themecolor.xml" value="0.1005" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/round_big_button_white.xml" value="0.1005" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/round_black_tag.xml" value="0.239" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/round_empty_button.xml" value="0.2575" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/round_pink_tag.xml" value="0.219" />
@@ -18,12 +26,19 @@
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/selector_text_category.xml" value="0.1" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/selector_view.xml" value="0.329" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout-v21/activity_main.xml" value="0.2752808988764045" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout-v21/activity_post_detail.xml" value="0.5" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout-v21/comment_item.xml" value="0.31025641025641026" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_manage_account.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_manage_post.xml" value="0.15185185185185185" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_register.xml" value="0.1" />
-        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_write_post.xml" value="0.10810810810810811" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_write_post.xml" value="0.33" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/image_picker_item.xml" value="0.3151041666666667" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/item_manage_account.xml" value="0.15925925925925927" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/item_message.xml" value="0.3151041666666667" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/item_suggestion.xml" value="0.15185185185185185" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/list_item.xml" value="0.33" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/reply_item.xml" value="0.33" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/menu/menu.xml" value="0.23425925925925925" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/menu/menu_post_detail.xml" value="0.3605128205128205" />
         <entry key="..\:/Users/harol/SideProject/Side-Project/app/src/main/res/drawable/drawable_view_focused.xml" value="0.38229166666666664" />

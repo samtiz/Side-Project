@@ -287,7 +287,7 @@ class WritePostActivity: BasicActivity() {
         override fun onStopTrackingTouch(slider: RangeSlider) {
             minCost = mCostSlider.values[0].toInt()
             maxCost = mCostSlider.values[1].toInt()
-            mTxtSelectedFee.text = "$minCost 원 ~ $maxCost 원"
+            mTxtSelectedFee.text = "${minCost}원 ~ ${maxCost}원"
         }
     }
 
