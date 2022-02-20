@@ -398,72 +398,78 @@ class PostDetailActivity : BasicActivity(){
     override fun onResume() {
         super.onResume()
         mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
-            post = it.getValue(Post::class.java) as Post
-            postUid = post?.uid
-            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
-            txtResName.text = post?.restaurantName
-            txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
-            txtResCategory2.text = post?.foodCategories?.get(1) ?: ""
-            txtResCategory3.text = post?.foodCategories?.get(2) ?: ""
-            txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
-            txtLocation.text = "배달 수령 위치: ${post?.dorm}"
-            txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-            var strTime = ""
-            val limitList = post?.timeLimit?.split(":")
-            val time = System.currentTimeMillis()
-            val dateFormat = SimpleDateFormat("hh:mm")
-            val currentHM = dateFormat.format(Date(time)).toString()
-            println(currentHM)
-            if (post?.visibility == false) {
-                strTime = "이미 만료된 게시물입니다."
+            if (it.value == null) {
+                Toast.makeText(this@PostDetailActivity, "존재하지 않는 모집글입니다.", Toast.LENGTH_SHORT).show()
+                finish()
             }
             else {
-                strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
-                    "내일 "
-                } else {
-                    "오늘 "
+                post = it.getValue(Post::class.java) as Post
+                postUid = post?.uid
+                txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
+                txtResName.text = post?.restaurantName
+                txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
+                txtResCategory2.text = post?.foodCategories?.get(1) ?: ""
+                txtResCategory3.text = post?.foodCategories?.get(2) ?: ""
+                txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
+                txtLocation.text = "배달 수령 위치: ${post?.dorm}"
+                txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
+                var strTime = ""
+                val limitList = post?.timeLimit?.split(":")
+                val time = System.currentTimeMillis()
+                val dateFormat = SimpleDateFormat("hh:mm")
+                val currentHM = dateFormat.format(Date(time)).toString()
+                println(currentHM)
+                if (post?.visibility == false) {
+                    strTime = "이미 만료된 게시물입니다."
                 }
-                if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
-                    strTime += "오후 "
-                    if (limitList.get(0).let{ it1 -> it1 == "12"}) {
-                        strTime += "12시 "
-                        strTime += "${limitList.get(1)}분"
+                else {
+                    strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
+                        "내일 "
+                    } else {
+                        "오늘 "
                     }
-                    else {
-                        strTime += "${limitList.get(0).toInt()-12}시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                } else if (limitList != null){
-                    strTime += "오전 "
-                    if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
-                        strTime += "12시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                    else {
-                        strTime += "${limitList.get(0)}시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                }
-            }
-
-
-            txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
-            txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
-            txtMain.text = post?.mainText
-            if (post?.comments?.isEmpty()!!) {
-                txtNumInquire.text = "  0"
-            }
-            else {
-                var numInquire = 0
-                for ((key1, value1) in post?.comments!!) {
-                    numInquire += 1
-                    if (value1.replys.isNotEmpty()) {
-                        for ((key2, value2) in value1.replys) {
-                            numInquire += 1
+                    if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
+                        strTime += "오후 "
+                        if (limitList.get(0).let{ it1 -> it1 == "12"}) {
+                            strTime += "12시 "
+                            strTime += "${limitList.get(1)}분"
+                        }
+                        else {
+                            strTime += "${limitList.get(0).toInt()-12}시 "
+                            strTime += "${limitList.get(1)}분"
+                        }
+                    } else if (limitList != null){
+                        strTime += "오전 "
+                        if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
+                            strTime += "12시 "
+                            strTime += "${limitList.get(1)}분"
+                        }
+                        else {
+                            strTime += "${limitList.get(0)}시 "
+                            strTime += "${limitList.get(1)}분"
                         }
                     }
                 }
-                txtNumInquire.text = "  ${numInquire}"
+
+
+                txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
+                txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
+                txtMain.text = post?.mainText
+                if (post?.comments?.isEmpty()!!) {
+                    txtNumInquire.text = "  0"
+                }
+                else {
+                    var numInquire = 0
+                    for ((key1, value1) in post?.comments!!) {
+                        numInquire += 1
+                        if (value1.replys.isNotEmpty()) {
+                            for ((key2, value2) in value1.replys) {
+                                numInquire += 1
+                            }
+                        }
+                    }
+                    txtNumInquire.text = "  ${numInquire}"
+                }
             }
         }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
         observeComments()
