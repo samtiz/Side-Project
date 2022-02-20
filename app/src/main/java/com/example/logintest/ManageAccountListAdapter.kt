@@ -87,12 +87,16 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                 holder.itemView.setOnClickListener {
                     val et: EditText = EditText(context)
                     et.setSingleLine()
+                    et.setTextColor(ContextCompat.getColor(context, R.color.black))
                     val container: FrameLayout = FrameLayout(context)
                     val params: FrameLayout.LayoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                     params.leftMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
                     params.rightMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
+                    params.topMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
+                    params.bottomMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
                     et.layoutParams = params
                     et.hint = "변경할 닉네임을 입력하세요"
+
                     container.addView(et)
                     val builder: AlertDialog.Builder = AlertDialog.Builder(context)
                     builder.setTitle("닉네임 변경")
@@ -134,6 +138,7 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                 holder.itemView.setOnClickListener {
                     val et: EditText = EditText(context)
                     et.setSingleLine()
+                    et.setTextColor(ContextCompat.getColor(context, R.color.black))
                     val container: FrameLayout = FrameLayout(context)
                     val params: FrameLayout.LayoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                     params.leftMargin = context.resources.getDimensionPixelSize(R.dimen.dialog_margin)
@@ -205,10 +210,10 @@ class ManageAccountListAdapter(private val context: Context): RecyclerView.Adapt
                             "단, 한 번에 하나의 모집 글만 작성할 수 있다는 점 명심해주세요.\n" +
                             "\n3. 채팅\n" +
                             "원하는 모집 글을 찾은 경우 홈 화면에서 모집글을 눌러 자세히 볼 수 있습니다. " +
-                            "배달 수령 위치, 모집 완료 시간 등을 확인한 후, 배달 팟에 참여하고 싶다면 채팅방 바로가기 버튼을 눌러 게시물의 채팅방에 참여하세요. " +
-                            "다른 사람들과 채팅으로 주문 시간, 주문 메뉴, 배달 수령 위치 등릉 세부적으로 조정하시면 됩니다. " +
-                            "이 또한 한 번에 하나의 채팅방에만 참여할 수 있으며, 참여하고 있는 채팅방의 경우 하단의 채팅방 버튼을 통해 바로 들어가실 수 있습니다. (작성자의 경우 하단 버튼을 통해 자신이 쓴 모집글의 채팅방에 바로 들어가실 수 있습니다. " +
-                            "배달이 완료되어 모두가 음식을 받았다면 채팅방을 나가시면 되고, 모집글 작성자는 채팅방을 터트려주시면 됩니다.") //TODO
+                            "배달 수령 위치, 모집 완료 시간 등을 확인한 후, 배달 모집방에 참여하고 싶다면 채팅방 버튼을 눌러 게시물의 채팅에 참여하세요.\n" +
+                            "다른 사람들과 채팅으로 주문 시간, 주문 메뉴, 배달 수령 위치 등을 세부적으로 조정하시면 됩니다. " +
+                            "이 또한 한 번에 하나의 채팅에만 참여할 수 있으며, 참여하고 있는 채팅의 경우 하단의 채팅 버튼을 통해 바로 들어가실 수 있습니다. (작성자의 경우 하단 버튼을 통해 자신이 쓴 모집글의 채팅방에 바로 들어가실 수 있습니다.) " +
+                            "배달이 완료되어 모두가 음식을 받았다면 오른쪽 상단의 더보기 버튼을 눌러 채팅방을 나가시면 됩니다.\n") //TODO
                     builder.setPositiveButton("확인") { _, _ -> }
                     builder.show()
                 }

@@ -5,6 +5,7 @@
       <map>
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/bg_spinner.xml" value="0.177" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/category_button_backgroud.xml" value="0.329" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/chattextinputbackground.xml" value="0.123" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/drawable_view.xml" value="0.329" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/drawable_view_focused.xml" value="0.329" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/drawable/dropdown_icon.xml" value="0.129" />
@@ -29,6 +30,7 @@
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout-v21/activity_main.xml" value="0.2752808988764045" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout-v21/activity_post_detail.xml" value="0.5" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout-v21/comment_item.xml" value="0.31025641025641026" />
+        <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_image_picker.xml" value="0.1675925925925926" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_manage_account.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/YuHojin/AndroidStudioProjects/logintest/app/src/main/res/layout/activity_manage_post.xml" value="0.15185185185185185" />

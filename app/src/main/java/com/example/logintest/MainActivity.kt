@@ -78,6 +78,9 @@ class MainActivity : BasicActivity() {
     private var btnCat22: Button? = null
     private var btnCatList: ArrayList<Button?>? = null
 
+    val spinnerArray: Array<String> = arrayOf("택시승강장" ,"쪽문", "세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
+        "여울/나들관", "다솜/희망관", "원내아파트", "나래/미르관", "나눔관", "문지관", "화암관")
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -300,7 +303,8 @@ class MainActivity : BasicActivity() {
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.navigation_home
         observerData()
-
+        val app = applicationContext as GlobalVariable
+        spinnerItem.setSelection(spinnerArray.indexOf(app.getUserLocation()))
     }
 
 
@@ -381,8 +385,7 @@ class MainActivity : BasicActivity() {
 
         val searchView: SearchView = menuItem?.actionView as SearchView
 
-        val spinnerArray: Array<String> = arrayOf("택시승강장" ,"쪽문", "세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
-                "여울/나들관", "다솜/희망관", "원내아파트", "나래/미르관", "나눔관", "문지관", "화암관")
+
 
         val loc_spinnerAdapter: ArrayAdapter<String> = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, spinnerArray)
         spinnerItem.adapter = loc_spinnerAdapter

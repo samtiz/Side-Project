@@ -194,7 +194,7 @@ class MessageActivity : BasicActivity(){
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-
+                println(isViewing)
                 //Toast.makeText(applicationContext, "존재하지 않는 채팅방입니다.", Toast.LENGTH_SHORT).show()
                 if (isViewing!!) {
                     val dlg: AlertDialog.Builder = AlertDialog.Builder(this@MessageActivity, android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
@@ -502,6 +502,7 @@ class MessageActivity : BasicActivity(){
     }
 
     private fun exitMasterPost() {
+        isViewing = false
         val time = System.currentTimeMillis()
         val dateFormat = SimpleDateFormat("hh:mm")
         val AMPM = if(SimpleDateFormat("a").format(Date(time)).toString() == "AM"){"오전"}else{"오후"}
