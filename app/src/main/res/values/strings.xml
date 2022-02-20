@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">logintest</string>
+    <string name="app_name">공동배달구역 KAIST</string>
     <string name="default_notification_channel_id">fcm_default_channel</string>
 </resources>
