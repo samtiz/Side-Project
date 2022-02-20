@@ -9,19 +9,32 @@
         android:layout_height="wrap_content"
         android:id="@+id/image_picker_layout"
         >
+
         <ImageView
+            android:id="@+id/image_picker_item"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:backgroundTint="#ffffff"
-            android:scaleType="centerCrop"
-            android:id="@+id/image_picker_item"
-            />
+            android:background="@drawable/imagepickerbackground"
+            android:scaleType="centerCrop" />
+
         <ImageView
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:id="@+id/image_check_box_button"
             android:layout_alignRight="@+id/image_picker_item"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/image_not_check_image"/>
+
+        <ImageView
+            android:visibility="invisible"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:id="@+id/image_check_box_button_check"
+            android:layout_alignRight="@+id/image_picker_item"
+            android:layout_marginTop="13dp"
+            android:layout_marginRight="13dp"
+            android:background="@drawable/image_check_image"/>
 
 
     </RelativeLayout>

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+
     >
 
     <LinearLayout
@@ -13,8 +14,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/adminbackground"
         android:layout_gravity="center"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         >
 
         <TextView
@@ -40,9 +41,9 @@
         <LinearLayout
             android:id="@+id/messageItem_layout_destination"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center"
+
             android:layout_marginLeft="3dp">
             <ImageView
                 android:id="@+id/messageItem_imageview_profile"
@@ -51,7 +52,7 @@
                 android:scaleType="fitCenter"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="6dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginLeft="3dp"
                 app:tint="#E6E8EF" />
@@ -62,7 +63,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginEnd="7dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
             >
             <TextView
                 android:id="@+id/messageItem_textview_name"
@@ -71,6 +72,7 @@
                 android:text="이름"
                 android:textColor="@color/black"
                 android:textStyle="bold"
+                android:layout_marginLeft="2dp"
                 android:layout_marginBottom="4dp"/>
 
             <LinearLayout
@@ -86,6 +88,7 @@
                     android:text="메세지"
                     android:background="@drawable/othermessagebubble"
                     android:textColor="@color/black" />
+
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:adjustViewBounds="true"
                     android:id="@+id/messageItem_imageview_message"

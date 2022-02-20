@@ -229,23 +229,23 @@ class MessageActivity : BasicActivity(){
         })
 
         // 키보드 올라가면 같이 올라가게
-        recyclerView?.addOnLayoutChangeListener(object : View.OnLayoutChangeListener{
-            override fun onLayoutChange(
-                v: View?,
-                left: Int,
-                top: Int,
-                right: Int,
-                bottom: Int,
-                oldLeft: Int,
-                oldTop: Int,
-                oldRight: Int,
-                oldBottom: Int
-            ) {
-                if (bottom < oldBottom){
-                    recyclerView?.scrollToPosition(recyclerView?.adapter?.itemCount!! - 1)
-                }
-            }
-        })
+//        recyclerView?.addOnLayoutChangeListener(object : View.OnLayoutChangeListener{
+//            override fun onLayoutChange(
+//                v: View?,
+//                left: Int,
+//                top: Int,
+//                right: Int,
+//                bottom: Int,
+//                oldLeft: Int,
+//                oldTop: Int,
+//                oldRight: Int,
+//                oldBottom: Int
+//            ) {
+//                if (bottom < oldBottom){
+//                    recyclerView?.scrollToPosition(recyclerView?.adapter?.itemCount!! - 1)
+//                }
+//            }
+//        })
 
 
         Handler().postDelayed({
@@ -304,7 +304,6 @@ class MessageActivity : BasicActivity(){
                 }
                 shouldShowRequestPermissionRationale(android.Manifest.permission.READ_EXTERNAL_STORAGE)->{
                     // 교육용 팝 확인 후 권한 팝업 띄우는 기능
-
                     showContextPopupPermission()
                 }
                 else ->{

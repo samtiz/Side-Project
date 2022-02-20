@@ -13,5 +13,6 @@
     <color name="superLightGray">#F0F1F2</color>
     <color name="themeColor">#00AFFE</color>
     <color name="tagPink">#FE585C</color>
+    <color name= "colorPrimaryDark">#FFFFFF</color>
     <color name="hintColor">#98999B</color>
 </resources>
