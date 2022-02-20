@@ -5,8 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -29,6 +28,7 @@ import kotlin.collections.ArrayList
 
 class PostDetailActivity : BasicActivity(){
     private var postId: String? = null
+    private var postUid: String? = null
     private var isMyPost: Boolean? = null
     private var btnDelete: Button? = null
     private var btnModify: Button? = null
@@ -115,6 +115,8 @@ class PostDetailActivity : BasicActivity(){
             } else {
                 false
             }
+            postUid = post?.uid
+            /*
             txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
             txtResName.text = post?.restaurantName
             txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
@@ -129,39 +131,45 @@ class PostDetailActivity : BasicActivity(){
             val dateFormat = SimpleDateFormat("hh:mm")
             val currentHM = dateFormat.format(Date(time)).toString()
             println(currentHM)
-            strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
-                "내일 "
-            } else {
-                "오늘 "
+            if (post?.visibility == false) {
+                strTime = "이미 만료된 게시물입니다."
             }
-            if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
-                strTime += "오후 "
-                if (limitList.get(0).let{ it1 -> it1 == "12"}) {
-                    strTime += "12시 "
-                    strTime += "${limitList.get(1)}분"
+            else {
+                strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
+                    "내일 "
+                } else {
+                    "오늘 "
                 }
-                else {
-                    strTime += "${limitList.get(0).toInt()-12}시 "
-                    strTime += "${limitList.get(1)}분"
-                }
-            } else if (limitList != null){
-                strTime += "오전 "
-                if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
-                    strTime += "12시 "
-                    strTime += "${limitList.get(1)}분"
-                }
-                else {
-                    strTime += "${limitList.get(0)}시 "
-                    strTime += "${limitList.get(1)}분"
+                if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
+                    strTime += "오후 "
+                    if (limitList.get(0).let{ it1 -> it1 == "12"}) {
+                        strTime += "12시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                    else {
+                        strTime += "${limitList.get(0).toInt()-12}시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                } else if (limitList != null){
+                    strTime += "오전 "
+                    if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
+                        strTime += "12시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                    else {
+                        strTime += "${limitList.get(0)}시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
                 }
             }
+
 
 
             txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
             txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
             txtMain.text = post?.mainText
             if (post?.comments?.isEmpty()!!) {
-                txtNumInquire.text = " 모집 0"
+                txtNumInquire.text = "  0"
             }
             else {
                 var numInquire = 0
@@ -175,6 +183,7 @@ class PostDetailActivity : BasicActivity(){
                 }
                 txtNumInquire.text = "  ${numInquire}"
             }
+            */
             if (isMyPost!!) {
                 btnDelete?.visibility = VISIBLE
                 btnModify?.visibility = VISIBLE
@@ -241,6 +250,10 @@ class PostDetailActivity : BasicActivity(){
                     etInquireMain.requestFocus()
                 }
             }
+            adapter = ListAdapterPostComment(this@PostDetailActivity, postUid)
+            recyclerViewInquire.layoutManager = WrapContentLinearLayoutManager(this@PostDetailActivity)
+            recyclerViewInquire.adapter = adapter
+            observeComments()
         }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
 
 
@@ -263,30 +276,35 @@ class PostDetailActivity : BasicActivity(){
                 val dateFormat = SimpleDateFormat("hh:mm")
                 val currentHM = dateFormat.format(Date(time)).toString()
                 println(currentHM)
-                strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
-                    "내일 "
-                } else {
-                    "오늘 "
+                if (post?.visibility == false) {
+                    strTime = "이미 만료된 게시물입니다."
                 }
-                if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
-                    strTime += "오후 "
-                    if (limitList.get(0).let{ it1 -> it1 == "12"}) {
-                        strTime += "12시 "
-                        strTime += "${limitList.get(1)}분"
+                else {
+                    strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
+                        "내일 "
+                    } else {
+                        "오늘 "
                     }
-                    else {
-                        strTime += "${limitList.get(0).toInt()-12}시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                } else if (limitList != null){
-                    strTime += "오전 "
-                    if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
-                        strTime += "12시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                    else {
-                        strTime += "${limitList.get(0)}시 "
-                        strTime += "${limitList.get(1)}분"
+                    if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
+                        strTime += "오후 "
+                        if (limitList.get(0).let{ it1 -> it1 == "12"}) {
+                            strTime += "12시 "
+                            strTime += "${limitList.get(1)}분"
+                        }
+                        else {
+                            strTime += "${limitList.get(0).toInt()-12}시 "
+                            strTime += "${limitList.get(1)}분"
+                        }
+                    } else if (limitList != null){
+                        strTime += "오전 "
+                        if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
+                            strTime += "12시 "
+                            strTime += "${limitList.get(1)}분"
+                        }
+                        else {
+                            strTime += "${limitList.get(0)}시 "
+                            strTime += "${limitList.get(1)}분"
+                        }
                     }
                 }
 
@@ -294,15 +312,24 @@ class PostDetailActivity : BasicActivity(){
                 txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
                 txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
                 txtMain.text = post?.mainText
+                if (post?.comments?.isEmpty()!!) {
+                    txtNumInquire.text = "  0"
+                }
+                else {
+                    var numInquire = 0
+                    for ((key1, value1) in post?.comments!!) {
+                        numInquire += 1
+                        if (value1.replys.isNotEmpty()) {
+                            for ((key2, value2) in value1.replys) {
+                                numInquire += 1
+                            }
+                        }
+                    }
+                    txtNumInquire.text = "  ${numInquire}"
+                }
             }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
             swipeRefreshLayout_postDetail.isRefreshing = false
         }
-
-
-        adapter = ListAdapterPostComment(this@PostDetailActivity)
-        recyclerViewInquire.layoutManager = WrapContentLinearLayoutManager(this@PostDetailActivity)
-        recyclerViewInquire.adapter = adapter
-        observeComments()
 
 
         btnPostInquire.setOnClickListener {
@@ -323,9 +350,10 @@ class PostDetailActivity : BasicActivity(){
                     comment.commentId = key
                     mDatabaseReference.child("Post").child(postId!!).child("comments").child(key).setValue(comment)
                     Toast.makeText(this@PostDetailActivity, "게시하였습니다.", Toast.LENGTH_SHORT).show()
-                    etInquireMain.text.clear()
+                    etInquireMain.text = null
+                    hideKeyboardByView(this, layoutInquire)
                     layoutInquire.visibility = GONE
-                    Fragment().hideKeyboard()
+
                 }
                 observeComments()
             }.addOnFailureListener {
@@ -352,9 +380,10 @@ class PostDetailActivity : BasicActivity(){
                     reply.replyId = key
                     mDatabaseReference.child("Post").child(postId!!).child("comments").child(commentId!!).child("replys").child(key).setValue(reply)
                     Toast.makeText(this@PostDetailActivity, "게시하였습니다.", Toast.LENGTH_SHORT).show()
-                    etReplyMain.text.clear()
+                    etReplyMain.text = null
+                    hideKeyboardByView(this, layoutReply)
                     layoutReply.visibility = GONE
-                    Fragment().hideKeyboard()
+
                 }
                 observeComments()
             }.addOnFailureListener {
@@ -370,6 +399,7 @@ class PostDetailActivity : BasicActivity(){
         super.onResume()
         mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
             post = it.getValue(Post::class.java) as Post
+            postUid = post?.uid
             txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
             txtResName.text = post?.restaurantName
             txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
@@ -384,30 +414,35 @@ class PostDetailActivity : BasicActivity(){
             val dateFormat = SimpleDateFormat("hh:mm")
             val currentHM = dateFormat.format(Date(time)).toString()
             println(currentHM)
-            strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
-                "내일 "
-            } else {
-                "오늘 "
+            if (post?.visibility == false) {
+                strTime = "이미 만료된 게시물입니다."
             }
-            if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
-                strTime += "오후 "
-                if (limitList.get(0).let{ it1 -> it1 == "12"}) {
-                    strTime += "12시 "
-                    strTime += "${limitList.get(1)}분"
+            else {
+                strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
+                    "내일 "
+                } else {
+                    "오늘 "
                 }
-                else {
-                    strTime += "${limitList.get(0).toInt()-12}시 "
-                    strTime += "${limitList.get(1)}분"
-                }
-            } else if (limitList != null){
-                strTime += "오전 "
-                if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
-                    strTime += "12시 "
-                    strTime += "${limitList.get(1)}분"
-                }
-                else {
-                    strTime += "${limitList.get(0)}시 "
-                    strTime += "${limitList.get(1)}분"
+                if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
+                    strTime += "오후 "
+                    if (limitList.get(0).let{ it1 -> it1 == "12"}) {
+                        strTime += "12시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                    else {
+                        strTime += "${limitList.get(0).toInt()-12}시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                } else if (limitList != null){
+                    strTime += "오전 "
+                    if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
+                        strTime += "12시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
+                    else {
+                        strTime += "${limitList.get(0)}시 "
+                        strTime += "${limitList.get(1)}분"
+                    }
                 }
             }
 
@@ -415,6 +450,21 @@ class PostDetailActivity : BasicActivity(){
             txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
             txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
             txtMain.text = post?.mainText
+            if (post?.comments?.isEmpty()!!) {
+                txtNumInquire.text = "  0"
+            }
+            else {
+                var numInquire = 0
+                for ((key1, value1) in post?.comments!!) {
+                    numInquire += 1
+                    if (value1.replys.isNotEmpty()) {
+                        for ((key2, value2) in value1.replys) {
+                            numInquire += 1
+                        }
+                    }
+                }
+                txtNumInquire.text = "  ${numInquire}"
+            }
         }.addOnFailureListener { Toast.makeText(this@PostDetailActivity, "get postId failed", Toast.LENGTH_SHORT).show() }
         observeComments()
     }

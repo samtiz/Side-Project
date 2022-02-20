@@ -10,10 +10,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 
-class ListAdapterPostComment(private val context: Context): RecyclerView.Adapter<ListAdapterPostComment.ViewHolder>() {
+class ListAdapterPostComment(private val context: Context, private val postUid: String?): RecyclerView.Adapter<ListAdapterPostComment.ViewHolder>() {
     private var commentList = mutableListOf<PostComment>()
 
     fun setCommentData(data: MutableList<PostComment>) {
@@ -27,10 +30,16 @@ class ListAdapterPostComment(private val context: Context): RecyclerView.Adapter
 
     override fun onBindViewHolder(holder: ListAdapterPostComment.ViewHolder, position: Int) {
         val comment: PostComment = commentList[position]
-        holder.userName.text = comment.userName
+        if (comment.uid == postUid) {
+            holder.userName.text = comment.userName + "(작성자)"
+            holder.userName.setTextColor(ContextCompat.getColor(context, R.color.themeColor))
+        } else {
+            holder.userName.text = comment.userName
+            holder.userName.setTextColor(ContextCompat.getColor(context, R.color.black))
+        }
         holder.mainText.text = comment.mainText
         holder.replyView.layoutManager = WrapContentLinearLayoutManager(context)
-        val adapter = ListAdapterPostReply(context)
+        val adapter = ListAdapterPostReply(context, postUid)
         holder.replyView.adapter = adapter
         adapter.setReplyData(comment.replys)
         adapter.notifyDataSetChanged()
