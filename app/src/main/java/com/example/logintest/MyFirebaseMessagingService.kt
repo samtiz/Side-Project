@@ -9,6 +9,7 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
@@ -25,7 +26,16 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
     private val mFirebaseAuth = FirebaseAuth.getInstance()
     private val mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
 
+    private var icon : Drawable? = null
+
+
+
     override fun onMessageReceived(p0: RemoteMessage) {
+
+//        if (android.os.Build.VERSION.SDK_INT >= 28) {   // Android P
+//            icon = R.drawable.ic_white_noti;
+//        }
+
         super.onMessageReceived(p0)
         if (p0.data["flag"] == "chat") {
             sendChatNotification(p0.data["title"], p0.data["body"])
@@ -57,7 +67,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             val channelId = "delete_post_notification_channel"
             val defaultSoundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(com.example.logintest.R.drawable.selector_bottom_navi_chat_icon_selected)
+                .setSmallIcon(com.example.logintest.R.drawable.ic_stat_name)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true)
@@ -99,7 +109,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             val channelId = "comment_notification_channel"
             val defaultSoundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(com.example.logintest.R.drawable.selector_bottom_navi_chat_icon_selected)
+                .setSmallIcon(com.example.logintest.R.drawable.ic_stat_name)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true)
@@ -145,7 +155,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
                 val channelId = "chat_notification_channel"
                 val defaultSoundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
                 val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(this, channelId)
-                    .setSmallIcon(com.example.logintest.R.drawable.selector_bottom_navi_chat_icon_selected)
+                    .setSmallIcon(com.example.logintest.R.drawable.ic_stat_name)
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
