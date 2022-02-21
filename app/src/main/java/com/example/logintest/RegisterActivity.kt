@@ -101,7 +101,7 @@ class RegisterActivity : BasicActivity() {
         mEtPwd.setOnFocusChangeListener(object : View.OnFocusChangeListener{
             override fun onFocusChange(view: View?, hasFocus: Boolean) {
                 if (!hasFocus) {
-                    if (!Pattern.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{8,16}.\$", mEtPwd.text.toString())){
+                    if (!Pattern.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{7,15}.\$", mEtPwd.text.toString())){
                         mTxtPwdCheck.text = "* 8~16자 숫자, 문자를 사용하세요."
                         mTxtPwdCheck.setTextColor(Color.parseColor("#88ff0000"))
                         isPwdValid = true

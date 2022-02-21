@@ -222,7 +222,7 @@ class ManageAccountListAdapter(private val context: Context, private val usernam
                     builder.setTitle("비밀번호 변경")
                     builder.setView(container)
                     builder.setPositiveButton("확인") { _, _ ->
-                        if (!Pattern.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{8,16}.\$", et.text)){
+                        if (!Pattern.matches("^(?=.*[A-Za-z])(?=.*[0-9]).{7,15}.\$", et.text)){
                             Toast.makeText(context, "비밀번호는 8~16자 숫자, 문자를 사용하세요", Toast.LENGTH_SHORT).show()
                         }
                         else{
