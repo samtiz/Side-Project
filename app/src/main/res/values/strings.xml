@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">공동배달구역 KAIST</string>
     <string name="default_notification_channel_id">fcm_default_channel</string>
+    <string name="your_string_here"><u>공동배달구역 KAIST의 이용약관, 개인정보 수집 및 이용에 모두 동의합니다.</u></string>
 </resources>

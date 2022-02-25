@@ -43,7 +43,8 @@ class LoginActivity : BasicActivity() {
 
         val btnRegister: Button = findViewById(R.id.btn_register)
         btnRegister.setOnClickListener {
-            val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+//            val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+            val intent = Intent(this@LoginActivity, TOSActivity::class.java)
             startActivity(intent)
 
         }
