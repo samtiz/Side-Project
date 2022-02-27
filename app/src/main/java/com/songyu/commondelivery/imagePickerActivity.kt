@@ -78,12 +78,16 @@ class imagePickerActivity : AppCompatActivity() {
 
         var columns =
             arrayOf(MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID)
+
         val orderBy = MediaStore.Images.Media._ID
 
+//        var columns = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME)
+//        var orderBy = MediaStore.Images.Media._ID + " DESC"
+//
         var cursor = context.contentResolver.query(uri,columns,null,null,orderBy)
 
 
-        if(cursor !=null && cursor.count>0){
+        if(cursor !=null && cursor.count >0){
             while(cursor.moveToNext()){
 
                 var indexPath = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
@@ -95,6 +99,9 @@ class imagePickerActivity : AppCompatActivity() {
             Log.e("getGalleryPhotos","error")
 
         }
+
+
+
         list.reverse()
     }
 }
