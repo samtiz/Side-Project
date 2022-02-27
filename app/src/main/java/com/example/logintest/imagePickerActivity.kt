@@ -74,8 +74,7 @@ class imagePickerActivity : AppCompatActivity() {
     }
 
 
-    fun getGalleryPhotos( context : Context) : ArrayList<String>{
-        var pictures = ArrayList<String>()
+    fun getGalleryPhotos( context : Context){
 
         var uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
@@ -98,7 +97,6 @@ class imagePickerActivity : AppCompatActivity() {
             Log.e("getGalleryPhotos","error")
 
         }
-        pictures.reverse()
-        return pictures
+        list.reverse()
     }
 }
