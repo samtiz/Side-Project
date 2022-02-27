@@ -15,6 +15,7 @@ class TOSActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tosactivity)
 
+
         val btnRegister: Button = findViewById(R.id.btn_go_to_register)
 
         var termAgree1: Boolean = false
