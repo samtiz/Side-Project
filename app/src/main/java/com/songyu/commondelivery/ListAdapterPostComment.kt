@@ -1,6 +1,7 @@
 package com.songyu.commondelivery
 
 import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -12,7 +13,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -53,6 +56,11 @@ class ListAdapterPostComment(private val context: Context, private val postUid: 
             val layoutReply: ConstraintLayout = c.findViewById(R.id.reply_constraintLayout)
             val layoutInquire: ConstraintLayout = c.findViewById(R.id.inquire_constraintLayout)
             val etReplyMain: EditText = c.findViewById(R.id.edit_reply)
+            val layoutEntire: SwipeRefreshLayout = c.findViewById(R.id.swipeRefreshLayout_postDetail)
+            val params = layoutEntire.layoutParams as ViewGroup.MarginLayoutParams
+            val px = context.dpToPx(45)
+            params.bottomMargin = px
+            layoutEntire.layoutParams = params
             layoutInquire.visibility = GONE
             layoutReply.visibility = VISIBLE
             etReplyMain.requestFocus()
@@ -90,5 +98,7 @@ class ListAdapterPostComment(private val context: Context, private val postUid: 
         val replyView: RecyclerView = itemView.findViewById(R.id.recyclerView_reply)
         val btnReply: Button = itemView.findViewById(R.id.btn_reply)
     }
+
+    fun Context.dpToPx(dp: Int): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), resources.displayMetrics).toInt()
 
 }

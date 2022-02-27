@@ -3,9 +3,11 @@ package com.songyu.commondelivery
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.*
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -13,6 +15,7 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -53,6 +56,7 @@ class PostDetailActivity : BasicActivity(){
     private lateinit var layoutInquire: ConstraintLayout
     private lateinit var layoutReply: ConstraintLayout
     private lateinit var txtNumInquire: TextView
+    private lateinit var layoutEntire: SwipeRefreshLayout
 
 
 
@@ -102,6 +106,7 @@ class PostDetailActivity : BasicActivity(){
         layoutInquire = findViewById(R.id.inquire_constraintLayout)
         layoutReply = findViewById(R.id.reply_constraintLayout)
         txtNumInquire = findViewById(R.id.txt_num_inquire)
+        layoutEntire = findViewById(R.id.swipeRefreshLayout_postDetail)
 
 
         mDatabaseReference.child("Post").child(postId!!).get().addOnSuccessListener {
@@ -112,74 +117,7 @@ class PostDetailActivity : BasicActivity(){
                 false
             }
             postUid = post?.uid
-            /*
-            txtPostDetailToolbarTitle.text = "${post?.users?.get(post?.uid)}의 모집글"
-            txtResName.text = post?.restaurantName
-            txtResCategory1.text = post?.foodCategories?.get(0) ?: ""
-            txtResCategory2.text = post?.foodCategories?.get(1) ?: ""
-            txtResCategory3.text = post?.foodCategories?.get(2) ?: ""
-            txtResCategory4.text = post?.foodCategories?.get(3) ?: ""
-            txtLocation.text = "배달 수령 위치: ${post?.dorm}"
-            txtFee.text = "배달비: ${post?.minDeliveryFee}원 ~ ${post?.maxDeliveryFee}원"
-            var strTime = ""
-            val limitList = post?.timeLimit?.split(":")
-            val time = System.currentTimeMillis()
-            val dateFormat = SimpleDateFormat("hh:mm")
-            val currentHM = dateFormat.format(Date(time)).toString()
-            println(currentHM)
-            if (post?.visibility == false) {
-                strTime = "이미 만료된 게시물입니다."
-            }
-            else {
-                strTime += if (currentHM > post?.timeLimit?.let { it1 -> leftPad(it1) }.toString()) {
-                    "내일 "
-                } else {
-                    "오늘 "
-                }
-                if (limitList?.get(0)?.let{ it1 -> it1.toInt() >= 12} == true) {
-                    strTime += "오후 "
-                    if (limitList.get(0).let{ it1 -> it1 == "12"}) {
-                        strTime += "12시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                    else {
-                        strTime += "${limitList.get(0).toInt()-12}시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                } else if (limitList != null){
-                    strTime += "오전 "
-                    if (limitList.get(0).let{ it1 -> it1.toInt() == 0}) {
-                        strTime += "12시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                    else {
-                        strTime += "${limitList.get(0)}시 "
-                        strTime += "${limitList.get(1)}분"
-                    }
-                }
-            }
 
-
-
-            txtTime.text = "모집 만료 시간: " + strTime // TODO 시간 포맷 바꿔서 적용
-            txtHeadCount.text = "총 참여 인원: ${post?.users?.size}명"
-            txtMain.text = post?.mainText
-            if (post?.comments?.isEmpty()!!) {
-                txtNumInquire.text = "  0"
-            }
-            else {
-                var numInquire = 0
-                for ((key1, value1) in post?.comments!!) {
-                    numInquire += 1
-                    if (value1.replys.isNotEmpty()) {
-                        for ((key2, value2) in value1.replys) {
-                            numInquire += 1
-                        }
-                    }
-                }
-                txtNumInquire.text = "  ${numInquire}"
-            }
-            */
             if (isMyPost!!) {
                 btnDelete?.visibility = VISIBLE
                 btnModify?.visibility = VISIBLE
@@ -243,6 +181,10 @@ class PostDetailActivity : BasicActivity(){
                 btnInquire.setOnClickListener{
                     layoutReply.visibility = GONE
                     layoutInquire.visibility = VISIBLE
+                    val params = layoutEntire.layoutParams as ViewGroup.MarginLayoutParams
+                    val px = dpToPx(45)
+                    params.bottomMargin = px
+                    layoutEntire.layoutParams = params
                     etInquireMain.requestFocus()
                 }
             }
@@ -345,6 +287,9 @@ class PostDetailActivity : BasicActivity(){
                 else {
                     comment.commentId = key
                     mDatabaseReference.child("Post").child(postId!!).child("comments").child(key).setValue(comment)
+                    val params = layoutEntire.layoutParams as ViewGroup.MarginLayoutParams
+                    params.bottomMargin = 0
+                    layoutEntire.layoutParams = params
                     Toast.makeText(this@PostDetailActivity, "게시하였습니다.", Toast.LENGTH_SHORT).show()
                     etInquireMain.text = null
                     hideKeyboardByView(this, layoutInquire)
@@ -375,6 +320,9 @@ class PostDetailActivity : BasicActivity(){
                 else {
                     reply.replyId = key
                     mDatabaseReference.child("Post").child(postId!!).child("comments").child(commentId!!).child("replys").child(key).setValue(reply)
+                    val params = layoutEntire.layoutParams as ViewGroup.MarginLayoutParams
+                    params.bottomMargin = 0
+                    layoutEntire.layoutParams = params
                     Toast.makeText(this@PostDetailActivity, "게시하였습니다.", Toast.LENGTH_SHORT).show()
                     etReplyMain.text = null
                     hideKeyboardByView(this, layoutReply)
@@ -477,6 +425,8 @@ class PostDetailActivity : BasicActivity(){
             adapter.notifyDataSetChanged()
         })
     }
+
+    fun dpToPx(dp: Int): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), resources.displayMetrics).toInt()
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_post_detail, menu)
