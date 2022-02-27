@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.logintest">
+    package="com.songyu.commondelivery">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".GlobalVariable"
+        android:name="com.songyu.commondelivery.GlobalVariable"
         android:allowBackup="true"
         android:icon="@mipmap/ic_main"
         android:label="@string/app_name"
@@ -13,39 +13,38 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Logintest">
         <activity
-            android:name=".TOSActivity"
+            android:name="com.songyu.commondelivery.TOSActivity"
             android:exported="false" />
         <activity
-            android:name=".photoDetailActivity"
+            android:name="com.songyu.commondelivery.photoDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".imagePickerActivity"
+            android:name="com.songyu.commondelivery.imagePickerActivity"
             android:exported="false" />
         <activity
-            android:name=".MessageActivity"
+            android:name="com.songyu.commondelivery.MessageActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".LoginActivity"
+            android:parentActivityName="com.songyu.commondelivery.MainActivity" />
+        <activity android:name="com.songyu.commondelivery.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".ManageAccountActivity" />
-        <activity android:name=".BasicActivity" />
-        <activity android:name=".WritePostActivity" /> <!-- <activity android:name=".ManagePostActivity"/> -->
+        <activity android:name="com.songyu.commondelivery.RegisterActivity" />
         <activity
-            android:name=".PostDetailActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-
+            android:name="com.songyu.commondelivery.MainActivity" />
+        <activity android:name="com.songyu.commondelivery.ManageAccountActivity" />
+        <activity android:name="com.songyu.commondelivery.BasicActivity" />
+        <activity android:name="com.songyu.commondelivery.WritePostActivity" />
+<!--        <activity android:name=".ManagePostActivity"/>-->
+        <activity
+            android:name="com.songyu.commondelivery.PostDetailActivity"
+            android:parentActivityName="com.songyu.commondelivery.MainActivity"
+            android:exported="false"/>
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name="com.songyu.commondelivery.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -58,9 +57,11 @@
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="false" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/selector_bottom_navi_chat_icon_selected" />
@@ -71,6 +72,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/black" />
+
     </application>
+
+
 
 </manifest>
