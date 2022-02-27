@@ -140,7 +140,6 @@
             android:id="@+id/btn_dorm"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:onClick="showCofirmationDialog"
             android:text="선택"
             android:textSize="14sp"
             android:textColor="@color/black"

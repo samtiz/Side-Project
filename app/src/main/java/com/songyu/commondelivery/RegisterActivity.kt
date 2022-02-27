@@ -31,6 +31,10 @@ class RegisterActivity : BasicActivity() {
     private lateinit var mEtName: EditText                      // NickName text
     private lateinit var mBtnRegister: Button                   // Register button
     private lateinit var mTxtDorm: EditText
+    private lateinit var mBtnDorm: Button
+    private val dormitories = arrayOf("세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
+        "여울/나들관", "다솜/희망관", "원내아파트", "나래/미르관", "나눔관", "문지관", "화암관")
+    private var selectedItemIndex = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +52,8 @@ class RegisterActivity : BasicActivity() {
         mTxtPwdConfirm = findViewById(R.id.txt_pwdconfirm)
         mBtnRegister = findViewById((R.id.btn_register))
         mTxtDorm = findViewById(R.id.txt_dorm)
+        mBtnDorm = findViewById(R.id.btn_dorm)
+
 
         var isPwdValid = false
 
@@ -115,6 +121,16 @@ class RegisterActivity : BasicActivity() {
             }
         })
 
+        mBtnDorm.setOnClickListener {
+            var selectedDorm = dormitories[selectedItemIndex]
+            MaterialAlertDialogBuilder(this).setTitle("기숙사 선택").setSingleChoiceItems(dormitories, selectedItemIndex) { _, which ->
+                selectedItemIndex = which
+                selectedDorm = dormitories[which]
+            }.setPositiveButton("확인") { _, _ ->
+                mTxtDorm.setText(selectedDorm)
+            }.setNeutralButton("취소") { _, _ ->  }.show()
+        }
+
         mBtnRegister.setOnClickListener(View.OnClickListener {
             val strEmail: String = mEtEmail.text.toString()
             val strPwd: String = mEtPwd.text.toString()
@@ -125,16 +141,16 @@ class RegisterActivity : BasicActivity() {
                 !Patterns.EMAIL_ADDRESS.matcher(strEmail).matches() -> {
                     Toast.makeText(this@RegisterActivity, "이메일을 입력해주세요", Toast.LENGTH_SHORT).show()
                 }
-                strPwd == ""-> {
+                strPwd.isEmpty() -> {
                     Toast.makeText(this@RegisterActivity, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
                 }
-                strPwdConfirm == ""-> {
+                strPwdConfirm.isEmpty() -> {
                     Toast.makeText(this@RegisterActivity, "비밀번호 확인란을 입력해주세요", Toast.LENGTH_SHORT).show()
                 }
-                strName == "" -> {
+                strName.isEmpty() -> {
                     Toast.makeText(this@RegisterActivity, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
                 }
-                strDorm == ""-> {
+                strDorm.isEmpty()-> {
                     Toast.makeText(this@RegisterActivity, "기숙사를 입력해주세요", Toast.LENGTH_SHORT).show()
                 }
                 strPwd != strPwdConfirm -> {
@@ -179,20 +195,6 @@ class RegisterActivity : BasicActivity() {
                 }
             }
         })
-
-    }
-
-    var selectedItemIndex = 0
-    fun showCofirmationDialog(view: View) {
-        val dormitories = arrayOf("세종관", "사랑관", "소망관", "성실관", "진리관", "아름관", "신뢰관", "지혜관", "갈릴레이관",
-                "여울/나들관", "다솜/희망관", "원내아파트", "나래/미르관", "나눔관", "문지관", "화암관")
-        var selectedDorm = dormitories[selectedItemIndex]
-        MaterialAlertDialogBuilder(this).setTitle("기숙사 선택").setSingleChoiceItems(dormitories, selectedItemIndex) { _, which ->
-            selectedItemIndex = which
-            selectedDorm = dormitories[which]
-        }.setPositiveButton("확인") { _, _ ->
-            mTxtDorm.setText(selectedDorm)
-        }.setNeutralButton("취소") { _, _ ->  }.show()
 
     }
 
