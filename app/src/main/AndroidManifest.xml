@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Logintest">
         <activity
+            android:name="com.songyu.commondelivery.TOSActivity"
+            android:exported="false" />
+        <activity
             android:name="com.songyu.commondelivery.photoDetailActivity"
             android:exported="false" />
         <activity

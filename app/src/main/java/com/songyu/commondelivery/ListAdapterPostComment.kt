@@ -9,12 +9,18 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class ListAdapterPostComment(private val context: Context, private val postUid: String?): RecyclerView.Adapter<ListAdapterPostComment.ViewHolder>() {
     private var commentList = mutableListOf<PostComment>()
+    private lateinit var mDatabaseReference: DatabaseReference
 
     fun setCommentData(data: MutableList<PostComment>) {
         commentList = data
@@ -26,6 +32,7 @@ class ListAdapterPostComment(private val context: Context, private val postUid: 
     }
 
     override fun onBindViewHolder(holder: ListAdapterPostComment.ViewHolder, position: Int) {
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("logintest")
         val comment: PostComment = commentList[position]
         if (comment.uid == postUid) {
             holder.userName.text = comment.userName + "(작성자)"
@@ -51,6 +58,19 @@ class ListAdapterPostComment(private val context: Context, private val postUid: 
             etReplyMain.requestFocus()
             val app = context.applicationContext as GlobalVariable
             app.setCurrentCommentId(comment.commentId)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            MaterialAlertDialogBuilder(context).setMessage("이 문의를 신고하시겠습니까?")
+                .setPositiveButton("확인") { _, _ ->
+                    comment.commentId?.let { it1 ->
+                        mDatabaseReference.child("Report").child("comment").child(
+                            it1
+                        ).setValue(true)
+                    }
+                    Toast.makeText(context, "신고가 접수되셨습니다.", Toast.LENGTH_SHORT).show()
+                }.setNegativeButton("취소") { _, _ -> }.show()
+            return@setOnLongClickListener true
         }
 
     }

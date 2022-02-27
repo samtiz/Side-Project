@@ -503,7 +503,11 @@ class PostDetailActivity : BasicActivity(){
                 return true
             }
             R.id.report_post -> {
-                Toast.makeText(this, "신고가 접수되셨습니다.", Toast.LENGTH_SHORT).show()
+                mDatabaseReference.child("Report").child("post").child(postId!!).setValue(true).addOnSuccessListener {
+                    Toast.makeText(this, "신고가 접수되셨습니다.", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener {
+                    Toast.makeText(this, "서버 오류: 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         return super.onOptionsItemSelected(item)
